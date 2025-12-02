@@ -23,7 +23,9 @@ export interface SchoolVisit {
   comments: string;
   photoCount: number;
   voiceNotesCount: number;
-  duration?: number; // in minutes
+  voiceNotes?: { id: string; name: string; url: string; duration: number }[];
+  photos?: { id: string; name: string; url: string }[];
+  duration?: number;
 }
 
 const mockIndicators: VisitIndicator[] = [
@@ -55,6 +57,14 @@ const mockVisits: SchoolVisit[] = [
     comments: 'School in good condition. Minor repairs needed in block B.',
     photoCount: 5,
     voiceNotesCount: 2,
+    voiceNotes: [
+      { id: 'v1-1', name: 'Observations', url: 'voice1.m4a', duration: 45 },
+      { id: 'v1-2', name: 'Recommendations', url: 'voice2.m4a', duration: 30 },
+    ],
+    photos: [
+      { id: 'p1-1', name: 'Classroom.jpg', url: 'photo1.jpg' },
+      { id: 'p1-2', name: 'Playground.jpg', url: 'photo2.jpg' },
+    ],
     duration: 120,
   },
   {
@@ -86,13 +96,13 @@ export function useMockVisits() {
   const getVisitsForUser = useCallback(
     (userId: string, userRole: string) => {
       if (userRole === 'DEO' || userRole === 'DDEO') {
-        return visits; // See all visits
+        return visits;
       }
       if (userRole === 'AEO') {
-        return visits.filter((v) => v.conductedBy === userId); // See own visits
+        return visits.filter((v) => v.conductedBy === userId);
       }
       if (userRole === 'HEAD_TEACHER') {
-        return visits.filter((v) => v.schoolId === userId); // See visits to own school
+        return visits.filter((v) => v.schoolId === userId);
       }
       return [];
     },
@@ -106,34 +116,11 @@ export function useMockVisits() {
     [visits]
   );
 
-  const createVisit = useCallback(
-    (
-      schoolId: string,
-      schoolName: string,
-      visitType: 'administrative' | 'academic' | 'monitoring',
-      conductedBy: string,
-      conductedByName: string,
-      conductedByRole: string
-    ) => {
-      const newVisit: SchoolVisit = {
-        id: `v-${Date.now()}`,
-        schoolId,
-        schoolName,
-        visitDate: new Date(),
-        visitType,
-        conductedBy,
-        conductedByName,
-        conductedByRole,
-        status: 'in_progress',
-        gpsLocation: { lat: 28.6139 + Math.random() * 0.1, lng: 77.209 + Math.random() * 0.1 },
-        indicators: mockIndicators.map((ind) => ({ ...ind })),
-        comments: '',
-        photoCount: 0,
-        voiceNotesCount: 0,
-      };
-
-      setVisits((prev) => [newVisit, ...prev]);
-      return newVisit;
+  const updateVisit = useCallback(
+    (visitId: string, updates: Partial<SchoolVisit>) => {
+      setVisits((prev) =>
+        prev.map((v) => (v.id === visitId ? { ...v, ...updates } : v))
+      );
     },
     []
   );
@@ -142,6 +129,60 @@ export function useMockVisits() {
     (visitId: string, indicators: VisitIndicator[]) => {
       setVisits((prev) =>
         prev.map((v) => (v.id === visitId ? { ...v, indicators } : v))
+      );
+    },
+    []
+  );
+
+  const addIndicator = useCallback(
+    (visitId: string, indicator: VisitIndicator) => {
+      setVisits((prev) =>
+        prev.map((v) =>
+          v.id === visitId
+            ? { ...v, indicators: [...v.indicators, indicator] }
+            : v
+        )
+      );
+    },
+    []
+  );
+
+  const addVoiceNote = useCallback(
+    (visitId: string, name: string) => {
+      setVisits((prev) =>
+        prev.map((v) => {
+          if (v.id === visitId) {
+            const voiceNotes = v.voiceNotes || [];
+            return {
+              ...v,
+              voiceNotes: [
+                ...voiceNotes,
+                { id: `v-${Date.now()}`, name, url: `voice_${Date.now()}.m4a`, duration: 30 },
+              ],
+              voiceNotesCount: voiceNotes.length + 1,
+            };
+          }
+          return v;
+        })
+      );
+    },
+    []
+  );
+
+  const addPhoto = useCallback(
+    (visitId: string, name: string) => {
+      setVisits((prev) =>
+        prev.map((v) => {
+          if (v.id === visitId) {
+            const photos = v.photos || [];
+            return {
+              ...v,
+              photos: [...photos, { id: `p-${Date.now()}`, name, url: `photo_${Date.now()}.jpg` }],
+              photoCount: photos.length + 1,
+            };
+          }
+          return v;
+        })
       );
     },
     []
@@ -173,8 +214,11 @@ export function useMockVisits() {
     visits,
     getVisitsForUser,
     getVisit,
-    createVisit,
+    updateVisit,
     updateVisitIndicators,
+    addIndicator,
+    addVoiceNote,
+    addPhoto,
     completeVisit,
     getIndicators,
   };
