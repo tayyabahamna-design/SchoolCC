@@ -106,6 +106,17 @@ export default function Dashboard() {
         <div className="mb-8">
           <h2 className="text-xl font-bold text-foreground mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {user.role === 'HEAD_TEACHER' && (
+              <Button
+                onClick={() => navigate('/collaborative-forms')}
+                size="lg"
+                className="h-auto py-4"
+                data-testid="button-collaborative-forms"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Collaborative Forms
+              </Button>
+            )}
             {(user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DEO' || user.role === 'DDEO') && (
               <Button
                 onClick={() => navigate('/create-request')}

@@ -16,6 +16,9 @@ import CreateVisit from "@/pages/CreateVisit";
 import ViewVisit from "@/pages/ViewVisit";
 import SchoolAlbum from "@/pages/SchoolAlbum";
 import CreateActivity from "@/pages/CreateActivity";
+import CollaborativeForms from "@/pages/CollaborativeForms";
+import CreateCollaborativeForm from "@/pages/CreateCollaborativeForm";
+import ViewCollaborativeForm from "@/pages/ViewCollaborativeForm";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -35,6 +38,9 @@ function Router() {
       <Route path="/visit/:id" component={ViewVisit} />
       <Route path="/album/:schoolId" component={SchoolAlbum} />
       <Route path="/create-activity/:schoolId" component={CreateActivity} />
+      <Route path="/collaborative-forms" component={CollaborativeForms} />
+      <Route path="/create-collaborative-form" component={CreateCollaborativeForm} />
+      <Route path="/collaborative-form/:formId" component={ViewCollaborativeForm} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
