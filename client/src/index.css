@@ -222,41 +222,6 @@
 }
 
 @layer utilities {
-  /* Gradient utilities for modern design */
-  .bg-gradient-primary {
-    @apply bg-gradient-to-br from-primary to-blue-600;
-  }
-  
-  .bg-gradient-accent {
-    @apply bg-gradient-to-br from-accent to-green-600;
-  }
-  
-  .bg-gradient-subtle {
-    @apply bg-gradient-to-br from-slate-50 to-slate-100;
-  }
-  
-  .text-gradient-primary {
-    @apply bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent;
-  }
-  
-  /* Card enhancements */
-  .card-elevated {
-    @apply bg-white shadow-lg hover:shadow-xl transition-shadow duration-300;
-  }
-  
-  .card-interactive {
-    @apply bg-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer;
-  }
-  
-  /* Button enhancements */
-  .btn-gradient {
-    @apply bg-gradient-primary text-white font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200;
-  }
-  
-  .btn-subtle {
-    @apply bg-gradient-subtle text-foreground font-medium hover:shadow-sm transition-all duration-200;
-  }
-
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;
   }
