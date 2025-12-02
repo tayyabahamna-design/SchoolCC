@@ -151,38 +151,40 @@ export default function Calendar() {
 
           {/* Sidebar - Pending & Today's Leaves */}
           <div className="space-y-6">
-            {/* Pending Leaves */}
-            <Card className="p-6">
-              <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-blue-600" />
-                Pending Approvals
-              </h3>
-              <div className="space-y-3">
-                {pendingLeaves.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No pending leave requests</p>
-                ) : (
-                  pendingLeaves.map((leave) => (
-                    <div key={leave.id} className="border border-border rounded-lg p-3 text-sm">
-                      <p className="font-medium text-foreground">{leave.teacherName}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {leave.startDate.toLocaleDateString()} - {leave.endDate.toLocaleDateString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground capitalize">{leave.leaveType}</p>
-                      <div className="flex gap-2 mt-2">
-                        <Button size="sm" variant="outline" className="h-7 text-xs flex-1" data-testid={`button-approve-${leave.id}`}>
-                          <Check className="w-3 h-3 mr-1" />
-                          Approve
-                        </Button>
-                        <Button size="sm" variant="outline" className="h-7 text-xs flex-1" data-testid={`button-reject-${leave.id}`}>
-                          <AlertCircle className="w-3 h-3 mr-1" />
-                          Reject
-                        </Button>
+            {/* Pending Leaves - Only for Head Teachers */}
+            {user.role === 'HEAD_TEACHER' && (
+              <Card className="p-6">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  Pending Approvals
+                </h3>
+                <div className="space-y-3">
+                  {pendingLeaves.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No pending leave requests</p>
+                  ) : (
+                    pendingLeaves.map((leave) => (
+                      <div key={leave.id} className="border border-border rounded-lg p-3 text-sm">
+                        <p className="font-medium text-foreground">{leave.teacherName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {leave.startDate.toLocaleDateString()} - {leave.endDate.toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-muted-foreground capitalize">{leave.leaveType}</p>
+                        <div className="flex gap-2 mt-2">
+                          <Button size="sm" variant="outline" className="h-7 text-xs flex-1" data-testid={`button-approve-${leave.id}`}>
+                            <Check className="w-3 h-3 mr-1" />
+                            Approve
+                          </Button>
+                          <Button size="sm" variant="outline" className="h-7 text-xs flex-1" data-testid={`button-reject-${leave.id}`}>
+                            <AlertCircle className="w-3 h-3 mr-1" />
+                            Reject
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </Card>
+                    ))
+                  )}
+                </div>
+              </Card>
+            )}
 
             {/* Legend */}
             <Card className="p-6">
