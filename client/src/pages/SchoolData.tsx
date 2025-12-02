@@ -12,8 +12,13 @@ export default function SchoolData() {
 
   if (!user) return null;
 
-  const schools = getSchoolData();
+  const allSchools = getSchoolData();
   const userSchool = user.schoolId ? getSchoolById(user.schoolId) : null;
+  
+  // Teachers and head teachers only see their own school
+  const visibleSchools = (user.role === 'TEACHER' || user.role === 'HEAD_TEACHER') 
+    ? (userSchool ? [userSchool] : []) 
+    : allSchools;
 
   return (
     <div className="min-h-screen bg-background">
@@ -144,10 +149,10 @@ export default function SchoolData() {
         {/* All Schools in District */}
         <div>
           <h2 className="text-lg font-semibold text-foreground mb-4">
-            {user.role === 'DEO' || user.role === 'DDEO' ? 'All Schools in District' : 'District Schools Overview'}
+            {user.role === 'DEO' || user.role === 'DDEO' ? 'All Schools in District' : user.role === 'AEO' ? 'Schools in Your Area' : 'Your School'}
           </h2>
           <div className="grid gap-4">
-            {schools.map((school) => (
+            {visibleSchools.map((school) => (
               <Card key={school.id} className="p-6 hover:border-primary/30 transition-all">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                   <div>
