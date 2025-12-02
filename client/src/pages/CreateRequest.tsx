@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useMockDataRequests, DataField } from '@/hooks/useMockDataRequests';
 import { useLocation } from 'wouter';
-import { Plus, X, ArrowLeft } from 'lucide-react';
+import { Plus, X, ArrowLeft, Mic, Square, Play } from 'lucide-react';
 
 const FIELD_TYPES = ['text', 'number', 'file', 'photo', 'voice_note'];
 const MOCK_ASSIGNEES = [
@@ -24,6 +24,8 @@ export default function CreateRequest() {
   const [fields, setFields] = useState<DataField[]>([]);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [recordingField, setRecordingField] = useState<string | null>(null);
+  const [recordedVoiceNotes, setRecordedVoiceNotes] = useState<Record<string, string>>({});
 
   if (!user) return null;
 
@@ -41,6 +43,11 @@ export default function CreateRequest() {
 
   const removeField = (id: string) => {
     setFields(fields.filter((f) => f.id !== id));
+    setRecordedVoiceNotes((prev) => {
+      const updated = { ...prev };
+      delete updated[id];
+      return updated;
+    });
   };
 
   const updateField = (id: string, updates: Partial<DataField>) => {
@@ -51,6 +58,21 @@ export default function CreateRequest() {
     setSelectedAssignees((prev) =>
       prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
     );
+  };
+
+  const toggleVoiceRecording = (fieldId: string) => {
+    if (recordingField === fieldId) {
+      // Stop recording
+      setRecordingField(null);
+      // Simulate recording completion - in real app would save audio blob
+      setRecordedVoiceNotes((prev) => ({
+        ...prev,
+        [fieldId]: `voice_${Date.now()}`,
+      }));
+    } else {
+      // Start recording
+      setRecordingField(fieldId);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -186,6 +208,29 @@ export default function CreateRequest() {
                           Required
                         </label>
                       </div>
+
+                      {/* Voice Note Preview for Field Type */}
+                      {field.type === 'voice_note' && (
+                        <div className="bg-primary/5 border border-primary/20 rounded p-2 text-xs">
+                          <p className="font-medium text-primary">Voice Note Field</p>
+                          <p className="text-muted-foreground">Assignees can record audio responses</p>
+                          {recordedVoiceNotes[field.id] && (
+                            <div className="mt-2 flex items-center gap-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-6 text-xs"
+                                disabled
+                              >
+                                <Play className="w-3 h-3" />
+                                Sample
+                              </Button>
+                              <span className="text-xs text-green-600">Demo recording</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <Button
                       type="button"

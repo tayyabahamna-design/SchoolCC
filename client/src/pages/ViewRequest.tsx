@@ -3,10 +3,10 @@ import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useMockDataRequests, DataField } from '@/hooks/useMockDataRequests';
+import { useMockDataRequests, DataField, RequestAssignee } from '@/hooks/useMockDataRequests';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Mic, Play, Upload, Download, Lock } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, Mic, Play, Upload, Download, Lock, Square } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function ViewRequest() {
   const { id } = useParams();
@@ -14,9 +14,19 @@ export default function ViewRequest() {
   const [, navigate] = useLocation();
   const { getRequest, updateAssigneeFields } = useMockDataRequests();
   const [editing, setEditing] = useState(false);
-  const [editedFields, setEditedFields] = useState<Record<string, DataField>>({});
+  const [editedAssignee, setEditedAssignee] = useState<RequestAssignee | null>(null);
+  const [recording, setRecording] = useState<string | null>(null);
 
   const request = getRequest(id || '');
+
+  useEffect(() => {
+    if (request && user) {
+      const userAssignee = request.assignees.find((a) => a.userId === user.id);
+      if (userAssignee && !editedAssignee) {
+        setEditedAssignee(userAssignee);
+      }
+    }
+  }, [request, user, editedAssignee]);
 
   if (!request || !user) {
     return null;
@@ -33,40 +43,25 @@ export default function ViewRequest() {
 
   const canEdit = userAssignee && (user.role === 'TEACHER' || user.role === 'HEAD_TEACHER');
 
-  if (!editing && !editedFields[userAssignee?.id || '']) {
-    setEditedFields({
-      ...editedFields,
-      [userAssignee?.id || '']: {
-        ...userAssignee,
-        fields: userAssignee?.fields || [],
-      },
-    });
-  }
-
   const handleFieldChange = (fieldId: string, value: string | number | null) => {
-    const assigneeId = userAssignee?.id || '';
-    const currentFields = editedFields[assigneeId]?.fields || userAssignee?.fields || [];
+    if (!editedAssignee) return;
 
-    setEditedFields({
-      ...editedFields,
-      [assigneeId]: {
-        ...(editedFields[assigneeId] || userAssignee),
-        fields: currentFields.map((f) =>
-          f.id === fieldId ? { ...f, value } : f
-        ),
-      },
+    setEditedAssignee({
+      ...editedAssignee,
+      fields: editedAssignee.fields.map((f) =>
+        f.id === fieldId ? { ...f, value } : f
+      ),
     });
   };
 
   const handleSubmit = () => {
-    const assigneeId = userAssignee?.id || '';
-    const updated = editedFields[assigneeId];
-
-    if (updated && userAssignee) {
-      updateAssigneeFields(request.id, assigneeId, updated.fields);
+    if (editedAssignee && userAssignee) {
+      updateAssigneeFields(request.id, userAssignee.id, editedAssignee.fields);
       setEditing(false);
     }
   };
+
+  const displayAssignee = editedAssignee || userAssignee;
 
   return (
     <div className="min-h-screen bg-background">
@@ -124,7 +119,7 @@ export default function ViewRequest() {
         </Card>
 
         {/* Data Fields */}
-        {userAssignee && (
+        {displayAssignee && (
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground">Response Fields</h2>
@@ -132,10 +127,7 @@ export default function ViewRequest() {
             </div>
 
             <div className="space-y-4">
-              {userAssignee.fields.map((field) => {
-                const editedValue = editedFields[userAssignee.id]?.fields.find((f) => f.id === field.id)
-                  ?.value;
-                const value = editing ? editedValue : field.value;
+              {displayAssignee.fields.map((field) => {
                 const isDisabled = !editing || isReadOnly;
 
                 return (
@@ -150,7 +142,7 @@ export default function ViewRequest() {
                       <Input
                         type="text"
                         placeholder="Enter text"
-                        value={value as string || ''}
+                        value={field.value as string || ''}
                         onChange={(e) => handleFieldChange(field.id, e.target.value)}
                         disabled={isDisabled}
                         data-testid={`input-field-${field.id}`}
@@ -161,7 +153,7 @@ export default function ViewRequest() {
                       <Input
                         type="number"
                         placeholder="Enter number"
-                        value={value as number || ''}
+                        value={field.value as number || ''}
                         onChange={(e) => handleFieldChange(field.id, e.target.value ? parseInt(e.target.value) : null)}
                         disabled={isDisabled}
                         data-testid={`input-number-${field.id}`}
@@ -172,7 +164,7 @@ export default function ViewRequest() {
                       <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
                         <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
                         <p className="text-sm text-muted-foreground">
-                          {value ? 'Photo attached' : 'Click to upload photo'}
+                          {field.value ? 'Photo attached' : 'Click to upload photo'}
                         </p>
                         {!isDisabled && <input type="file" accept="image/*" className="mt-2" hidden />}
                       </div>
@@ -182,7 +174,7 @@ export default function ViewRequest() {
                       <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
                         <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
                         <p className="text-sm text-muted-foreground">
-                          {value ? 'File attached' : 'Click to upload file'}
+                          {field.value ? 'File attached' : 'Click to upload file'}
                         </p>
                         {!isDisabled && <input type="file" className="mt-2" hidden />}
                       </div>
@@ -191,7 +183,7 @@ export default function ViewRequest() {
                     {field.type === 'voice_note' && (
                       <div className="border border-border rounded-lg p-4 space-y-2">
                         <div className="flex items-center gap-2">
-                          {value ? (
+                          {field.voiceUrl ? (
                             <>
                               <Button
                                 type="button"
@@ -201,7 +193,7 @@ export default function ViewRequest() {
                                 data-testid={`button-play-voice-${field.id}`}
                               >
                                 <Play className="w-4 h-4" />
-                                Play Recording
+                                Play Recording ({field.fileName || 'voice'})
                               </Button>
                               <span className="text-xs text-muted-foreground">Recording attached</span>
                             </>
@@ -214,11 +206,23 @@ export default function ViewRequest() {
                                 disabled={isDisabled}
                                 className="gap-2"
                                 data-testid={`button-record-voice-${field.id}`}
+                                onClick={() => setRecording(recording === field.id ? null : field.id)}
                               >
-                                <Mic className="w-4 h-4" />
-                                Record Voice Note
+                                {recording === field.id ? (
+                                  <>
+                                    <Square className="w-4 h-4" />
+                                    Stop Recording
+                                  </>
+                                ) : (
+                                  <>
+                                    <Mic className="w-4 h-4" />
+                                    Record Voice Note
+                                  </>
+                                )}
                               </Button>
-                              <span className="text-xs text-muted-foreground">No recording</span>
+                              <span className="text-xs text-muted-foreground">
+                                {recording === field.id ? 'Recording...' : 'No recording'}
+                              </span>
                             </>
                           )}
                         </div>
