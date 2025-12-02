@@ -1,0 +1,51 @@
+Prompt: School Monitoring & Data Platform — All-in-One Instruction
+
+Develop a modern, cross-device (web/mobile/tablet/laptop) application for public school monitoring, data management, and field/accountability flows. The app must address the realities of government field education: not just digitizing visits, but powering a live, auditable ecosystem for inventory, institutional performance, resource tracking, requests, and evidence—all with the highest user clarity and security.
+
+Key Specifications and Features
+
+School Visit Monitoring
+AEOs plan, conduct, and log both administrative and academic/monitoring visits.
+Each visit is subject to silent GPS tracking throughout—location trail visible ONLY to DDEO/DEO/admin, NEVER shown to AEOs or field users.
+Each visit/form includes policy-aligned, dynamic indicators (see “Indicators” below), with versioning and automated updates across all templates.
+Submission includes evidence: photos, documents, comments, and optionally, voice notes (see below).
+Institutional Inventory & Data
+Each school has a detailed, up-to-date profile: infrastructure, enrollment, facilities, utilities, legal/records, land ownership, furniture, equipment, and compliance docs—exactly following the fields in your PSRP Inventory Proforma.
+Data is editable by authorized personnel (HT/AEO/Admin), versioned, and historical (auditable changes).
+All data is filterable/exportable (CSV, Excel, PDF) by region, type, field, or time.
+Indicators
+“Indicators” are the core checklists, criteria, or data points (e.g., attendance %, # of working toilets, head teacher presence, compliance to lesson plan, water availability, infrastructure status, etc.) used in both school visits and institutional forms.
+Must support multiple types: Boolean, count, scale (1-4, Yes/No/Partial), text, photo, file attachment, and voice note per field.
+Admin can update/version indicators and templates; users always see correct versions for their assigned task or visit.
+Hierarchical Data Request System (“Ping”)
+Any user at any level (DEO, DDEO, AEO, Head Teacher) can issue a data request to anyone at or below their level in the org chart.
+Requests can include any mix of indicator fields, text, file, photo, AND voice note field (for spoken responses; upload/playback in-app).
+Requests are tracked for status, deadline, escalation, and evidence.
+Teachers and staff assigned rows or subtasks in a request can only see and edit their own data; other rows are locked, ensuring privacy and auditability.
+Full audit log: who assigned, who responded, what/when was submitted.
+Evidence & Media Album
+Any form, field, visit, or request can include evidence: image capture, file upload, and voice notes.
+All media files are linked to the source context for easy per-school/per-task review and export.
+Authorized users can download evidence individually or in bulk as required.
+Leave & Staff Calendar
+Intuitive, role-based leave calendar for all staff—with category for type of leave, approval flows (HT/AEO), and visibility as required.
+Exposes at-a-glance: who is on leave today, planned/unplanned gaps, and support for schedule planning.
+Security & Permission Model
+DEO/DDEO: Full data, export, audit, and GPS access. Can issue requests to anyone, see all logs (including GPS).
+AEO: Manage only their own visits, requests, assigned tasks. Cannot view others’ GPS, task responses, or audit logs.
+HT: See/manage own school inventory, requests, and evidence. Issue or respond to requests down or laterally.
+Teacher: Only see/edit their row in assigned data requests/tasks; upload their evidence, comments, voice notes.
+Admin: User access, indicator/form builder, versioning, and all system data.
+Compliance, Offline & Audit
+Entire app works offline-first: all forms and file evidence can be entered and staged offline, then syncs automatically when connectivity returns.
+Audit trail on every action or data edit: who did what, when, and what changed.
+Non-compliance (late responses, missing evidence, skipped indicators) is auto-flagged/escalated for supervisor review.
+Usability
+Device-responsive: native feel on phone/tablet/web/desktop, with touch and keyboard shortcuts.
+Every flow is short, structured, and guidance-rich—especially for evidence/voice note capture.
+All users see only the tasks, data, and actions they’re authorized for.
+Bulk download/export for any data with proper access (forms, visit logs, inventory, responses, evidence).
+Summary:
+Build the system as a “living cockpit” for every school and user, not just a one-time digital form. Silent GPS tracking ensures accountability without eroding trust. Indicators, templates, and media/voice notes capture ground realities in the form the field actually wants to use them. Data requests, tasks, and evidence can be issued, assigned, reviewed, and escalated across all device types—with privacy, audit, and downloadability at core.
+
+If any uncertainty arises about what counts as an indicator, what media can be attached, how permissions work, or what scenario/flow to support, always align with the underlying principle: maximize data usefulness and compliance, minimize unnecessary user friction and maximize audit integrity.
