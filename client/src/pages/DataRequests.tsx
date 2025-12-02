@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useMockDataRequests } from '@/hooks/useMockDataRequests';
 import { useLocation } from 'wouter';
-import { Plus, Download, ChevronRight, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Download, ChevronRight, Clock, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export default function DataRequests() {
   const { user } = useAuth();
@@ -32,9 +32,19 @@ export default function DataRequests() {
       {/* Header */}
       <div className="bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Data Requests</h1>
-            <p className="text-sm text-muted-foreground">Manage and track all data requests</p>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/dashboard')}
+              data-testid="button-back-to-dashboard"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Data Requests</h1>
+              <p className="text-sm text-muted-foreground">Manage and track all data requests</p>
+            </div>
           </div>
           <div className="flex gap-2">
             {(user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DEO' || user.role === 'DDEO') && (
