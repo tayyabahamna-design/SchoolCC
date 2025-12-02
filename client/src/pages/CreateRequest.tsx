@@ -1,0 +1,254 @@
+import { useState } from 'react';
+import { useAuth } from '@/contexts/auth';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { useMockDataRequests, DataField } from '@/hooks/useMockDataRequests';
+import { useLocation } from 'wouter';
+import { Plus, X, ArrowLeft } from 'lucide-react';
+
+const FIELD_TYPES = ['text', 'number', 'file', 'photo', 'voice_note'];
+const MOCK_ASSIGNEES = [
+  { id: 'teacher-1', name: 'Mr. Vikram Das', role: 'TEACHER', school: 'School A' },
+  { id: 'teacher-2', name: 'Ms. Priya Verma', role: 'TEACHER', school: 'School A' },
+  { id: 'ht-1', name: 'Mrs. Anjali Singh', role: 'HEAD_TEACHER', school: 'School A' },
+];
+
+export default function CreateRequest() {
+  const { user } = useAuth();
+  const [, navigate] = useLocation();
+  const { createRequest } = useMockDataRequests();
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [fields, setFields] = useState<DataField[]>([]);
+  const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  if (!user) return null;
+
+  const addField = () => {
+    setFields([
+      ...fields,
+      {
+        id: `f-${Date.now()}`,
+        name: '',
+        type: 'text',
+        required: true,
+      },
+    ]);
+  };
+
+  const removeField = (id: string) => {
+    setFields(fields.filter((f) => f.id !== id));
+  };
+
+  const updateField = (id: string, updates: Partial<DataField>) => {
+    setFields(fields.map((f) => (f.id === id ? { ...f, ...updates } : f)));
+  };
+
+  const toggleAssignee = (id: string) => {
+    setSelectedAssignees((prev) =>
+      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
+    );
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || fields.length === 0 || selectedAssignees.length === 0) {
+      return;
+    }
+
+    setLoading(true);
+    setTimeout(() => {
+      createRequest(
+        title,
+        description,
+        fields,
+        selectedAssignees.map((id) => {
+          const assignee = MOCK_ASSIGNEES.find((a) => a.id === id);
+          return {
+            userId: assignee?.id || '',
+            userName: assignee?.name || '',
+            userRole: assignee?.role || '',
+            schoolId: 'school-1',
+            schoolName: assignee?.school || '',
+          };
+        }),
+        user.id,
+        user.name,
+        user.role
+      );
+      navigate('/data-requests');
+    }, 500);
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="bg-white border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/data-requests')}
+            data-testid="button-back"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <h1 className="text-2xl font-bold text-foreground ml-4">Create Data Request</h1>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Info */}
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Request Details</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Request Title *
+                </label>
+                <Input
+                  placeholder="e.g., Monthly Attendance Verification"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  data-testid="input-title"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Description
+                </label>
+                <textarea
+                  placeholder="Provide context about this request..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary min-h-24"
+                  data-testid="textarea-description"
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Fields */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Data Fields</h2>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addField}
+                data-testid="button-add-field"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Field
+              </Button>
+            </div>
+
+            {fields.length === 0 ? (
+              <p className="text-muted-foreground text-sm py-4">No fields yet. Add one to get started.</p>
+            ) : (
+              <div className="space-y-3">
+                {fields.map((field) => (
+                  <div key={field.id} className="flex gap-2 p-3 border border-border rounded-lg">
+                    <div className="flex-1 space-y-2">
+                      <Input
+                        placeholder="Field name"
+                        value={field.name}
+                        onChange={(e) => updateField(field.id, { name: e.target.value })}
+                        data-testid={`input-field-name-${field.id}`}
+                        className="text-sm"
+                      />
+                      <div className="flex gap-2">
+                        <select
+                          value={field.type}
+                          onChange={(e) => updateField(field.id, { type: e.target.value as any })}
+                          className="flex-1 px-2 py-1 text-sm border border-border rounded bg-background text-foreground"
+                          data-testid={`select-field-type-${field.id}`}
+                        >
+                          {FIELD_TYPES.map((t) => (
+                            <option key={t} value={t}>
+                              {t.replace('_', ' ').toUpperCase()}
+                            </option>
+                          ))}
+                        </select>
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={field.required}
+                            onChange={(e) => updateField(field.id, { required: e.target.checked })}
+                            data-testid={`checkbox-required-${field.id}`}
+                          />
+                          Required
+                        </label>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeField(field.id)}
+                      data-testid={`button-remove-field-${field.id}`}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+
+          {/* Assignees */}
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Assign To</h2>
+            <div className="space-y-2">
+              {MOCK_ASSIGNEES.map((assignee) => (
+                <label
+                  key={assignee.id}
+                  className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/30"
+                  data-testid={`label-assignee-${assignee.id}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedAssignees.includes(assignee.id)}
+                    onChange={() => toggleAssignee(assignee.id)}
+                    data-testid={`checkbox-assignee-${assignee.id}`}
+                  />
+                  <div className="ml-3 flex-1">
+                    <div className="font-medium text-foreground">{assignee.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {assignee.role} • {assignee.school}
+                    </div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </Card>
+
+          {/* Submit */}
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/data-requests')}
+              data-testid="button-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={!title.trim() || fields.length === 0 || selectedAssignees.length === 0 || loading}
+              data-testid="button-create"
+            >
+              {loading ? 'Creating...' : 'Create Request'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

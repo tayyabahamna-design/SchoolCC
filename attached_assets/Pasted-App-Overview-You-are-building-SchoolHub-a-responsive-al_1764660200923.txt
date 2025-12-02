@@ -1,0 +1,30 @@
+App Overview:
+You are building SchoolHub, a responsive (all-device) school management/monitoring app for education field teams. The system serves a strict user hierarchy: DEO, DDEO, AEO, Head Teachers, and Teachers, each with a role-based interface and access.
+
+For this prototype, focus on:
+
+Login flow: User logs in using their phone number, chooses role, enters password. The system must route every user to a unique dashboard and menu based on their role.
+“Data Requests” workflow:
+Users at higher levels (DEO, DDEO, AEO, Head Teacher) can create, assign, track, and audit data requests down to any user below them in the hierarchy.
+Data requests allow any combination of fields: text, number, file/photo, and voice note attachment.
+Requests can be assigned as “bulk” (to a group) or to an individual.
+Lower-level users (e.g., Teachers) can only see and edit their assigned row; everything else is locked down/read-only.
+Voice note playback works in UI, even if real uploads aren’t implemented in prototyping.
+Permission logic:
+DEO/DDEO: Full data access, can create/track/see all requests and responses.
+AEO: Can create and assign within their cluster/schools, view only what’s under their scope.
+Head Teacher: Issue requests to teachers, respond to higher-ups, see/respond for their school only.
+Teacher: Respond to assigned data line(s)/requests only; no access to peer/other school data.
+UI Priorities:
+“Data Requests” is a top-level nav item.
+Request list shows: requester, assignees, due date, status (completed/pending/overdue), and direct “export CSV” for supervisors.
+On assignment, user lands directly on their task (row), with clear field types—including voice note.
+Audit/assignee trail shown in details pane.
+For your prototype:
+
+Mock all flows in frontend-only React—no live backend needed, but do show different dashboards/permissions by logged-in role.
+Use simple, professional design with strong clarity around actions and access (“Edit” disabled for unassigned users, voice note player for audio).
+Priority user for the prototype: AEO and Teacher (show how AEO creates and assigns request; Teacher receives, fills, and submits their row, locked out from others).
+Add DEO and Head Teacher dashboards as stubs showing their full visibility (list of all requests, exports).
+Summary for sltech:
+Prototype the login (with role), then the full create-assign-complete-export data request flow between AEO and Teachers, with front-end logic enforcing all access controls. Voice note fields must be clearly visible/usable. DEO/DDEO/HT can see everything; Teachers can only edit their task. “Data Requests” should be a primary, always-available hub in the UI.

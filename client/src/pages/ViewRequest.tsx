@@ -1,0 +1,285 @@
+import { useParams } from 'wouter';
+import { useAuth } from '@/contexts/auth';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useMockDataRequests, DataField } from '@/hooks/useMockDataRequests';
+import { useLocation } from 'wouter';
+import { ArrowLeft, Mic, Play, Upload, Download, Lock } from 'lucide-react';
+import { useState } from 'react';
+
+export default function ViewRequest() {
+  const { id } = useParams();
+  const { user } = useAuth();
+  const [, navigate] = useLocation();
+  const { getRequest, updateAssigneeFields } = useMockDataRequests();
+  const [editing, setEditing] = useState(false);
+  const [editedFields, setEditedFields] = useState<Record<string, DataField>>({});
+
+  const request = getRequest(id || '');
+
+  if (!request || !user) {
+    return null;
+  }
+
+  const userAssignee = request.assignees.find((a) => a.userId === user.id);
+  const isReadOnly =
+    !userAssignee ||
+    (user.role !== 'AEO' &&
+      user.role !== 'HEAD_TEACHER' &&
+      user.role !== 'TEACHER' &&
+      user.role !== 'DEO' &&
+      user.role !== 'DDEO');
+
+  const canEdit = userAssignee && (user.role === 'TEACHER' || user.role === 'HEAD_TEACHER');
+
+  if (!editing && !editedFields[userAssignee?.id || '']) {
+    setEditedFields({
+      ...editedFields,
+      [userAssignee?.id || '']: {
+        ...userAssignee,
+        fields: userAssignee?.fields || [],
+      },
+    });
+  }
+
+  const handleFieldChange = (fieldId: string, value: string | number | null) => {
+    const assigneeId = userAssignee?.id || '';
+    const currentFields = editedFields[assigneeId]?.fields || userAssignee?.fields || [];
+
+    setEditedFields({
+      ...editedFields,
+      [assigneeId]: {
+        ...(editedFields[assigneeId] || userAssignee),
+        fields: currentFields.map((f) =>
+          f.id === fieldId ? { ...f, value } : f
+        ),
+      },
+    });
+  };
+
+  const handleSubmit = () => {
+    const assigneeId = userAssignee?.id || '';
+    const updated = editedFields[assigneeId];
+
+    if (updated && userAssignee) {
+      updateAssigneeFields(request.id, assigneeId, updated.fields);
+      setEditing(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="bg-white border-b border-border">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/data-requests')}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <h1 className="text-2xl font-bold text-foreground ml-4">{request.title}</h1>
+          </div>
+          {canEdit && !isReadOnly && (
+            <Button
+              onClick={() => (editing ? handleSubmit() : setEditing(true))}
+              data-testid={editing ? 'button-submit' : 'button-edit'}
+            >
+              {editing ? 'Submit' : 'Edit'}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+        {/* Request Info */}
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Request Information</h2>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">Created by</p>
+              <p className="font-medium text-foreground">{request.createdByName}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Due Date</p>
+              <p className="font-medium text-foreground">{request.dueDate.toLocaleDateString()}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Priority</p>
+              <p className="font-medium text-foreground capitalize">{request.priority}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Status</p>
+              <p className="font-medium text-foreground capitalize">
+                {userAssignee?.status || 'Assigned'}
+              </p>
+            </div>
+          </div>
+          <p className="mt-4 text-sm text-foreground">{request.description}</p>
+        </Card>
+
+        {/* Data Fields */}
+        {userAssignee && (
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground">Response Fields</h2>
+              {isReadOnly && <Lock className="w-4 h-4 text-muted-foreground" />}
+            </div>
+
+            <div className="space-y-4">
+              {userAssignee.fields.map((field) => {
+                const editedValue = editedFields[userAssignee.id]?.fields.find((f) => f.id === field.id)
+                  ?.value;
+                const value = editing ? editedValue : field.value;
+                const isDisabled = !editing || isReadOnly;
+
+                return (
+                  <div key={field.id} className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                      {field.name}
+                      {field.required && <span className="text-red-600">*</span>}
+                      {isReadOnly && <Lock className="w-3 h-3 text-muted-foreground" />}
+                    </label>
+
+                    {field.type === 'text' && (
+                      <Input
+                        type="text"
+                        placeholder="Enter text"
+                        value={value as string || ''}
+                        onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                        disabled={isDisabled}
+                        data-testid={`input-field-${field.id}`}
+                      />
+                    )}
+
+                    {field.type === 'number' && (
+                      <Input
+                        type="number"
+                        placeholder="Enter number"
+                        value={value as number || ''}
+                        onChange={(e) => handleFieldChange(field.id, e.target.value ? parseInt(e.target.value) : null)}
+                        disabled={isDisabled}
+                        data-testid={`input-number-${field.id}`}
+                      />
+                    )}
+
+                    {field.type === 'photo' && (
+                      <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
+                        <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">
+                          {value ? 'Photo attached' : 'Click to upload photo'}
+                        </p>
+                        {!isDisabled && <input type="file" accept="image/*" className="mt-2" hidden />}
+                      </div>
+                    )}
+
+                    {field.type === 'file' && (
+                      <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
+                        <Upload className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">
+                          {value ? 'File attached' : 'Click to upload file'}
+                        </p>
+                        {!isDisabled && <input type="file" className="mt-2" hidden />}
+                      </div>
+                    )}
+
+                    {field.type === 'voice_note' && (
+                      <div className="border border-border rounded-lg p-4 space-y-2">
+                        <div className="flex items-center gap-2">
+                          {value ? (
+                            <>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="gap-2"
+                                data-testid={`button-play-voice-${field.id}`}
+                              >
+                                <Play className="w-4 h-4" />
+                                Play Recording
+                              </Button>
+                              <span className="text-xs text-muted-foreground">Recording attached</span>
+                            </>
+                          ) : (
+                            <>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                disabled={isDisabled}
+                                className="gap-2"
+                                data-testid={`button-record-voice-${field.id}`}
+                              >
+                                <Mic className="w-4 h-4" />
+                                Record Voice Note
+                              </Button>
+                              <span className="text-xs text-muted-foreground">No recording</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {editing && !isReadOnly && (
+              <div className="mt-6 flex gap-2">
+                <Button
+                  onClick={handleSubmit}
+                  data-testid="button-save-changes"
+                >
+                  Save Changes
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setEditing(false)}
+                  data-testid="button-cancel-edit"
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
+          </Card>
+        )}
+
+        {/* Audit Trail */}
+        <Card className="p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Assignee Status</h2>
+          <div className="space-y-3">
+            {request.assignees.map((assignee) => (
+              <div key={assignee.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                <div>
+                  <p className="font-medium text-foreground">{assignee.userName}</p>
+                  <p className="text-xs text-muted-foreground">{assignee.schoolName || 'N/A'}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium capitalize">{assignee.status}</p>
+                  {assignee.submittedAt && (
+                    <p className="text-xs text-muted-foreground">
+                      Submitted: {assignee.submittedAt.toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Export */}
+        {(user.role === 'DEO' || user.role === 'DDEO' || user.role === 'AEO') && (
+          <Button variant="outline" className="w-full" data-testid="button-export-response">
+            <Download className="w-4 h-4 mr-2" />
+            Export All Responses as CSV
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
