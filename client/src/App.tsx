@@ -27,7 +27,7 @@ function Router() {
 
   return (
     <Switch>
-      <Route path="/" component={isAuthenticated ? Dashboard : Login} />
+      <Route path="/" component={isAuthenticated ? (user?.role === 'CEO' ? CEODashboard : Dashboard) : Login} />
       <Route path="/dashboard" component={isAuthenticated ? (user?.role === 'CEO' ? CEODashboard : Dashboard) : Login} />
       <Route path="/data-requests" component={DataRequests} />
       <Route path="/create-request" component={CreateRequest} />

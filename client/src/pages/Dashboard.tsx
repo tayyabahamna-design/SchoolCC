@@ -14,7 +14,7 @@ export default function Dashboard() {
   const { getTeacherStats } = useMockTeacherData();
   const { getVisitsForUser } = useMockVisits();
 
-  if (!user) {
+  if (!user || user.role === 'CEO') {
     navigate('/');
     return null;
   }
@@ -29,6 +29,11 @@ export default function Dashboard() {
   const { totalTeachers, presentToday, onLeaveToday, absentToday } = getTeacherStats();
 
   const dashboardStats = {
+    CEO: [
+      { label: 'Total Teachers', value: totalTeachers, icon: Users },
+      { label: 'Present Today', value: presentToday, icon: TrendingUp },
+      { label: 'On Leave Today', value: onLeaveToday, icon: Calendar },
+    ],
     DEO: [
       { label: 'Total Teachers', value: totalTeachers, icon: Users },
       { label: 'Present Today', value: presentToday, icon: TrendingUp },
