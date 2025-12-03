@@ -22,13 +22,19 @@ import CreateCollaborativeForm from "@/pages/CreateCollaborativeForm";
 import ViewCollaborativeForm from "@/pages/ViewCollaborativeForm";
 import NotFound from "@/pages/not-found";
 
-function Router() {
+function DashboardRoute() {
   const { isAuthenticated, user } = useAuth();
+  if (!isAuthenticated) return <Login />;
+  return user?.role === 'CEO' ? <CEODashboard /> : <Dashboard />;
+}
+
+function Router() {
+  const { isAuthenticated } = useAuth();
 
   return (
     <Switch>
-      <Route path="/" component={isAuthenticated ? (user?.role === 'CEO' ? CEODashboard : Dashboard) : Login} />
-      <Route path="/dashboard" component={isAuthenticated ? (user?.role === 'CEO' ? CEODashboard : Dashboard) : Login} />
+      <Route path="/" component={DashboardRoute} />
+      <Route path="/dashboard" component={DashboardRoute} />
       <Route path="/data-requests" component={DataRequests} />
       <Route path="/create-request" component={CreateRequest} />
       <Route path="/request/:id" component={ViewRequest} />
