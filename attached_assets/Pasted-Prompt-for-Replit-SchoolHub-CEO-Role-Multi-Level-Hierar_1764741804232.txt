@@ -1,0 +1,43 @@
+Prompt for Replit — SchoolHub CEO Role & Multi-Level Hierarchy
+
+System Scope:
+SchoolHub is a modern, role-driven, cross-device platform for education system monitoring, analytics, and data requests. The hierarchy is deeply nested:
+
+One CEO oversees multiple DEOs (District Education Officers).
+Each DEO manages multiple DDEOs (Deputy DEOs).
+Each DDEO (or DEO directly) manages multiple AEOs (Assistant Education Officers).
+Each AEO covers multiple schools, each with its own Head Teacher(s) and multiple Teachers.
+CEO Role & Access:
+
+CEO has a dedicated login, with a dashboard aggregating and filtering analytics across ALL DEOs, DDEOs, and AEOs, clusters, schools, and staff below.
+CEO views KPIs, compliance, overdue actions, visit/request trends, and can drill down from aggregate to district/cluster/school, or assign escalations/flags to any subordinate.
+CEO does not edit field data or requests, but can download/export any data, audit any evidence, and see a full system audit trail.
+The CEO dashboard should cleanly visualize:
+Multiple DEO activity (table, map, or chart)
+Drilled-down chain: select a DEO → see their DDEOs, then any DDEO → see their AEOs, etc., down to school and individual teacher/task level.
+Ability to filter, subgroup, and summarize at any level.
+Organization Awareness:
+
+The software must incorporate that there can be:
+Multiple DEOs under one CEO
+Multiple DDEOs under each DEO
+Multiple AEOs under each DDEO (or DEO direct)
+Multiple schools under each AEO
+Multiple Head Teachers/Teachers per school
+All user/account management, dashboards, assignment, audit, and download flows must respect this tree structure.
+UI/UX Notes:
+
+Clean, modern interface; crisp white or gray backgrounds with deep blue/green action color.
+CEO’s dashboard = “mission control”—live analytics, summary cards by region, powerful filters, all teams/requests/alerts in a few clicks.
+Every card/chart/list must state clearly which district/DEO/AEO/school it represents and allow CEO to jump into details or export with one click.
+Data Request & Evidence Flows:
+
+Data requests and evidence review flow up and down the chain, always referencing which managers, AEOs, Head Teachers, teachers are involved.
+CEO can see the complete request/response chain for any data point, in any school, under any subordinate officer.
+For Prototype:
+
+Demo full CEO login, show dashboard across multiple DEOs and their cascaded structures.
+Illustrate drill-down and filter (CEO → DEO → DDEO → AEO → Headmaster → Teacher).
+Maintain strict, role-based read vs. write access—CEO is read-only at all levels except escalations/flags.
+Summary:
+Build the app with flexibility: support any number of DEOs/DDEOs/AEOs/schools/headmasters/teachers under the CEO, and make it easy for the CEO to see what's happening anywhere, anytime, at any level.
