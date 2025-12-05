@@ -117,32 +117,36 @@ const mockRequests: DataRequest[] = [
   },
 ];
 
-export function useMockDataRequests() {
-  const [requests, setRequests] = useState<DataRequest[]>(() => {
-    // Load from localStorage if available
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('dataRequests') : null;
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        return parsed.map((req: any) => ({
-          ...req,
-          createdAt: new Date(req.createdAt),
-          dueDate: new Date(req.dueDate),
-          assignees: req.assignees.map((a: any) => ({
-            ...a,
-            submittedAt: a.submittedAt ? new Date(a.submittedAt) : undefined,
-          })),
-        }));
-      } catch {
-        return mockRequests;
-      }
+// Helper to load and parse requests from localStorage
+const loadRequestsFromStorage = (): DataRequest[] => {
+  const stored = typeof window !== 'undefined' ? localStorage.getItem('dataRequests') : null;
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      return parsed.map((req: any) => ({
+        ...req,
+        createdAt: new Date(req.createdAt),
+        dueDate: new Date(req.dueDate),
+        assignees: req.assignees.map((a: any) => ({
+          ...a,
+          submittedAt: a.submittedAt ? new Date(a.submittedAt) : undefined,
+        })),
+      }));
+    } catch {
+      return mockRequests;
     }
-    return mockRequests;
-  });
+  }
+  return mockRequests;
+};
+
+export function useMockDataRequests() {
+  const [requests, setRequests] = useState<DataRequest[]>(loadRequestsFromStorage);
 
   const getRequestsForUser = useCallback(
     (userId: string, userRole: string) => {
-      return requests.filter((req) => {
+      // Always read latest from localStorage
+      const allRequests = loadRequestsFromStorage();
+      return allRequests.filter((req) => {
         if (userRole === 'DEO' || userRole === 'DDEO') {
           return true; // See all requests
         }
@@ -154,7 +158,7 @@ export function useMockDataRequests() {
         return req.assignees.some((a) => a.userId === userId);
       });
     },
-    [requests]
+    []
   );
 
   const getRequest = useCallback(
