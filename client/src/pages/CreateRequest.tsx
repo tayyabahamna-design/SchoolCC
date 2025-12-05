@@ -125,57 +125,55 @@ export default function CreateRequest() {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      // Create the data request
-      createRequest(
-        title,
-        description,
-        fields,
-        selectedAssignees.map((id) => {
-          const assignee = MOCK_ASSIGNEES.find((a) => a.id === id);
-          return {
-            userId: assignee?.id || '',
-            userName: assignee?.name || '',
-            userRole: assignee?.role || '',
-            schoolId: 'school-1',
-            schoolName: assignee?.school || '',
-          };
-        }),
-        user.id,
-        user.name,
-        user.role
-      );
+    // Create the data request
+    createRequest(
+      title,
+      description,
+      fields,
+      selectedAssignees.map((id) => {
+        const assignee = MOCK_ASSIGNEES.find((a) => a.id === id);
+        return {
+          userId: assignee?.id || '',
+          userName: assignee?.name || '',
+          userRole: assignee?.role || '',
+          schoolId: 'school-1',
+          schoolName: assignee?.school || '',
+        };
+      }),
+      user.id,
+      user.name,
+      user.role
+    );
 
-      // Automatically create collaborative form for the same data
-      const userSchool = getSchoolById('school-1');
-      if (userSchool) {
-        // Convert data request fields to collaborative form fields (text, number, and voice_note types)
-        // Voice notes are allowed for non-teacher roles
-        const collaborativeFields: FormField[] = fields
-          .filter((f) => f.type === 'text' || f.type === 'number' || f.type === 'voice_note')
-          .map((f) => ({
-            id: f.id,
-            name: f.name,
-            type: f.type === 'number' ? 'number' : f.type === 'voice_note' ? 'voice_note' : 'text',
-            required: f.required,
-          }));
+    // Automatically create collaborative form for the same data
+    const userSchool = getSchoolById('school-1');
+    if (userSchool) {
+      // Convert data request fields to collaborative form fields (text, number, and voice_note types)
+      // Voice notes are allowed for non-teacher roles
+      const collaborativeFields: FormField[] = fields
+        .filter((f) => f.type === 'text' || f.type === 'number' || f.type === 'voice_note')
+        .map((f) => ({
+          id: f.id,
+          name: f.name,
+          type: f.type === 'number' ? 'number' : f.type === 'voice_note' ? 'voice_note' : 'text',
+          required: f.required,
+        }));
 
-        // Only create form if there are compatible fields
-        if (collaborativeFields.length > 0) {
-          createForm(
-            userSchool.id,
-            userSchool.name,
-            title,
-            description || 'Data collection form - teachers fill their information',
-            collaborativeFields,
-            user.id,
-            user.name
-          );
-        }
+      // Only create form if there are compatible fields
+      if (collaborativeFields.length > 0) {
+        createForm(
+          userSchool.id,
+          userSchool.name,
+          title,
+          description || 'Data collection form - teachers fill their information',
+          collaborativeFields,
+          user.id,
+          user.name
+        );
       }
+    }
 
-      navigate('/data-requests');
-    }, 500);
+    navigate('/data-requests');
   };
 
   return (

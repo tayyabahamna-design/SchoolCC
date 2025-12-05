@@ -8,17 +8,25 @@ import { useState, useEffect } from 'react';
 
 export default function DataRequests() {
   const { user } = useAuth();
-  const [location, navigate] = useLocation();
+  const [, navigate] = useLocation();
   const { getRequestsForUser } = useMockDataRequests();
   const [requests, setRequests] = useState<DataRequest[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Fetch fresh requests whenever page is visited or user changes
+  // Fetch fresh requests whenever component mounts, user changes, or refresh is triggered
   useEffect(() => {
     if (user) {
       const freshRequests = getRequestsForUser(user.id, user.role);
       setRequests(freshRequests);
     }
-  }, [user?.id, user?.role, location]);
+  }, [user?.id, user?.role, refreshTrigger]);
+
+  // Auto-refresh when component becomes visible (page focus)
+  useEffect(() => {
+    const handleFocus = () => setRefreshTrigger((t) => t + 1);
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   if (!user) return null;
 
