@@ -1,0 +1,59 @@
+Issue:
+When an AEO creates a new data request, the app redirects to the Data Requests page, but the new request does not appear in the request list/dashboard—even though it should show up immediately.
+
+Diagnostic/Action Points:
+
+Ensure that after creating a request, the request is actually being written to localStorage under the right key (usually "dataRequests" or similar).
+Confirm that each new request includes the correct createdBy field set to the currently logged-in user's ID.
+On the Data Requests page, check that the getRequestsForUser function or equivalent is:
+Pulling the latest version of requests from localStorage (no stale cache/state),
+Filtering using the exact user ID you use when saving (createdBy === userID), and
+NOT filtering with a mismatched key, undefined userID, or subtle casing issues (createdby vs createdBy).
+Add a debugging console log so when a request is created and/or listed, you can inspect localStorage and the current userID.
+What to check or change:
+
+After creating a request, open DevTools and log:
+js
+
+
+console.log(JSON.parse(localStorage.getItem('dataRequests')));
+and
+js
+
+
+console.log("Current userID", userID);
+If requests do not have the correct createdBy, or if nothing appears in localStorage, there is a bug in the save logic.
+If localStorage has the new request but the UI does not show it, the filter is wrong or not re-triggering.
+Expected behavior:
+
+Once a request is created and you are redirected to the Data Requests page, you should see your request in the list/table instantly, reflecting any changes in localStorage and matching against your userID.
+Please:
+
+Check for silent failures in saving or filtering.
+Ensure localStorage is actually persistent (not cleared on reload/refresh).
+After fixing, test by creating a new request and verifying it is shown immediately on the requests page without page reload.
+If needed, paste the request creation, storage, and filtering code here for further review.
+
+This is the standard web app data state bug—check save, check filter, check refresh. Fixing this will unblock the most critical workflow.
+
+Here is an explicit prompt to give to Replit/dev to debug and fix the requests dashboard issue:
+
+Bug Report / Prompt: Data Requests Not Visible After Creation
+
+Problem:
+When I (AEO) create a data request, the request saves (to localStorage) and the app navigates to the Data Requests page, but the request does NOT appear in the request list/dashboard—despite the recent changes (“useEffect”, userID filter, etc.).
+
+What to check and fix:
+
+Check save: Is the new request actually being added to the localStorage array? Add a console.log right after save to verify the request object and array.
+Consistent keys: Ensure the createdBy field in each saved request exactly matches the userID (case and type). Check whether your filtering is using “createdBy”, “created_by”, etc.
+Filter logic: In getRequestsForUser, log out both the userID and each request's createdBy to ensure the filter is matching as intended.
+State updates: After saving the request, explicitly trigger re-reading the updated localStorage (not relying on a possibly stale state).
+Key mismatch: Make sure the localStorage key (e.g., “dataRequests”) is consistent in both the save and load code.
+How to debug:
+
+Add a console.log of the entire requests array and the current userID on the requests dashboard load.
+After request creation, manually reload the Data Requests page—if the request appears now, the issue is with your useEffect/state re-fetch logic.
+Test with two users: ensure both see only their requests, not all.
+Expected:
+After I create a request, it should always immediately appear in my Data Requests page—with no page refresh or re-login required.
