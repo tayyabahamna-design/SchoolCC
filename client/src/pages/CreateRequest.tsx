@@ -79,6 +79,15 @@ export default function CreateRequest() {
     }
   };
 
+  const deleteVoiceNote = (fieldId: string) => {
+    setRecordedVoiceNotes((prev) => {
+      const updated = { ...prev };
+      delete updated[fieldId];
+      return updated;
+    });
+    setRecordingField(null);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || fields.length === 0 || selectedAssignees.length === 0) {
@@ -245,24 +254,79 @@ export default function CreateRequest() {
 
                       {/* Voice Note Preview for Field Type */}
                       {field.type === 'voice_note' && (
-                        <div className="bg-primary/5 border border-primary/20 rounded p-2 text-xs">
-                          <p className="font-medium text-primary">Voice Note Field</p>
-                          <p className="text-muted-foreground">Assignees can record audio responses</p>
-                          {recordedVoiceNotes[field.id] && (
-                            <div className="mt-2 flex items-center gap-2">
+                        <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                          <div className="flex items-center justify-between mb-3">
+                            <div>
+                              <p className="font-medium text-blue-900">Voice Note Field</p>
+                              <p className="text-xs text-blue-700">Record audio responses for this field</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            {/* Record/Stop Button */}
+                            <Button
+                              type="button"
+                              variant={recordingField === field.id ? 'destructive' : 'outline'}
+                              size="sm"
+                              onClick={() => toggleVoiceRecording(field.id)}
+                              className={`text-xs ${recordingField === field.id ? 'bg-red-600 hover:bg-red-700' : ''}`}
+                              data-testid={`button-record-voice-${field.id}`}
+                            >
+                              {recordingField === field.id ? (
+                                <>
+                                  <Square className="w-3 h-3 mr-1" />
+                                  Stop
+                                </>
+                              ) : (
+                                <>
+                                  <Mic className="w-3 h-3 mr-1" />
+                                  Record
+                                </>
+                              )}
+                            </Button>
+
+                            {/* Play Button - only show if recording exists */}
+                            {recordedVoiceNotes[field.id] && (
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                className="h-6 text-xs"
+                                className="text-xs"
                                 disabled
+                                data-testid={`button-play-voice-${field.id}`}
                               >
-                                <Play className="w-3 h-3" />
-                                Sample
+                                <Play className="w-3 h-3 mr-1" />
+                                Play
                               </Button>
-                              <span className="text-xs text-green-600">Demo recording</span>
-                            </div>
-                          )}
+                            )}
+
+                            {/* Delete Button - only show if recording exists */}
+                            {recordedVoiceNotes[field.id] && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteVoiceNote(field.id)}
+                                className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                                data-testid={`button-delete-voice-${field.id}`}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            )}
+
+                            {/* Recording status */}
+                            {recordingField === field.id && (
+                              <div className="flex items-center gap-1 ml-2 px-2 py-1 bg-red-100 rounded animate-pulse">
+                                <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                                <span className="text-xs text-red-700 font-medium">Recording...</span>
+                              </div>
+                            )}
+
+                            {/* Recorded status */}
+                            {recordedVoiceNotes[field.id] && recordingField !== field.id && (
+                              <span className="text-xs text-green-600 font-medium ml-2">✓ Recorded</span>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>
