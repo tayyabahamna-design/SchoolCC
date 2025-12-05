@@ -86,7 +86,8 @@ export default function ViewRequest() {
   const handleDeleteRequest = () => {
     if (confirm('Are you sure you want to delete this request? This action cannot be undone.')) {
       deleteRequest(request.id);
-      navigate('/data-requests');
+      // Small delay to ensure localStorage is updated before navigation
+      setTimeout(() => navigate('/data-requests'), 100);
     }
   };
 

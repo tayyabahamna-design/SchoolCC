@@ -152,9 +152,9 @@ export function useMockDataRequests() {
 
   const getRequestsForUser = useCallback(
     (userId: string, userRole: string, userSchoolId?: string, userClusterId?: string, userDistrictId?: string) => {
-      // For now, still use localStorage. Will be replaced with API calls
+      // Always load fresh from localStorage to get latest deletions/updates
       const allRequests = loadRequestsFromStorage();
-      return allRequests.filter((req) => {
+      const filtered = allRequests.filter((req) => {
         if (req.createdBy === userId) return true;
         if (req.assignees.some((a) => a.userId === userId)) return true;
         
@@ -170,6 +170,9 @@ export function useMockDataRequests() {
         }
         return false;
       });
+      // Update internal requests state to keep in sync
+      setRequests(allRequests);
+      return filtered;
     },
     []
   );
