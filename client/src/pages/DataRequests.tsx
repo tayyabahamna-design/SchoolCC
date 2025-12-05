@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 
 export default function DataRequests() {
   const { user } = useAuth();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const { getRequestsForUser } = useMockDataRequests();
   const [requests, setRequests] = useState<DataRequest[]>([]);
 
@@ -18,7 +18,7 @@ export default function DataRequests() {
       const freshRequests = getRequestsForUser(user.id, user.role);
       setRequests(freshRequests);
     }
-  }, [user?.id, user?.role, getRequestsForUser]);
+  }, [user?.id, user?.role, location]);
 
   if (!user) return null;
 
