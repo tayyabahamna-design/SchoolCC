@@ -1,0 +1,38 @@
+ Request Creation, Assignment, and Visibility Workflow
+
+Product Rules:
+
+Hierarchy for Creation & Assignment
+Any user (CEO, DEO, DDEO, AEO, Head Teacher) can create a request and assign it ONLY to people below them in the org chart.
+At every point, the UI for “Assign To” MUST only show valid direct subordinates—not peers or users above.
+Visibility
+Requests can be viewed by:
+The creator (always)
+The current assignee(s) (always)
+Anyone higher up in the hierarchy, recursively. Example:
+CEO sees everything below (all requests).
+DEO sees all requests assigned to/by any DDEO, AEO, Head Teacher, or Teacher in their district.
+Head Teacher sees only requests they created, assigned to them, or involving their own teachers (not other schools).
+Teachers see only requests assigned to them or they themselves created.
+No other users can see the request.
+Concrete Example UI/Logic:
+If a Head Teacher is logged in, when assigning, only Teachers at their school are selectable.
+If a DEO is logged in, they can assign to any DDEO/AEO below, and view all requests in their district.
+A Teacher cannot create requests upwards, only to their Head Teacher (if that’s permitted by policy).
+Requests Page Filtering:
+When any user views the requests dashboard:
+Show all requests they created
+Show all requests assigned to them
+Show all requests created/assigned by or to anyone below in their jurisdiction tree
+Audit and Review:
+Every request should store creator, assignee(s), and school/cluster. The audit log should record creation, viewing, and reassignment with timestamps and user roles.
+No Cross/Upward Assignment:
+Prevent creation or assignment of requests to peers or to users higher in the org.
+Summary for developers:
+
+Enforce strict “assign down” only, never sideways or up.
+Ensure all request filtering and visibility follows the org chart, with upward visibility (superiors see all below; never the reverse).
+Check all dashboards/lists respect these permissions.
+If you want role/request-assignment matrix or sample JSON, just let dl know.
+Acceptance test:
+A Head Teacher, DEO, and Teacher should each see only the requests they’re entitled to, with absolutely no “peeking” across schools, upwards, or outside their jurisdiction.
