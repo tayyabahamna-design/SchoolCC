@@ -20,6 +20,12 @@ import CreateActivity from "@/pages/CreateActivity";
 import CollaborativeForms from "@/pages/CollaborativeForms";
 import CreateCollaborativeForm from "@/pages/CreateCollaborativeForm";
 import ViewCollaborativeForm from "@/pages/ViewCollaborativeForm";
+import AEOActivityHub from "@/pages/AEOActivityHub";
+import MonitoringVisitForm from "@/pages/MonitoringVisitForm";
+import MentoringVisitForm from "@/pages/MentoringVisitForm";
+import OfficeVisitForm from "@/pages/OfficeVisitForm";
+import OtherActivityForm from "@/pages/OtherActivityForm";
+import AEOActivityLogs from "@/pages/AEOActivityLogs";
 import NotFound from "@/pages/not-found";
 
 function DashboardRoute() {
@@ -48,6 +54,12 @@ function Router() {
       <Route path="/collaborative-forms" component={CollaborativeForms} />
       <Route path="/create-collaborative-form" component={CreateCollaborativeForm} />
       <Route path="/collaborative-form/:formId" component={ViewCollaborativeForm} />
+      <Route path="/aeo-activity/hub" component={AEOActivityHub} />
+      <Route path="/aeo-activity/monitoring" component={MonitoringVisitForm} />
+      <Route path="/aeo-activity/mentoring" component={MentoringVisitForm} />
+      <Route path="/aeo-activity/office" component={OfficeVisitForm} />
+      <Route path="/aeo-activity/other-activity" component={OtherActivityForm} />
+      <Route path="/aeo-activity/logs" component={AEOActivityLogs} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
