@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { useMockDataRequests, DataField } from '@/hooks/useMockDataRequests';
 import { useMockCollaborativeForms, FormField } from '@/hooks/useMockCollaborativeForms';
 import { useMockTeacherData } from '@/hooks/useMockTeacherData';
+import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { useLocation } from 'wouter';
 import { Plus, X, ArrowLeft, Mic, Square, Play } from 'lucide-react';
 
@@ -22,6 +23,7 @@ export default function CreateRequest() {
   const { createRequest } = useMockDataRequests();
   const { createForm } = useMockCollaborativeForms();
   const { getSchoolById } = useMockTeacherData();
+  const { startRecording, stopRecording, playRecording, deleteRecording, hasRecording } = useVoiceRecorder();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -29,8 +31,7 @@ export default function CreateRequest() {
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [recordingField, setRecordingField] = useState<string | null>(null);
-  const [recordedVoiceNotes, setRecordedVoiceNotes] = useState<Record<string, string>>({});
-  const [recordedDescription, setRecordedDescription] = useState<string | null>(null);
+  const [recordedVoiceNotes, setRecordedVoiceNotes] = useState<Set<string>>(new Set());
 
   if (!user) return null;
 
@@ -48,11 +49,14 @@ export default function CreateRequest() {
 
   const removeField = (id: string) => {
     setFields(fields.filter((f) => f.id !== id));
-    setRecordedVoiceNotes((prev) => {
-      const updated = { ...prev };
-      delete updated[id];
-      return updated;
-    });
+    if (recordedVoiceNotes.has(id)) {
+      deleteRecording(id);
+      setRecordedVoiceNotes((prev) => {
+        const updated = new Set(prev);
+        updated.delete(id);
+        return updated;
+      });
+    }
   };
 
   const updateField = (id: string, updates: Partial<DataField>) => {
@@ -69,21 +73,21 @@ export default function CreateRequest() {
     if (recordingField === fieldId) {
       // Stop recording
       setRecordingField(null);
-      // Simulate recording completion - in real app would save audio blob
-      setRecordedVoiceNotes((prev) => ({
-        ...prev,
-        [fieldId]: `voice_${Date.now()}`,
-      }));
+      stopRecording(fieldId).then(() => {
+        setRecordedVoiceNotes((prev) => new Set([...prev, fieldId]));
+      });
     } else {
       // Start recording
       setRecordingField(fieldId);
+      startRecording();
     }
   };
 
   const deleteVoiceNote = (fieldId: string) => {
+    deleteRecording(fieldId);
     setRecordedVoiceNotes((prev) => {
-      const updated = { ...prev };
-      delete updated[fieldId];
+      const updated = new Set(prev);
+      updated.delete(fieldId);
       return updated;
     });
     setRecordingField(null);
@@ -92,14 +96,22 @@ export default function CreateRequest() {
   const toggleDescriptionRecording = () => {
     if (recordingField === 'description') {
       setRecordingField(null);
-      setRecordedDescription(`voice_${Date.now()}`);
+      stopRecording('description').then(() => {
+        setRecordedVoiceNotes((prev) => new Set([...prev, 'description']));
+      });
     } else {
       setRecordingField('description');
+      startRecording();
     }
   };
 
   const deleteDescriptionVoice = () => {
-    setRecordedDescription(null);
+    deleteRecording('description');
+    setRecordedVoiceNotes((prev) => {
+      const updated = new Set(prev);
+      updated.delete('description');
+      return updated;
+    });
     setRecordingField(null);
   };
 
@@ -226,22 +238,19 @@ export default function CreateRequest() {
                         <Mic className="w-4 h-4" />
                       )}
                     </Button>
-                    {recordedDescription && (
+                    {recordedVoiceNotes.has('description') && (
                       <Button
                         type="button"
                         variant="outline"
                         size="icon"
-                        onClick={() => {
-                          // Simulate playing audio - in real app would use Web Audio API
-                          alert('Voice note playing...');
-                        }}
+                        onClick={() => playRecording('description')}
                         data-testid="button-play-description"
                         title="Play voice note"
                       >
                         <Play className="w-4 h-4" />
                       </Button>
                     )}
-                    {recordedDescription && (
+                    {recordedVoiceNotes.has('description') && (
                       <Button
                         type="button"
                         variant="ghost"
@@ -262,7 +271,7 @@ export default function CreateRequest() {
                     <span className="text-red-700 font-medium">Recording...</span>
                   </div>
                 )}
-                {recordedDescription && recordingField !== 'description' && (
+                {recordedVoiceNotes.has('description') && recordingField !== 'description' && (
                   <div className="text-xs text-green-600 font-medium mt-2">✓ Voice note recorded</div>
                 )}
               </div>
@@ -357,16 +366,13 @@ export default function CreateRequest() {
                             </Button>
 
                             {/* Play Button - only show if recording exists */}
-                            {recordedVoiceNotes[field.id] && (
+                            {recordedVoiceNotes.has(field.id) && (
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 className="text-xs"
-                                onClick={() => {
-                                  // Simulate playing audio
-                                  alert('Playing voice note...');
-                                }}
+                                onClick={() => playRecording(field.id)}
                                 data-testid={`button-play-voice-${field.id}`}
                               >
                                 <Play className="w-3 h-3 mr-1" />
@@ -375,7 +381,7 @@ export default function CreateRequest() {
                             )}
 
                             {/* Delete Button - only show if recording exists */}
-                            {recordedVoiceNotes[field.id] && (
+                            {recordedVoiceNotes.has(field.id) && (
                               <Button
                                 type="button"
                                 variant="ghost"
@@ -397,7 +403,7 @@ export default function CreateRequest() {
                             )}
 
                             {/* Recorded status */}
-                            {recordedVoiceNotes[field.id] && recordingField !== field.id && (
+                            {recordedVoiceNotes.has(field.id) && recordingField !== field.id && (
                               <span className="text-xs text-green-600 font-medium ml-2">✓ Recorded</span>
                             )}
                           </div>
