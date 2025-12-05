@@ -8,8 +8,7 @@ import { useState, useEffect } from 'react';
 
 export default function DataRequests() {
   const { user } = useAuth();
-  const [location] = useLocation();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const { getRequestsForUser } = useMockDataRequests();
   const [requests, setRequests] = useState<DataRequest[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
