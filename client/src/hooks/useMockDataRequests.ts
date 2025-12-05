@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { ROLE_HIERARCHY, UserRole } from '@/contexts/auth';
 
 export interface DataField {
   id: string;
@@ -30,6 +31,9 @@ export interface DataRequest {
   createdBy: string;
   createdByName: string;
   createdByRole: string;
+  createdBySchoolId?: string;
+  createdByClusterId?: string;
+  createdByDistrictId?: string;
   createdAt: Date;
   dueDate: Date;
   assignees: RequestAssignee[];
@@ -143,19 +147,42 @@ export function useMockDataRequests() {
   const [requests, setRequests] = useState<DataRequest[]>(loadRequestsFromStorage);
 
   const getRequestsForUser = useCallback(
-    (userId: string, userRole: string) => {
+    (userId: string, userRole: string, userSchoolId?: string, userClusterId?: string, userDistrictId?: string) => {
       // Always read latest from localStorage
       const allRequests = loadRequestsFromStorage();
       return allRequests.filter((req) => {
-        if (userRole === 'DEO' || userRole === 'DDEO') {
-          return true; // See all requests
+        // Creator always sees their requests
+        if (req.createdBy === userId) return true;
+        
+        // Assignees always see their assignments
+        if (req.assignees.some((a) => a.userId === userId)) return true;
+        
+        // Hierarchy visibility: superiors see all requests in their jurisdiction
+        const creatorHierarchy = ROLE_HIERARCHY[req.createdByRole as UserRole] || 0;
+        const userHierarchyLevel = ROLE_HIERARCHY[userRole as UserRole] || 0;
+        
+        if (userHierarchyLevel > creatorHierarchy) {
+          // User is higher in hierarchy - check jurisdiction match
+          if (userRole === 'CEO') return true; // CEO sees everything
+          if (userRole === 'DEO') {
+            // DEO sees all in their district
+            return userDistrictId === req.createdByDistrictId;
+          }
+          if (userRole === 'DDEO') {
+            // DDEO sees all in their district
+            return userDistrictId === req.createdByDistrictId;
+          }
+          if (userRole === 'AEO') {
+            // AEO sees requests in their cluster
+            return userClusterId === req.createdByClusterId;
+          }
+          if (userRole === 'HEAD_TEACHER') {
+            // Head Teacher sees requests at their school
+            return userSchoolId === (req.createdBySchoolId || req.assignees[0]?.schoolId);
+          }
         }
-        if (userRole === 'AEO') {
-          // See requests they created OR requests assigned to them
-          return req.createdBy === userId || req.assignees.some((a) => a.userId === userId);
-        }
-        // HEAD_TEACHER and TEACHER see requests assigned to them
-        return req.assignees.some((a) => a.userId === userId);
+        
+        return false;
       });
     },
     []
@@ -200,7 +227,10 @@ export function useMockDataRequests() {
       assignees: Omit<RequestAssignee, 'status' | 'fields' | 'id'>[],
       createdBy: string,
       createdByName: string,
-      createdByRole: string
+      createdByRole: string,
+      createdBySchoolId?: string,
+      createdByClusterId?: string,
+      createdByDistrictId?: string
     ) => {
       const newRequest: DataRequest = {
         id: `req-${Date.now()}`,
@@ -210,6 +240,9 @@ export function useMockDataRequests() {
         createdBy,
         createdByName,
         createdByRole,
+        createdBySchoolId,
+        createdByClusterId,
+        createdByDistrictId,
         createdAt: new Date(),
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
         assignees: assignees.map((a, idx) => ({

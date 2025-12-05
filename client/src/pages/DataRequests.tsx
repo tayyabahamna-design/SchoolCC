@@ -16,10 +16,10 @@ export default function DataRequests() {
   // Fetch fresh requests whenever component mounts, user changes, or refresh is triggered
   useEffect(() => {
     if (user) {
-      const freshRequests = getRequestsForUser(user.id, user.role);
+      const freshRequests = getRequestsForUser(user.id, user.role, user.schoolId, user.clusterId, user.districtId);
       setRequests(freshRequests);
     }
-  }, [user?.id, user?.role, refreshTrigger]);
+  }, [user?.id, user?.role, user?.schoolId, user?.clusterId, user?.districtId, refreshTrigger]);
 
   // Auto-refresh when component becomes visible (page focus)
   useEffect(() => {

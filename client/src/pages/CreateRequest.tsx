@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '@/contexts/auth';
+import { useAuth, VALID_ASSIGNEES, type UserRole } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -11,14 +11,29 @@ import { useLocation } from 'wouter';
 import { Plus, X, ArrowLeft, Mic, Square, Play } from 'lucide-react';
 
 const FIELD_TYPES = ['text', 'number', 'file', 'photo', 'voice_note'];
-const MOCK_ASSIGNEES = [
-  { id: 'ht-1', name: 'Mrs. Anjali Singh', role: 'HEAD_TEACHER', school: 'School A' },
-  { id: 'ht-2', name: 'Mr. Rajesh Kumar', role: 'HEAD_TEACHER', school: 'School B' },
-  { id: 'teacher-1', name: 'Mr. Vikram Das', role: 'TEACHER', school: 'School A' },
-  { id: 'teacher-2', name: 'Ms. Priya Verma', role: 'TEACHER', school: 'School A' },
-  { id: 'teacher-3', name: 'Mr. Hassan Ali', role: 'TEACHER', school: 'School B' },
-  { id: 'teacher-4', name: 'Ms. Fatima Ahmed', role: 'TEACHER', school: 'School B' },
+
+// Org hierarchy with valid direct subordinates
+const ALL_USERS = [
+  // DEOs
+  { id: 'deo-1', name: 'Dr. Rajesh Kumar', role: 'DEO' as const, school: 'District' },
+  // DDEOs
+  { id: 'ddeo-1', name: 'Ms. Priya Sharma', role: 'DDEO' as const, school: 'District' },
+  // AEOs
+  { id: 'aeo-1', name: 'Mr. Amit Patel', role: 'AEO' as const, school: 'Cluster 1' },
+  // Head Teachers
+  { id: 'ht-1', name: 'Mrs. Anjali Singh', role: 'HEAD_TEACHER' as const, school: 'School A' },
+  { id: 'ht-2', name: 'Mr. Rajesh Kumar', role: 'HEAD_TEACHER' as const, school: 'School B' },
+  // Teachers
+  { id: 'teacher-1', name: 'Mr. Vikram Das', role: 'TEACHER' as const, school: 'School A' },
+  { id: 'teacher-2', name: 'Ms. Priya Verma', role: 'TEACHER' as const, school: 'School A' },
+  { id: 'teacher-3', name: 'Mr. Hassan Ali', role: 'TEACHER' as const, school: 'School B' },
+  { id: 'teacher-4', name: 'Ms. Fatima Ahmed', role: 'TEACHER' as const, school: 'School B' },
 ];
+
+const getValidAssigneesForUser = (userRole: UserRole): typeof ALL_USERS => {
+  const validRoles = VALID_ASSIGNEES[userRole] || [];
+  return ALL_USERS.filter(u => validRoles.includes(u.role as UserRole));
+};
 
 export default function CreateRequest() {
   const { user } = useAuth();
@@ -37,6 +52,9 @@ export default function CreateRequest() {
   const [recordedVoiceNotes, setRecordedVoiceNotes] = useState<Record<string, boolean>>({});
 
   if (!user) return null;
+
+  // Get valid assignees based on user role
+  const validAssignees = getValidAssigneesForUser(user.role);
 
   const addField = () => {
     setFields([
@@ -131,7 +149,7 @@ export default function CreateRequest() {
       description,
       fields,
       selectedAssignees.map((id) => {
-        const assignee = MOCK_ASSIGNEES.find((a) => a.id === id);
+        const assignee = ALL_USERS.find((a) => a.id === id);
         return {
           userId: assignee?.id || '',
           userName: assignee?.name || '',
@@ -142,7 +160,10 @@ export default function CreateRequest() {
       }),
       user.id,
       user.name,
-      user.role
+      user.role,
+      user.schoolId,
+      user.clusterId,
+      user.districtId
     );
 
     // Automatically create collaborative form for the same data
@@ -436,28 +457,34 @@ export default function CreateRequest() {
           {/* Assignees */}
           <Card className="p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Assign To</h2>
-            <div className="space-y-2">
-              {MOCK_ASSIGNEES.map((assignee) => (
-                <label
-                  key={assignee.id}
-                  className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/30"
-                  data-testid={`label-assignee-${assignee.id}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedAssignees.includes(assignee.id)}
-                    onChange={() => toggleAssignee(assignee.id)}
-                    data-testid={`checkbox-assignee-${assignee.id}`}
-                  />
-                  <div className="ml-3 flex-1">
-                    <div className="font-medium text-foreground">{assignee.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {assignee.role} • {assignee.school}
+            {validAssignees.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                Your role cannot create requests (assign to subordinates). Check your permissions.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {validAssignees.map((assignee) => (
+                  <label
+                    key={assignee.id}
+                    className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/30"
+                    data-testid={`label-assignee-${assignee.id}`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedAssignees.includes(assignee.id)}
+                      onChange={() => toggleAssignee(assignee.id)}
+                      data-testid={`checkbox-assignee-${assignee.id}`}
+                    />
+                    <div className="ml-3 flex-1">
+                      <div className="font-medium text-foreground">{assignee.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {assignee.role} • {assignee.school}
+                      </div>
                     </div>
-                  </div>
-                </label>
-              ))}
-            </div>
+                  </label>
+                ))}
+              </div>
+            )}
           </Card>
 
           {/* Submit */}

@@ -10,7 +10,28 @@ export interface User {
   schoolId?: string;
   schoolName?: string;
   clusterId?: string;
+  districtId?: string;
 }
+
+// Hierarchy: CEO > DEO > DDEO/AEO > HEAD_TEACHER > TEACHER
+export const ROLE_HIERARCHY: Record<UserRole, number> = {
+  'CEO': 5,
+  'DEO': 4,
+  'DDEO': 3,
+  'AEO': 3,
+  'HEAD_TEACHER': 2,
+  'TEACHER': 1,
+};
+
+// Direct subordinates for each role
+export const VALID_ASSIGNEES: Record<UserRole, UserRole[]> = {
+  'CEO': ['DEO'],
+  'DEO': ['DDEO', 'AEO'],
+  'DDEO': [],
+  'AEO': ['HEAD_TEACHER'],
+  'HEAD_TEACHER': ['TEACHER'],
+  'TEACHER': [],
+};
 
 interface AuthContextType {
   user: User | null;
@@ -32,22 +53,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           id: 'ceo-1',
           role: 'CEO',
           name: 'Mr. Suresh Desai',
+          districtId: 'district-1',
         },
         DEO: {
           id: 'deo-1',
           role: 'DEO',
           name: 'Dr. Rajesh Kumar',
+          districtId: 'district-1',
         },
         DDEO: {
           id: 'ddeo-1',
           role: 'DDEO',
           name: 'Ms. Priya Sharma',
+          districtId: 'district-1',
         },
         AEO: {
           id: 'aeo-1',
           role: 'AEO',
           name: 'Mr. Amit Patel',
           clusterId: 'cluster-1',
+          districtId: 'district-1',
         },
         HEAD_TEACHER: {
           id: 'ht-1',
@@ -55,6 +80,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           name: 'Mrs. Anjali Singh',
           schoolId: 'school-1',
           schoolName: 'Government Primary School, Zone A',
+          clusterId: 'cluster-1',
+          districtId: 'district-1',
         },
         TEACHER: {
           id: 'teacher-1',
@@ -62,6 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           name: 'Mr. Vikram Das',
           schoolId: 'school-1',
           schoolName: 'Government Primary School, Zone A',
+          clusterId: 'cluster-1',
+          districtId: 'district-1',
         },
       };
 
