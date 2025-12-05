@@ -269,11 +269,41 @@ export function useMockDataRequests() {
     []
   );
 
+  const deleteRequest = useCallback(
+    (requestId: string) => {
+      setRequests((prev) => {
+        const updated = prev.filter((req) => req.id !== requestId);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('dataRequests', JSON.stringify(updated));
+        }
+        return updated;
+      });
+    },
+    []
+  );
+
+  const updateRequest = useCallback(
+    (requestId: string, updates: Partial<DataRequest>) => {
+      setRequests((prev) => {
+        const updated = prev.map((req) =>
+          req.id === requestId ? { ...req, ...updates } : req
+        );
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('dataRequests', JSON.stringify(updated));
+        }
+        return updated;
+      });
+    },
+    []
+  );
+
   return {
     requests,
     getRequestsForUser,
     getRequest,
     updateAssigneeFields,
     createRequest,
+    deleteRequest,
+    updateRequest,
   };
 }
