@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Plus, Trash2, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, CheckCircle2, Mic, Square, Play, X } from 'lucide-react';
 import { useMockAEOActivities, MentoringVisitData, MentoringVisitIndicator } from '@/hooks/useMockAEOActivities';
 import { toast } from 'sonner';
 
@@ -40,6 +40,8 @@ export default function MentoringVisitForm({ onClose }: Props) {
 
   const [evidence, setEvidence] = useState<{ id: string; name: string; type: 'photo' | 'document' | 'voice'; url: string }[]>([]);
   const [loading, setLoading] = useState(false);
+  const [recordingField, setRecordingField] = useState<string | null>(null);
+  const [recordedVoiceNotes, setRecordedVoiceNotes] = useState<Record<string, string>>({});
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -76,13 +78,45 @@ export default function MentoringVisitForm({ onClose }: Props) {
     setEvidence(evidence.filter((e) => e.id !== id));
   };
 
+  const toggleVoiceRecording = (fieldId: string) => {
+    if (recordingField === fieldId) {
+      setRecordingField(null);
+      setRecordedVoiceNotes((prev) => ({
+        ...prev,
+        [fieldId]: `voice_${Date.now()}`,
+      }));
+    } else {
+      setRecordingField(fieldId);
+    }
+  };
+
+  const deleteVoiceNote = (fieldId: string) => {
+    setRecordedVoiceNotes((prev) => {
+      const updated = { ...prev };
+      delete updated[fieldId];
+      return updated;
+    });
+    setRecordingField(null);
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setTimeout(() => {
-      const { id: _, ...dataWithoutId } = formData;
       const visit: MentoringVisitData = {
         id: `ment-${Date.now()}`,
-        ...(dataWithoutId as MentoringVisitData),
+        aeoName: formData.aeoName || '',
+        schoolName: formData.schoolName || '',
+        visitDate: formData.visitDate || '',
+        arrivalTime: formData.arrivalTime || '',
+        departureTime: formData.departureTime || '',
+        classObserved: formData.classObserved || '',
+        teacherName: formData.teacherName || '',
+        subject: formData.subject || '',
+        indicators: formData.indicators || [],
+        generalFeedback: formData.generalFeedback || '',
+        strengthsObserved: formData.strengthsObserved || '',
+        areasForImprovement: formData.areasForImprovement || '',
+        actionItems: formData.actionItems || '',
         evidence,
         status: 'submitted',
         submittedAt: new Date(),
@@ -271,57 +305,273 @@ export default function MentoringVisitForm({ onClose }: Props) {
             <Card className="p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Feedback & Action Items</h2>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
+                {/* Strengths Observed */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Strengths Observed
                   </label>
-                  <textarea
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-900 min-h-20"
-                    placeholder="Describe the teacher's strengths..."
-                    value={formData.strengthsObserved || ''}
-                    onChange={(e) => handleInputChange('strengthsObserved', e.target.value)}
-                    data-testid="textarea-strengths"
-                  />
+                  <div className="flex gap-2">
+                    <textarea
+                      className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-900 min-h-20"
+                      placeholder="Describe the teacher's strengths..."
+                      value={formData.strengthsObserved || ''}
+                      onChange={(e) => handleInputChange('strengthsObserved', e.target.value)}
+                      data-testid="textarea-strengths"
+                    />
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        type="button"
+                        variant={recordingField === 'strengths' ? 'destructive' : 'outline'}
+                        size="icon"
+                        onClick={() => toggleVoiceRecording('strengths')}
+                        className={recordingField === 'strengths' ? 'bg-red-600 hover:bg-red-700' : ''}
+                        data-testid="button-record-strengths"
+                        title={recordingField === 'strengths' ? 'Stop recording' : 'Record voice note'}
+                      >
+                        {recordingField === 'strengths' ? (
+                          <Square className="w-4 h-4" />
+                        ) : (
+                          <Mic className="w-4 h-4" />
+                        )}
+                      </Button>
+                      {recordedVoiceNotes['strengths'] && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            disabled
+                            data-testid="button-play-strengths"
+                            title="Voice note recorded"
+                          >
+                            <Play className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteVoiceNote('strengths')}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            data-testid="button-delete-strengths-voice"
+                            title="Delete voice note"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {recordingField === 'strengths' && (
+                    <div className="flex items-center gap-2 mt-2 px-2 py-1 bg-red-100 rounded w-fit text-xs">
+                      <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                      <span className="text-red-700 font-medium">Recording...</span>
+                    </div>
+                  )}
+                  {recordedVoiceNotes['strengths'] && recordingField !== 'strengths' && (
+                    <div className="text-xs text-green-600 font-medium mt-2">✓ Voice note recorded</div>
+                  )}
                 </div>
 
+                {/* Areas for Improvement */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Areas for Improvement
                   </label>
-                  <textarea
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-900 min-h-20"
-                    placeholder="Identify areas for improvement..."
-                    value={formData.areasForImprovement || ''}
-                    onChange={(e) => handleInputChange('areasForImprovement', e.target.value)}
-                    data-testid="textarea-improvements"
-                  />
+                  <div className="flex gap-2">
+                    <textarea
+                      className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-900 min-h-20"
+                      placeholder="Identify areas for improvement..."
+                      value={formData.areasForImprovement || ''}
+                      onChange={(e) => handleInputChange('areasForImprovement', e.target.value)}
+                      data-testid="textarea-improvements"
+                    />
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        type="button"
+                        variant={recordingField === 'improvements' ? 'destructive' : 'outline'}
+                        size="icon"
+                        onClick={() => toggleVoiceRecording('improvements')}
+                        className={recordingField === 'improvements' ? 'bg-red-600 hover:bg-red-700' : ''}
+                        data-testid="button-record-improvements"
+                        title={recordingField === 'improvements' ? 'Stop recording' : 'Record voice note'}
+                      >
+                        {recordingField === 'improvements' ? (
+                          <Square className="w-4 h-4" />
+                        ) : (
+                          <Mic className="w-4 h-4" />
+                        )}
+                      </Button>
+                      {recordedVoiceNotes['improvements'] && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            disabled
+                            data-testid="button-play-improvements"
+                            title="Voice note recorded"
+                          >
+                            <Play className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteVoiceNote('improvements')}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            data-testid="button-delete-improvements-voice"
+                            title="Delete voice note"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {recordingField === 'improvements' && (
+                    <div className="flex items-center gap-2 mt-2 px-2 py-1 bg-red-100 rounded w-fit text-xs">
+                      <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                      <span className="text-red-700 font-medium">Recording...</span>
+                    </div>
+                  )}
+                  {recordedVoiceNotes['improvements'] && recordingField !== 'improvements' && (
+                    <div className="text-xs text-green-600 font-medium mt-2">✓ Voice note recorded</div>
+                  )}
                 </div>
 
+                {/* Action Items */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Action Items
                   </label>
-                  <textarea
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-900 min-h-20"
-                    placeholder="Specific action items for improvement..."
-                    value={formData.actionItems || ''}
-                    onChange={(e) => handleInputChange('actionItems', e.target.value)}
-                    data-testid="textarea-actions"
-                  />
+                  <div className="flex gap-2">
+                    <textarea
+                      className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-900 min-h-20"
+                      placeholder="Specific action items for improvement..."
+                      value={formData.actionItems || ''}
+                      onChange={(e) => handleInputChange('actionItems', e.target.value)}
+                      data-testid="textarea-actions"
+                    />
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        type="button"
+                        variant={recordingField === 'actions' ? 'destructive' : 'outline'}
+                        size="icon"
+                        onClick={() => toggleVoiceRecording('actions')}
+                        className={recordingField === 'actions' ? 'bg-red-600 hover:bg-red-700' : ''}
+                        data-testid="button-record-actions"
+                        title={recordingField === 'actions' ? 'Stop recording' : 'Record voice note'}
+                      >
+                        {recordingField === 'actions' ? (
+                          <Square className="w-4 h-4" />
+                        ) : (
+                          <Mic className="w-4 h-4" />
+                        )}
+                      </Button>
+                      {recordedVoiceNotes['actions'] && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            disabled
+                            data-testid="button-play-actions"
+                            title="Voice note recorded"
+                          >
+                            <Play className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteVoiceNote('actions')}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            data-testid="button-delete-actions-voice"
+                            title="Delete voice note"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {recordingField === 'actions' && (
+                    <div className="flex items-center gap-2 mt-2 px-2 py-1 bg-red-100 rounded w-fit text-xs">
+                      <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                      <span className="text-red-700 font-medium">Recording...</span>
+                    </div>
+                  )}
+                  {recordedVoiceNotes['actions'] && recordingField !== 'actions' && (
+                    <div className="text-xs text-green-600 font-medium mt-2">✓ Voice note recorded</div>
+                  )}
                 </div>
 
+                {/* General Feedback */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     General Feedback
                   </label>
-                  <textarea
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-900 min-h-20"
-                    placeholder="Additional comments..."
-                    value={formData.generalFeedback || ''}
-                    onChange={(e) => handleInputChange('generalFeedback', e.target.value)}
-                    data-testid="textarea-general-feedback"
-                  />
+                  <div className="flex gap-2">
+                    <textarea
+                      className="w-full px-3 py-2 border border-slate-300 rounded-md text-slate-900 min-h-20"
+                      placeholder="Additional comments..."
+                      value={formData.generalFeedback || ''}
+                      onChange={(e) => handleInputChange('generalFeedback', e.target.value)}
+                      data-testid="textarea-general-feedback"
+                    />
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        type="button"
+                        variant={recordingField === 'feedback' ? 'destructive' : 'outline'}
+                        size="icon"
+                        onClick={() => toggleVoiceRecording('feedback')}
+                        className={recordingField === 'feedback' ? 'bg-red-600 hover:bg-red-700' : ''}
+                        data-testid="button-record-feedback"
+                        title={recordingField === 'feedback' ? 'Stop recording' : 'Record voice note'}
+                      >
+                        {recordingField === 'feedback' ? (
+                          <Square className="w-4 h-4" />
+                        ) : (
+                          <Mic className="w-4 h-4" />
+                        )}
+                      </Button>
+                      {recordedVoiceNotes['feedback'] && (
+                        <>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            disabled
+                            data-testid="button-play-feedback"
+                            title="Voice note recorded"
+                          >
+                            <Play className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteVoiceNote('feedback')}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            data-testid="button-delete-feedback-voice"
+                            title="Delete voice note"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {recordingField === 'feedback' && (
+                    <div className="flex items-center gap-2 mt-2 px-2 py-1 bg-red-100 rounded w-fit text-xs">
+                      <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
+                      <span className="text-red-700 font-medium">Recording...</span>
+                    </div>
+                  )}
+                  {recordedVoiceNotes['feedback'] && recordingField !== 'feedback' && (
+                    <div className="text-xs text-green-600 font-medium mt-2">✓ Voice note recorded</div>
+                  )}
                 </div>
               </div>
             </Card>

@@ -151,57 +151,48 @@ export const OTHER_ACTIVITIES_LIST = [
 
 const MENTORING_INDICATORS = [
   {
-    id: 'class-env',
+    id: 'classroom-env',
     name: 'Classroom Environment',
     rubric: {
-      emerging: 'Teacher-dominated discussions with minimal student participation',
-      developing: 'Some student involvement in discussions with basic collaboration',
-      proficient: 'Student-led discussions, active collaboration, strong critical thinking',
+      emerging: 'Disorganized environment with poor classroom management and minimal student engagement',
+      developing: 'Fairly organized environment with adequate classroom management and moderate student engagement',
+      proficient: 'Well-organized, positive learning environment with strong classroom management and active student participation',
     },
   },
   {
     id: 'lesson-plan',
     name: 'Lesson Planning',
     rubric: {
-      emerging: 'Limited HOTS objectives, activities focus on recall/understanding',
-      developing: 'Some HOTS objectives included, mix of recall and analysis activities',
-      proficient: 'Clear HOTS objectives, activities for analysis, evaluation, synthesis, real-world integration',
+      emerging: 'Lessons lack clear objectives and structured planning',
+      developing: 'Lessons have some objectives and basic structure but could be more comprehensive',
+      proficient: 'Well-planned lessons with clear objectives, structured activities, and alignment with curriculum standards',
     },
   },
   {
-    id: 'instruction',
+    id: 'instructional-strategies',
     name: 'Instructional Strategies',
     rubric: {
-      emerging: 'Primarily direct instruction with closed-ended questions',
-      developing: 'Mix of direct and inquiry-based instruction with some open-ended questions',
-      proficient: 'Diverse strategies including open-ended questions, student analysis, problem-solving demonstrations',
+      emerging: 'Relies primarily on lecture and passive teaching methods',
+      developing: 'Mix of traditional and some interactive teaching methods with limited differentiation',
+      proficient: 'Diverse, interactive strategies including group work, critical thinking, and differentiated instruction',
     },
   },
   {
-    id: 'student-engage',
+    id: 'student-engagement',
     name: 'Student Engagement',
     rubric: {
-      emerging: 'Limited student participation, passive learning',
-      developing: 'Moderate student engagement in individual and small group tasks',
-      proficient: 'High engagement in problem-solving, multiple perspectives explored, creative solutions valued',
+      emerging: 'Low student participation and engagement with learning activities',
+      developing: 'Moderate engagement with some students participating actively',
+      proficient: 'High engagement across all students with active participation in meaningful learning activities',
     },
   },
   {
-    id: 'assessment',
+    id: 'assessment-feedback',
     name: 'Assessment & Feedback',
     rubric: {
-      emerging: 'Limited feedback, focus on correctness only',
-      developing: 'Some specific feedback provided, some self-assessment opportunities',
-      proficient: 'Actionable feedback, peer and self-assessment practices, higher-order assignments',
-    },
-  },
-  {
-    id: 'resources',
-    name: 'Resources for Collaboration',
-    rubric: {
-      emerging: 'Few or no resources available for student collaboration',
-      developing: 'Basic resources available but organization could be improved',
-      proficient: 'Well-organized, diverse resources readily available for collaborative problem-solving',
+      emerging: 'Limited assessment practices and minimal feedback to students',
+      developing: 'Some formative assessment and basic feedback provided to guide learning',
+      proficient: 'Comprehensive assessment strategies with constructive feedback and clear guidance for improvement',
     },
   },
 ];
