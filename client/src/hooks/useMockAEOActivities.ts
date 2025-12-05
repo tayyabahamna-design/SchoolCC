@@ -71,6 +71,21 @@ export interface MentoringVisitIndicator {
   examples: string;
 }
 
+export interface MentoringVisitArea {
+  id: string;
+  name: string;
+  indicators: Array<{
+    id: string;
+    name: string;
+    rating: 'emerging' | 'developing' | 'proficient' | null;
+    rubric: {
+      emerging: string;
+      developing: string;
+      proficient: string;
+    };
+  }>;
+}
+
 export interface MentoringVisitData {
   id: string;
   aeoName: string;
@@ -149,51 +164,186 @@ export const OTHER_ACTIVITIES_LIST = [
   'Quality assurance and monitoring',
 ];
 
-const MENTORING_INDICATORS = [
+const MENTORING_AREAS = [
   {
     id: 'classroom-env',
     name: 'Classroom Environment',
-    rubric: {
-      emerging: 'Disorganized environment with poor classroom management and minimal student engagement',
-      developing: 'Fairly organized environment with adequate classroom management and moderate student engagement',
-      proficient: 'Well-organized, positive learning environment with strong classroom management and active student participation',
-    },
+    indicators: [
+      {
+        id: 'ce-1',
+        name: 'Physical Setup & Organization',
+        rating: null,
+        rubric: {
+          emerging: 'Classroom is disorganized with cluttered learning materials',
+          developing: 'Classroom is adequately organized with some learning resources available',
+          proficient: 'Classroom is well-organized with clearly arranged learning materials and displays',
+        },
+      },
+      {
+        id: 'ce-2',
+        name: 'Classroom Management & Discipline',
+        rating: null,
+        rubric: {
+          emerging: 'Poor classroom management with frequent disruptions and off-task behavior',
+          developing: 'Adequate classroom management with occasional disruptions',
+          proficient: 'Excellent classroom management with consistent procedures and positive student behavior',
+        },
+      },
+      {
+        id: 'ce-3',
+        name: 'Student-Centered Learning Environment',
+        rating: null,
+        rubric: {
+          emerging: 'Teacher-dominated environment with minimal student voice',
+          developing: 'Some student involvement but primarily teacher-led',
+          proficient: 'Student-centered environment that encourages collaboration and peer learning',
+        },
+      },
+    ],
   },
   {
     id: 'lesson-plan',
     name: 'Lesson Planning',
-    rubric: {
-      emerging: 'Lessons lack clear objectives and structured planning',
-      developing: 'Lessons have some objectives and basic structure but could be more comprehensive',
-      proficient: 'Well-planned lessons with clear objectives, structured activities, and alignment with curriculum standards',
-    },
+    indicators: [
+      {
+        id: 'lp-1',
+        name: 'Clear Learning Objectives',
+        rating: null,
+        rubric: {
+          emerging: 'Lesson lacks clear objectives',
+          developing: 'Lesson has basic objectives but may be unclear to students',
+          proficient: 'Lesson has SMART objectives clearly communicated to students',
+        },
+      },
+      {
+        id: 'lp-2',
+        name: 'Higher-Order Thinking Integration',
+        rating: null,
+        rubric: {
+          emerging: 'Limited focus on HOTS; activities focus on recall only',
+          developing: 'Some HOTS elements included with mix of recall and analysis activities',
+          proficient: 'Strong HOTS focus with analysis, evaluation, and synthesis activities',
+        },
+      },
+      {
+        id: 'lp-3',
+        name: 'Resource & Material Planning',
+        rating: null,
+        rubric: {
+          emerging: 'Few or inadequate resources planned for the lesson',
+          developing: 'Basic resources planned but not optimally utilized',
+          proficient: 'Well-planned, varied resources effectively integrated into lesson',
+        },
+      },
+    ],
   },
   {
     id: 'instructional-strategies',
     name: 'Instructional Strategies',
-    rubric: {
-      emerging: 'Relies primarily on lecture and passive teaching methods',
-      developing: 'Mix of traditional and some interactive teaching methods with limited differentiation',
-      proficient: 'Diverse, interactive strategies including group work, critical thinking, and differentiated instruction',
-    },
+    indicators: [
+      {
+        id: 'inst-1',
+        name: 'Direct Instruction Effectiveness',
+        rating: null,
+        rubric: {
+          emerging: 'Instruction is unclear or difficult to follow',
+          developing: 'Instruction is generally clear with some areas lacking detail',
+          proficient: 'Clear, well-structured instruction that builds understanding systematically',
+        },
+      },
+      {
+        id: 'inst-2',
+        name: 'Questioning Techniques',
+        rating: null,
+        rubric: {
+          emerging: 'Primarily uses closed-ended recall questions',
+          developing: 'Mix of closed and open-ended questions with some depth',
+          proficient: 'Uses diverse questioning strategies to promote critical thinking',
+        },
+      },
+      {
+        id: 'inst-3',
+        name: 'Interactive & Collaborative Methods',
+        rating: null,
+        rubric: {
+          emerging: 'Limited use of group work or collaborative learning',
+          developing: 'Some collaborative activities but not optimally structured',
+          proficient: 'Regular use of well-structured collaborative and interactive learning strategies',
+        },
+      },
+    ],
   },
   {
     id: 'student-engagement',
     name: 'Student Engagement',
-    rubric: {
-      emerging: 'Low student participation and engagement with learning activities',
-      developing: 'Moderate engagement with some students participating actively',
-      proficient: 'High engagement across all students with active participation in meaningful learning activities',
-    },
+    indicators: [
+      {
+        id: 'se-1',
+        name: 'Active Participation',
+        rating: null,
+        rubric: {
+          emerging: 'Few students participate; mostly passive learning',
+          developing: 'Moderate participation from majority of students',
+          proficient: 'High engagement with all students actively participating',
+        },
+      },
+      {
+        id: 'se-2',
+        name: 'On-Task Behavior',
+        rating: null,
+        rubric: {
+          emerging: 'Many students off-task or disengaged',
+          developing: 'Most students on-task with occasional distractions',
+          proficient: 'All students remain on-task throughout the lesson',
+        },
+      },
+      {
+        id: 'se-3',
+        name: 'Critical Thinking & Problem-Solving',
+        rating: null,
+        rubric: {
+          emerging: 'Limited evidence of student problem-solving or critical thinking',
+          developing: 'Some students engage in problem-solving activities',
+          proficient: 'Students actively engage in critical thinking and solve complex problems',
+        },
+      },
+    ],
   },
   {
     id: 'assessment-feedback',
     name: 'Assessment & Feedback',
-    rubric: {
-      emerging: 'Limited assessment practices and minimal feedback to students',
-      developing: 'Some formative assessment and basic feedback provided to guide learning',
-      proficient: 'Comprehensive assessment strategies with constructive feedback and clear guidance for improvement',
-    },
+    indicators: [
+      {
+        id: 'af-1',
+        name: 'Formative Assessment Practices',
+        rating: null,
+        rubric: {
+          emerging: 'Limited or no formative assessment used',
+          developing: 'Some formative assessment used to check understanding',
+          proficient: 'Consistent formative assessment throughout lesson to guide instruction',
+        },
+      },
+      {
+        id: 'af-2',
+        name: 'Quality of Feedback',
+        rating: null,
+        rubric: {
+          emerging: 'Minimal feedback or only correctness feedback provided',
+          developing: 'Some specific feedback but could be more constructive',
+          proficient: 'Regular, actionable feedback that guides student improvement',
+        },
+      },
+      {
+        id: 'af-3',
+        name: 'Student Self & Peer Assessment',
+        rating: null,
+        rubric: {
+          emerging: 'No opportunities for student self or peer assessment',
+          developing: 'Limited opportunities for self or peer assessment',
+          proficient: 'Regular opportunities for students to assess themselves and peers',
+        },
+      },
+    ],
   },
 ];
 
@@ -230,10 +380,14 @@ export function useMockAEOActivities() {
 
   return {
     addMonitoringVisit,
+    monitoringVisits,
     addMentoringVisit,
+    mentoringVisits,
     addOfficeVisit,
+    officeVisits,
     addOtherActivity,
+    otherActivities,
     getAllActivities,
-    mentoringIndicators: MENTORING_INDICATORS,
+    mentoringAreas: MENTORING_AREAS,
   };
 }

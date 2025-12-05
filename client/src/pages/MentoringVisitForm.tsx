@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Plus, Trash2, CheckCircle2, Mic, Square, Play, X } from 'lucide-react';
-import { useMockAEOActivities, MentoringVisitData, MentoringVisitIndicator } from '@/hooks/useMockAEOActivities';
+import { useMockAEOActivities, MentoringVisitData, MentoringVisitArea } from '@/hooks/useMockAEOActivities';
 import { toast } from 'sonner';
 
 const SCHOOLS = [
@@ -22,21 +22,17 @@ interface Props {
 
 export default function MentoringVisitForm({ onClose }: Props) {
   const { user } = useAuth();
-  const { addMentoringVisit, mentoringIndicators } = useMockAEOActivities();
+  const { addMentoringVisit, mentoringAreas } = useMockAEOActivities();
 
   const [formData, setFormData] = useState<Partial<MentoringVisitData>>({
     aeoName: user?.name || '',
     visitDate: new Date().toISOString().split('T')[0],
     status: 'draft',
     evidence: [],
-    indicators: mentoringIndicators.map((ind) => ({
-      id: ind.id,
-      name: ind.name,
-      rating: null,
-      rubricText: '',
-      examples: '',
-    })),
+    indicators: [],
   });
+
+  const [selectedAreas, setSelectedAreas] = useState<Record<string, Record<string, 'emerging' | 'developing' | 'proficient' | null>>>({});
 
   const [evidence, setEvidence] = useState<{ id: string; name: string; type: 'photo' | 'document' | 'voice'; url: string }[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,20 +43,13 @@ export default function MentoringVisitForm({ onClose }: Props) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleIndicatorRating = (indicatorId: string, rating: 'emerging' | 'developing' | 'proficient') => {
-    const indicator = mentoringIndicators.find((ind) => ind.id === indicatorId);
-    setFormData((prev) => ({
+  const handleIndicatorRating = (areaId: string, indicatorId: string, rating: 'emerging' | 'developing' | 'proficient') => {
+    setSelectedAreas((prev) => ({
       ...prev,
-      indicators: prev.indicators?.map((ind) => {
-        if (ind.id === indicatorId && indicator) {
-          return {
-            ...ind,
-            rating,
-            rubricText: indicator.rubric[rating],
-          };
-        }
-        return ind;
-      }),
+      [areaId]: {
+        ...(prev[areaId] || {}),
+        [indicatorId]: rating,
+      },
     }));
   };
 
@@ -256,44 +245,59 @@ export default function MentoringVisitForm({ onClose }: Props) {
             <Card className="p-6">
               <h2 className="text-lg font-semibold text-slate-900 mb-6">HOTS Indicators</h2>
               <p className="text-sm text-slate-600 mb-6">
-                Rate each indicator based on your observation. Select a rating to see rubric details.
+                Rate each indicator within every area based on your observation.
               </p>
 
-              <div className="space-y-8">
-                {formData.indicators?.map((indicator, idx) => (
-                  <div key={indicator.id} className="border-b pb-6 last:border-b-0">
-                    <h3 className="font-semibold text-slate-900 mb-4">{indicator.name}</h3>
+              <div className="space-y-10">
+                {mentoringAreas.map((area) => (
+                  <div key={area.id} className="border-b pb-8 last:border-b-0">
+                    <h3 className="text-base font-bold text-slate-900 mb-6 p-3 bg-slate-100 rounded-lg">
+                      {area.name}
+                    </h3>
 
-                    {/* Rating Buttons */}
-                    <div className="grid grid-cols-3 gap-3 mb-4">
-                      {['emerging', 'developing', 'proficient'].map((rating) => (
-                        <button
-                          key={rating}
-                          onClick={() => handleIndicatorRating(indicator.id, rating as any)}
-                          className={`p-3 rounded-lg border-2 text-center transition-all ${
-                            indicator.rating === rating
-                              ? getRatingColor(rating) + ' border-current font-semibold'
-                              : 'bg-white border-slate-300 hover:border-slate-400'
-                          }`}
-                          data-testid={`button-rating-${indicator.id}-${rating}`}
-                        >
-                          <div className="text-sm capitalize font-medium">
-                            {rating === 'emerging' && '🔴'}
-                            {rating === 'developing' && '🟡'}
-                            {rating === 'proficient' && '🟢'}
-                            <span className="ml-2">{rating}</span>
+                    <div className="space-y-6 ml-4">
+                      {area.indicators.map((indicator) => {
+                        const selectedRating = selectedAreas[area.id]?.[indicator.id];
+                        const currentIndicatorData = area.indicators.find((ind) => ind.id === indicator.id);
+
+                        return (
+                          <div key={indicator.id} className="border-l-2 border-slate-300 pl-4">
+                            <h4 className="font-semibold text-slate-800 mb-3">{indicator.name}</h4>
+
+                            {/* Rating Buttons */}
+                            <div className="grid grid-cols-3 gap-2 mb-3">
+                              {['emerging', 'developing', 'proficient'].map((rating) => (
+                                <button
+                                  key={rating}
+                                  onClick={() => handleIndicatorRating(area.id, indicator.id, rating as any)}
+                                  className={`p-2 rounded-lg border-2 text-center transition-all text-sm ${
+                                    selectedRating === rating
+                                      ? getRatingColor(rating) + ' border-current font-semibold'
+                                      : 'bg-white border-slate-300 hover:border-slate-400'
+                                  }`}
+                                  data-testid={`button-rating-${area.id}-${indicator.id}-${rating}`}
+                                >
+                                  <div className="capitalize font-medium">
+                                    {rating === 'emerging' && '🔴'}
+                                    {rating === 'developing' && '🟡'}
+                                    {rating === 'proficient' && '🟢'}
+                                    <span className="ml-1 text-xs">{rating}</span>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+
+                            {/* Rubric Display */}
+                            {selectedRating && (
+                              <div className={`p-3 rounded-lg text-sm ${getRatingColor(selectedRating)}`}>
+                                <p className="text-slate-900 font-medium mb-1">Rubric:</p>
+                                <p className="text-slate-700">{indicator.rubric[selectedRating]}</p>
+                              </div>
+                            )}
                           </div>
-                        </button>
-                      ))}
+                        );
+                      })}
                     </div>
-
-                    {/* Rubric Display */}
-                    {indicator.rating && (
-                      <div className={`p-4 rounded-lg ${getRatingColor(indicator.rating)}`}>
-                        <p className="text-sm text-slate-900 font-medium">Rubric Description:</p>
-                        <p className="text-sm text-slate-700 mt-2">{indicator.rubricText}</p>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
