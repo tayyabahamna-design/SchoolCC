@@ -12,9 +12,12 @@ import { Plus, X, ArrowLeft, Mic, Square, Play } from 'lucide-react';
 
 const FIELD_TYPES = ['text', 'number', 'file', 'photo', 'voice_note'];
 const MOCK_ASSIGNEES = [
+  { id: 'ht-1', name: 'Mrs. Anjali Singh', role: 'HEAD_TEACHER', school: 'School A' },
+  { id: 'ht-2', name: 'Mr. Rajesh Kumar', role: 'HEAD_TEACHER', school: 'School B' },
   { id: 'teacher-1', name: 'Mr. Vikram Das', role: 'TEACHER', school: 'School A' },
   { id: 'teacher-2', name: 'Ms. Priya Verma', role: 'TEACHER', school: 'School A' },
-  { id: 'ht-1', name: 'Mrs. Anjali Singh', role: 'HEAD_TEACHER', school: 'School A' },
+  { id: 'teacher-3', name: 'Mr. Hassan Ali', role: 'TEACHER', school: 'School B' },
+  { id: 'teacher-4', name: 'Ms. Fatima Ahmed', role: 'TEACHER', school: 'School B' },
 ];
 
 export default function CreateRequest() {
