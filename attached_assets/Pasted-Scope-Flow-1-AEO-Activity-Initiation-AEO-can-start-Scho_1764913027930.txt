@@ -1,0 +1,279 @@
+Scope & Flow
+1. AEO Activity Initiation:
+
+AEO can start:
+School Visit (must pick one: Monitoring, Mentoring, Office)
+Log “Other Activity” (from department-provided activity list)
+2. Visit Types & Forms:
+
+Monitoring Visit:
+Use the “AEO Visit Performa” field structure — form must validate all below indicators, with number/text/rating fields as shown.
+Monitoring Visit Indicator Fields:
+
+Tehsil, Markaz, AEO Name, School Name, Date, Arrival/Departure Time
+Teacher Presence: Total, Present, Percentage
+Head Teacher Presence: Yes/No/On duty/Leave/Other
+Student Attendance: Total, Present, Percentage
+Availability of Furniture: Total Students, With/Without Furniture
+Classroom Observation: Good/Average/Need improvement
+LND: English %, Urdu %, Maths %
+NSB: Allocation, Expenditure, Balance, Utilization %
+Toilet Sufficiency: Total Students, Total Toilets, Required (per SRT)
+Drinking Water: Available/Not available/Taste
+Hygiene: Cleanliness of washrooms/building/classrooms (Good/Average/Poor)
+Retention: Total, Retained, Dropped
+Partial Facility: Types/Reason
+Data Health: Variation %
+General Remarks
+Form must allow attachment of evidence (photos/docs/voice) per section, and signature for Head Teacher and AEO.
+
+Mentoring Visit (HOTS) Form:
+Use higher-order skills matrix/rubric, capturing ratings for each indicator with supporting text and examples.
+Mentoring Visit (HOTS) Indicators & Rubrics:
+
+Classroom Environment:
+Discussions & critical thinking (teacher-dominated → student-led, collaborative problem-solving)
+Resources for collaboration/problem-solving (none → well-organized)
+Students encouraged for complex tasks
+Lesson Planning:
+Objectives linked to thinking/problem-solving
+Plan includes analysis, evaluation, synthesis
+Integration of real-world/interdisciplinary
+Instructional Strategies:
+Open-ended, thought-provoking questions
+Student analysis, critique, interpretation
+Demonstrates problem-solving/creativity
+Scaffolding higher-order tasks (levels of guidance)
+Student Engagement:
+Individual/collaborative problem-solving
+Multiple perspectives, novel solutions
+Assessment & Feedback:
+Self-/peer-assessment (consistency/purpose)
+Specific, actionable feedback
+Assignments involving higher-order tasks (analysis, creation)
+Each scored as Emerging/Developing/Proficient with rubric examples provided (see extracts above).
+
+Office Visit:
+Simple form with:
+Arrival/Departure time
+Purpose/short summary (dropdown or text)
+Core office activities completed (checklist—admin, reporting, coordination, etc.)
+3. Other Activities for AEOs:
+
+When not planning a visit, AEO can select from a dropdown/list of department-approved activities:
+Attending training
+Conducting community mobilization
+Participating in departmental meetings
+Report/data compilation
+Hotline/complaint resolution
+Supervision of office/admin tasks
+(See uploaded “Other AEO activities” doc for full text.)
+Each activity should allow description/comments and timestamp.
+
+4. Features & UI/UX:
+
+All forms are dynamic, mandatory fields enforced, auto-save offline, and easy attachment of evidence/voice notes.
+Each activity/visit/other log is fully auditable, tagged by user/time.
+Only authorized users can create, edit, or see relevant tasks.
+Rubrics for mentoring must present indicator, rating levels (with color/tooltip), and rubric example text side-by-side.
+Clear success/completion feedback after each submission.
+Summary for sltech:
+Build three main visit forms (Monitoring, Mentoring, Office) each matched exactly to the department’s indicators/rubrics plus a fourth option for “Other Activities.” Monitoring and mentoring forms must present the correct field/rating layout, examples, and handle evidence. “Other Activities” are a separate, auditable log based on the provided official list.
+
+If you want checklist or JSON for indicators, or sample field layout/wireframe, ask!
+
+Here is a clear, comprehensive prompt for Replit/sltech that provides (a) your visit indicator forms for Monitoring, Mentoring, and Office, (b) detailed extracted indicators and rubrics, and (c) how AEOs can select from an official “Other Activities” list when not planning a visit.
+
+Prompt for Replit/sltech: SchoolHub Visit Forms, Indicators & AEO Activity Selection
+
+AEO Flow Requirements
+When an AEO logs an activity, they must:
+
+Choose between
+(1) Plan a Visit (Monitoring, Mentoring, or Office Visit) or
+(2) Select “Other Activity” from a centrally managed activities list.
+1. Visit Types & Indicator Forms
+A. Monitoring Visit Form (“AEO Visit Performa”)
+Fields to be captured exactly:
+
+Tehsil, Markaz, AEO Name, School Name, Date/Time (Arrival/Departure)
+Teacher Presence: Total / Present / %
+Head Teacher Presence: (Yes/No/On duty/Leave/Other)
+Student Attendance: Total / Present / %
+Furniture Availability: Total students, With/Without furniture
+Classroom Observation: Good, Average, Needs improvement
+LND (Literacy & Numeracy Drive): English %, Urdu %, Maths %
+NSB (Non-Salary Budget): Allocation, Expenditure, Balance, Utilization %
+Toilets: Total students, Total toilets, Toilets required as per SRT
+Drinking Water: Available/Not available/Taste
+School hygiene: Cleanliness of washrooms, buildings, classrooms (Good/Average/Poor)
+Retention (K–12): Total, Retained, Dropped
+Partial Facility: Types, Reason
+Data Health: Variation %
+General Remarks: Free text
+Signatures: Head Teacher, AEO
+Evidence upload must be available for any field/section as required.
+
+B. Mentoring Visit Form (“Higher Order Thinking Skills” HOTS Rubric)
+For each class observed:
+
+Indicators grouped (each scored as Emerging, Developing, or Proficient, with rubric-level examples):
+Classroom Environment:
+Discussions/critical thinking (teacher-dominated ↔ student-collaborative)
+Resources & space for collaboration
+Encouragement for complex/critical activities
+Lesson Planning:
+Explicit HOTS objectives
+Activities for analysis/evaluation/synthesis
+Real-world/interdisciplinary tasks
+Instructional Strategies:
+Use of open-ended/thought-provoking questions
+Student analysis, critique, argumentation
+Teacher demonstration of problem-solving/creativity
+Scaffolding for complex ideas
+Student Engagement:
+Collaboration on synthesis/problem-solving
+Exploration of perspectives/novel solutions
+Assessment & Feedback:
+Self/peer assessment (consistency & purpose)
+Actionable, specific feedback
+HOTS-oriented assignments (analysis, creation)
+Rating rubrics and rubric text/descriptions must be visible inline for each indicator.
+
+C. Office Visit
+Capture arrival/departure time, purpose/reason (dropdown or text), list of office activities completed (admin, reporting, meeting, coordination, oversight, etc.).
+Evidence/comments as needed.
+2. Other Activities for AEOs
+When not planning a visit, AEO selects an “Other Activity” from a validated department list (examples based on typical MoE/SED directives):
+
+Attending in-service training/departmental meetings
+Preparing/compiling education reports or data
+Community/school mobilization activities
+Complaint/hotline resolution work
+Supervision/coordination of office or admin tasks
+Supporting school record audits/inventory
+Facilitating exams/assessments
+(Any other activity per "Other AEO Activities.pdf" list—ensure this is loaded and updated in the app)
+Each logged activity:
+
+Dropdown selection, optional comments, evidence, timestamp, fully auditable/loggable.
+3. UX/UI
+Each visit/activity type launches the matching dynamic form with sections, rating rubrics/examples, evidence uploads, and help text.
+AEO can only submit complete, validated forms.
+Any logged or planned task is matched to work calendar and performance dashboard.
+Summary for Developer:
+Support structured, policy-matching Monitoring, Mentoring, and Office visit forms–with extracted indicator fields and rubric-scale scoring where required. Always provide the option for “Other Activities” when not on a visit, tied to a centrally managed, updatable activity list. All forms/audit logs must be exportable, evidence-supported, and presented in a modern, clear UI.
+
+Let me know if you want indicator JSONs or activity list detail from the “Other AEO Activities” document!
+
+Here is an explicit, complete set of indicators and activities you (or sltech) should use to build the forms and AEO “other activity” flows—extracted from the documents you provided:
+
+Monitoring Visit Indicators (“AEO Visit Performa”)
+Tehsil, Markaz, Name of AEO, School Name, Date of Visit, Time of Visit (Arrival/Departure)
+Teacher Presence: Total, Present, Percentage
+Head Teacher Presence: Yes/No/On Duty/Leave/Other
+Student Attendance: Total, Present, Percentage
+Availability of Furniture: Total Students, With Furniture, Without Furniture
+Classroom Observation: Good, Average, Need Improvement
+LND (English %, Urdu %, Maths %)
+NSB: Total Allocation, Expenditure, Balance, Utilization %
+Sufficiency of Toilets: Total Students, Total Toilets, Toilets Required
+Drinking Water: Available, Not Available, Taste
+School Hygiene: Cleanliness of Washrooms / Building / Classrooms (Good/Average/Poor)
+Retention (K-12): Total Students, Retained Students, Dropped Students
+Partial Facility: Types, Reason
+Data Health: Variation %
+General Remarks
+Mentoring Visit Indicators (HOTS/Higher Order Thinking Skills Rubric)
+For each indicator, rate as Emerging, Developing, or Proficient and provide rubric-aligned feedback.
+
+Classroom Environment: Level of student discussion, collaboration, critical thinking
+Lesson Planning: Objectives clarity, inclusion of HOTS, real-world connection, depth of planned activities
+Instructional Strategies: Use of open-ended/thought-provoking questions, analysis tasks, demonstration of problem-solving, scaffolding
+Student Engagement: Individual/group problem-solving, creativity, multiple perspectives
+Assessment & Feedback: Self/peer assessment, actionable feedback, depth of assignments
+Rubric details for each are in the images—must be displayed inline when scoring (e.g., “Emerging: Discussions are teacher-dominated; Proficient: Students debate solutions collaboratively”).
+
+Office Visit
+Log arrival/departure time
+Purpose/short reason (dropdown/text)
+Checklist of completed tasks (admin/reports/meetings/etc.)
+Other Activities for AEOs
+(Examples—should be loaded from the official list/document)
+
+Attend in-service/departmental training
+Prepare/compile official reports/data
+Community mobilization/outreach
+Handle hotline/complaint resolution
+Supervise or coordinate office/admin work
+Support school audits/inventory
+Facilitate exams/assessments
+Any task from “Other AEO Activities.pdf” (load actual list and keep it updatable)
+Log each as: Activity Type (dropdown), Comments, Evidence Upload, Timestamp
+
+Instructions for sltech:
+
+Each visit type (Monitoring, Mentoring, Office) launches the specific form with required indicators and evidence, exactly as above.
+“Other Activity” presents a dropdown from the department-provided activity list.
+Mentoring forms must show rating scales (Emerging/Developing/Proficient) with rubric descriptions and examples for every field.
+All activity and visit logs are auditable, assignable, and exportable.
+If sltech needs the raw text/JSON for activity options, mentoring rubrics, or a mockup layout, let me know!
+
+Here’s everything you (or sltech) need for the forms and options:
+
+AEO Visit Types & Form Indicators
+Monitoring Visit Form (AEO Visit Performa — Required Fields)
+Tehsil, Markaz, AEO Name, School Name
+Date & Time (Arrival/Departure)
+Teacher Presence: Total / Present / Percentage
+Head Teacher Presence: Yes / No / On duty / Leave / Other
+Student Attendance: Total / Present / Percentage
+Furniture Availability: Total students / With/Without furniture
+Classroom Observation: Good / Average / Needs improvement
+LND: English %, Urdu %, Maths %
+NSB: Total allocation / Expenditure / Balance / Utilization %
+Toilet Sufficiency: Total students / Total toilets / Toilets required (SRT)
+Drinking Water: Available / Not available / Taste
+School Hygiene: Cleanliness of washrooms, building, classrooms (Good/Average/Poor)
+Retention (K-12): Total students / Retained / Dropped
+Partial Facility: Types, Reason
+Data Health: Variation %
+General remarks, Signatures
+Mentoring Visit (HOTS Rubric - For Each Class Observed)
+Each indicator is scored as Emerging, Developing, or Proficient; rubric examples must appear in the UI.
+
+Discussions (teacher-dominated ↔ student, active, collaborative)
+Resources/Space for collaboration
+Complexity in assigned activities
+Objectives: focus, clarity, linkage to HOTS/critical thinking
+Lesson Plan: analysis, evaluation, synthesis strategies
+Real-world/interdisciplinary integration
+Instructional Techniques (open-ended Qs, critique, scaffolding for HOTS)
+Student Collaboration/Synthesis
+Perspective Exploration (single → multiple, creative)
+Self/Peer Assessment (consistency)
+Feedback (specific, actionable)
+Assignment tasks (HOTS/creation vs recall only)
+Office Visit:
+Arrival/Departure time
+Purpose/reason (dropdown or text)
+Checklist: Core office/admin/reporting tasks
+Other Activities (when AEO is not planning a visit)
+AEO selects from a central, updatable list (load from your “Other AEO Activities” doc):
+
+Attending training or department meetings
+Report/data preparation and compilation
+Community or school mobilization
+Complaint/hotline resolution
+Office/admin supervision or coordination
+Inventory management, audit support
+Facilitating assessments or exams
+(Anything included in “Other AEO Activities.pdf,” keep this loadable and editable as requirements change)
+Each must include: Activity type (dropdown), Comments, Evidence (file/photo/voice), Timestamp.
+
+Instructions for Developers/Designers (sltech):
+Each Visit Type launches a specific, required indicator form—monitoring (performa), mentoring (rubric), or office (simple).
+“Other Activity” (when not on a visit) offers a dropdown, pulls from official, admin-updatable list.
+Mentoring (HOTS) form must present rubric levels and certification text inline for every indicator—AEO cannot guess what qualifies as “Developing” vs “Proficient.”
+All actions, forms, and uploads are logged/audit-ready.
+UI must be modern, error-tolerant, and mobile-optimized.
