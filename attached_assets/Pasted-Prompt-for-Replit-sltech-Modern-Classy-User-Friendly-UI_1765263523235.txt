@@ -1,0 +1,48 @@
+Prompt for Replit/sltech: Modern, Classy, User-Friendly UI (Beige & Black Theme)
+
+Objective:
+Deliver a contemporary, visually pleasing, and intuitive UI for SchoolHub. The design must use a beige background and bold black for high contrast and modern luxury—applicable to every user, from CEO to teacher.
+
+UI/UX and Visual Directions
+Color Theme:
+
+Use a welcoming beige (e.g., #FFF6E5, #F8ECD1, or similar) for the main background.
+All primary text, icons, and actions should be deep, rich black (#111111).
+Primary/CTA buttons: black or elegant dark-brown fill with white/beige text; use gold or bronze for highlights and hover states if desired.
+Cards and data blocks: slightly lighter shades of beige or off-white, with warm floating shadows.
+Typography:
+
+Modern, readable sans-serif (Inter, Segoe UI, DM Sans) for clarity.
+Bold, large area/section headings; generous line-height and spacing for all body text.
+Cards, Shadow, and Depth:
+
+All cards should float prominently using smooth shadows, substantial padding, and rounded corners for an inviting feel.
+Buttons/Interactions:
+
+Primary actions: large, black or deep brown, rounded, with smooth hover.
+Secondary/outlined actions: muted beige fill, crisp black border, change state on hover.
+Animations on hover/click should make interactive elements feel “alive.”
+Navigation/Layout:
+
+Sidebar: vertical, beige, with bold black icons and text. The current section is subtly highlighted using gold, bronze, or a richer beige tone.
+All icons left-aligned with text, uniform in size and style.
+Dashboard: prioritize major CTAs (“Plan a Visit,” “Create Data Request”) at the top; activity cards and analytics below.
+Activity and Analytics Cards:
+
+Use black/gold icons minimally for accents within activity cards.
+All metrics, stats, and activity counters as elevated, clickable cards.
+Clear badge/status (using gold/bronze) for due, overdue, or completed activity.
+Responsiveness & Accessibility:
+
+Ensure all text is fully legible (high contrast) against beige.
+Mobile layouts must preserve the inviting, open feel; stack and prioritize actions for touch.
+Modals/Feedback:
+
+All popups/modals with beige backgrounds, black text, clear close controls, and smooth drop shadows.
+Feedback and toasts use subtle accent color (e.g., pale gold) with solid text readability.
+Summary for dev/design:
+
+Commit to beige for all backgrounds, deep black for text and CTAs, gold/bronze for accent.
+Modern, generous spacing and shadow everywhere.
+Placement, navigation, and UI flows must make the app as enjoyable to use as any leading modern SaaS.
+No need to reference grey—just affirm what is wanted.
