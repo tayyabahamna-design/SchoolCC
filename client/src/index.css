@@ -62,32 +62,32 @@
   --elevate-2: rgba(0, 0, 0, 0.05);
 
   /* Beige, Black & Gold Luxury Palette */
-  --background: 53 56% 63%;
+  --background: 45 40% 87%;
   --foreground: 0 0% 7%;
-  --border: 53 50% 75%;
+  --border: 45 35% 80%;
   --card: 0 0% 99%;
   --card-foreground: 0 0% 7%;
-  --card-border: 53 45% 82%;
+  --card-border: 45 30% 90%;
   
-  --sidebar: 53 56% 63%;
+  --sidebar: 45 40% 87%;
   --sidebar-foreground: 0 0% 7%;
-  --sidebar-border: 53 50% 75%;
+  --sidebar-border: 45 35% 80%;
   --sidebar-primary: 0 0% 7%;
-  --sidebar-primary-foreground: 53 56% 85%;
+  --sidebar-primary-foreground: 45 40% 93%;
   --sidebar-accent: 45 96% 50%;
   --sidebar-accent-foreground: 0 0% 7%;
   --sidebar-ring: 0 0% 7%;
   
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 7%;
-  --popover-border: 53 50% 75%;
+  --popover-border: 45 35% 80%;
   
   --primary: 0 0% 7%;
-  --primary-foreground: 53 56% 85%;
-  --secondary: 53 60% 88%;
+  --primary-foreground: 45 40% 93%;
+  --secondary: 45 45% 92%;
   --secondary-foreground: 0 0% 7%;
   
-  --muted: 53 50% 80%;
+  --muted: 45 35% 82%;
   --muted-foreground: 0 0% 40%;
   
   --accent: 45 96% 50%;
