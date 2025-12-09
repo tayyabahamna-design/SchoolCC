@@ -1,0 +1,30 @@
+Prompt for Replit/sltech – Full UI/UX Modernization (Not just color!)
+
+Visual Tone
+Keep the beige and black palette, but the interface needs to feel modern—not just look differently colored.
+Elevate all major cards and quick actions with stronger shadows, bigger border radii, and more vertical spacing between rows.
+Component Redesign & Layout
+Group quick actions into a visually distinct, slightly elevated card or section with more breathing room.
+Quick actions should use bold, full-width primary/secondary buttons or large icon chips. Use a clear visual separation between navigation, analytics, and actions.
+Make the “Your Activities” and “Recent Activity” areas have more spacing and a slightly lighter beige card background than the page for true depth.
+Dashboard cards (stats, recent activity) should be more interactive—hover scales them, click allows drilldown.
+Main CTAs (Plan a Visit, Create Data Request) should look “touchable”—stronger elevation, bold text, very clear active/hover states.
+Navigation & Icon Placement
+Place icons consistently to the left of button/card labels.
+Sidebar (if present) should float with large icons and clear active indication; for header-nav, group sections with clear space between.
+Remove crowded button clusters—group actions logically.
+Profile/avatar and logout should be in the upper right, stylized as a modern button or dropdown, not a legacy pill.
+Interactions
+Transitions: All modals, toasts, and tooltips should use simple, smooth fade/slide effects (not instant pop-in).
+Card and button hover uses elevation and background color animation (e.g., gold or subtle bronze glow on primary actions).
+Typography
+Increase base font size (minimum 16px for body, bigger for cards/analytics). Use more aggressive headings for section titles.
+Make numbers, due-dates, and labels large and easy to scan.
+Mobile Responsiveness
+Card layout must stack cleanly into one column on mobile—never cause horizontal scroll.
+Clarity
+Remove all unnecessary borders, lines, and crowded clusters UI. Use whitespace as a design element.
+Sample References
+Use modern SaaS like Notion, Linear, Stripe, or Apple Notes web dashboard as visual references for floating cards/action clarity.
+Summary for Devs:
+A modern UI is not a color swap. This means more padding, real card elevation, bold readable fonts, smooth rounded corners, interactive cards/buttons, beautiful hover, best-in-class iconography, and smart layout grouping. It needs to be beautiful, clear, and relaxed—easy to scan, fun to touch, a joy to use.
