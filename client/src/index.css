@@ -53,55 +53,55 @@
   --color-destructive-border: var(--destructive-border);
 }
 
-/* LIGHT MODE - Modern Premium Design */
+/* LIGHT MODE - Modern Beige & Black Luxury Design */
 :root {
-  --button-outline: rgba(167, 51, 255, 0.08);
-  --badge-outline: rgba(167, 51, 255, 0.05);
+  --button-outline: rgba(17, 17, 17, 0.08);
+  --badge-outline: rgba(17, 17, 17, 0.05);
   --opaque-button-border-intensity: -4;
   --elevate-1: rgba(0, 0, 0, 0.02);
   --elevate-2: rgba(0, 0, 0, 0.05);
 
-  /* Modern Vibrant Color Palette */
-  --background: 240 20% 97%;
-  --foreground: 240 10% 15%;
-  --border: 240 15% 85%;
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 15%;
-  --card-border: 240 15% 85%;
+  /* Beige, Black & Gold Luxury Palette */
+  --background: 40 100% 96%;
+  --foreground: 0 0% 7%;
+  --border: 40 60% 88%;
+  --card: 0 0% 99%;
+  --card-foreground: 0 0% 7%;
+  --card-border: 40 50% 90%;
   
-  --sidebar: 240 25% 94%;
-  --sidebar-foreground: 240 10% 15%;
-  --sidebar-border: 240 15% 85%;
-  --sidebar-primary: 262 100% 50%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 15 100% 50%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-ring: 262 100% 50%;
+  --sidebar: 40 100% 96%;
+  --sidebar-foreground: 0 0% 7%;
+  --sidebar-border: 40 60% 88%;
+  --sidebar-primary: 0 0% 7%;
+  --sidebar-primary-foreground: 40 100% 96%;
+  --sidebar-accent: 45 96% 50%;
+  --sidebar-accent-foreground: 0 0% 7%;
+  --sidebar-ring: 0 0% 7%;
   
   --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 15%;
-  --popover-border: 240 15% 85%;
+  --popover-foreground: 0 0% 7%;
+  --popover-border: 40 60% 90%;
   
-  --primary: 262 100% 50%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 262 30% 92%;
-  --secondary-foreground: 240 10% 15%;
+  --primary: 0 0% 7%;
+  --primary-foreground: 40 100% 96%;
+  --secondary: 40 100% 93%;
+  --secondary-foreground: 0 0% 7%;
   
-  --muted: 240 30% 88%;
-  --muted-foreground: 240 10% 40%;
+  --muted: 40 60% 88%;
+  --muted-foreground: 0 0% 40%;
   
-  --accent: 15 100% 50%;
-  --accent-foreground: 0 0% 100%;
+  --accent: 45 96% 50%;
+  --accent-foreground: 0 0% 7%;
   
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   
   --input: 0 0% 100%;
-  --ring: 262 100% 50%;
-  --chart-1: 262 100% 50%;
-  --chart-2: 15 100% 50%;
-  --chart-3: 45 96% 50%;
-  --chart-4: 190 100% 45%;
+  --ring: 0 0% 7%;
+  --chart-1: 0 0% 7%;
+  --chart-2: 45 96% 50%;
+  --chart-3: 38 100% 50%;
+  --chart-4: 200 100% 50%;
   --chart-5: 280 100% 50%;
 
   --font-sans: 'Plus Jakarta Sans', 'Segoe UI', -apple-system, sans-serif;
