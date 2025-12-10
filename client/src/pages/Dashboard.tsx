@@ -7,7 +7,7 @@ import { useMockVisits } from '@/hooks/useMockVisits';
 import { useMockAEOActivities } from '@/hooks/useMockAEOActivities';
 import { useLocation } from 'wouter';
 import { useState } from 'react';
-import { LogOut, Plus, FileText, TrendingUp, Users, Calendar, Building2, MapPin, ClipboardList, CheckSquare, Award, ChevronRight, User } from 'lucide-react';
+import { LogOut, Plus, FileText, TrendingUp, Users, Calendar, Building2, MapPin, ClipboardList, CheckSquare, Award, ChevronRight, User, MessageSquare, Edit, School } from 'lucide-react';
 import MonitoringVisitForm from '@/pages/MonitoringVisitForm';
 import MentoringVisitForm from '@/pages/MentoringVisitForm';
 import OfficeVisitForm from '@/pages/OfficeVisitForm';
@@ -126,16 +126,28 @@ export default function Dashboard() {
               </>
             )}
             {user.role === 'HEAD_TEACHER' && (
-              <button
-                onClick={() => navigate('/collaborative-forms')}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-blue-100/80 hover:to-transparent transition-all duration-300 group press-effect"
-                data-testid="button-collaborative-forms"
-              >
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                  <Plus className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium text-foreground">Collaborative Forms</span>
-              </button>
+              <>
+                <button
+                  onClick={() => navigate('/edit-school')}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-teal-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                  data-testid="button-edit-school"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <School className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Edit School</span>
+                </button>
+                <button
+                  onClick={() => navigate('/collaborative-forms')}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-blue-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                  data-testid="button-collaborative-forms"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <Plus className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Collaborative Forms</span>
+                </button>
+              </>
             )}
             {(user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DEO' || user.role === 'DDEO') && (
               <button
@@ -196,6 +208,16 @@ export default function Dashboard() {
                 <span className="font-medium text-foreground">School Visits</span>
               </button>
             )}
+            <button
+              onClick={() => navigate('/queries')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-purple-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+              data-testid="button-view-queries"
+            >
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                <MessageSquare className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-medium text-foreground">Queries</span>
+            </button>
           </nav>
         </div>
 

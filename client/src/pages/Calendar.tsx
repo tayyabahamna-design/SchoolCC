@@ -1,18 +1,60 @@
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useMockTeacherData } from '@/hooks/useMockTeacherData';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useLeaveRecords, LeaveRecord } from '@/hooks/useLeaveRecords';
 import { useLocation } from 'wouter';
-import { ArrowLeft, ArrowRight, Check, Clock, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Clock, AlertCircle, Plus, X, Calendar as CalendarIcon, Upload, Eye, Edit2 } from 'lucide-react';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+
+const leaveTypeColors: Record<string, string> = {
+  sick: 'bg-red-100 text-red-700 border-red-200',
+  casual: 'bg-blue-100 text-blue-700 border-blue-200',
+  earned: 'bg-green-100 text-green-700 border-green-200',
+  special: 'bg-purple-100 text-purple-700 border-purple-200',
+};
 
 export default function Calendar() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
-  const { getPendingLeaves, getLeavesByDate } = useMockTeacherData();
+  const { getApprovedLeaves, getPendingLeaves, getLeavesByDate, addLeave, approveLeave, rejectLeave, updateLeave } = useLeaveRecords();
+  const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [selectedLeave, setSelectedLeave] = useState<LeaveRecord | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [newLeave, setNewLeave] = useState({
+    teacherName: '',
+    leaveType: 'casual' as 'sick' | 'casual' | 'earned' | 'special',
+    startDate: '',
+    endDate: '',
+    reason: '',
+    numberOfDays: 1,
+  });
 
   if (!user) return null;
+
+  if (user.role === 'TEACHER') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="p-6 text-center max-w-md">
+          <CalendarIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-lg font-semibold text-foreground mb-2">Access Restricted</h2>
+          <p className="text-muted-foreground mb-4">The leave calendar is only accessible to management staff.</p>
+          <Button onClick={() => navigate('/dashboard')} data-testid="button-go-back">
+            Go to Dashboard
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   const today = new Date();
   const currentMonth = currentDate.getMonth();
@@ -28,7 +70,10 @@ export default function Calendar() {
     days.push(new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000));
   }
 
-  const pendingLeaves = getPendingLeaves();
+  const pendingLeaves = user.role === 'HEAD_TEACHER' 
+    ? getPendingLeaves(user.schoolId) 
+    : getPendingLeaves();
+  const approvedLeaves = getApprovedLeaves();
 
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
@@ -40,29 +85,201 @@ export default function Calendar() {
 
   const monthName = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
+  const calculateDays = (start: string, end: string): number => {
+    if (!start || !end) return 0;
+    const startD = new Date(start);
+    const endD = new Date(end);
+    const diffTime = Math.abs(endD.getTime() - startD.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return diffDays;
+  };
+
+  const handleCreateLeave = () => {
+    if (!newLeave.teacherName || !newLeave.startDate || !newLeave.endDate || !newLeave.reason) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    addLeave({
+      teacherId: `teacher-${Date.now()}`,
+      teacherName: newLeave.teacherName,
+      schoolId: user.schoolId || 'SCH-001',
+      schoolName: user.schoolName || 'Demo School',
+      leaveType: newLeave.leaveType,
+      startDate: new Date(newLeave.startDate),
+      endDate: new Date(newLeave.endDate),
+      numberOfDays: calculateDays(newLeave.startDate, newLeave.endDate),
+      reason: newLeave.reason,
+      status: 'approved',
+      approvedBy: user.id,
+      approvedByName: user.name,
+      approvedAt: new Date(),
+    });
+
+    toast({
+      title: "Leave Added",
+      description: "The leave has been added to the calendar.",
+    });
+
+    setNewLeave({
+      teacherName: '',
+      leaveType: 'casual',
+      startDate: '',
+      endDate: '',
+      reason: '',
+      numberOfDays: 1,
+    });
+    setShowCreateDialog(false);
+  };
+
+  const handleApprove = (leaveId: string) => {
+    approveLeave(leaveId, user.id, user.name);
+    toast({
+      title: "Leave Approved",
+      description: "The leave request has been approved.",
+    });
+  };
+
+  const handleReject = (leaveId: string) => {
+    rejectLeave(leaveId);
+    toast({
+      title: "Leave Rejected",
+      description: "The leave request has been rejected.",
+    });
+  };
+
+  const handleViewLeave = (leave: LeaveRecord) => {
+    setSelectedLeave(leave);
+    setShowViewDialog(true);
+    setIsEditing(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <div className="bg-white border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/dashboard')}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Staff Leave Calendar</h1>
-            <p className="text-sm text-muted-foreground">Track and manage teacher leave requests</p>
+        <div className="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/dashboard')}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Staff Leave Calendar</h1>
+              <p className="text-sm text-muted-foreground">Track and manage teacher leave requests</p>
+            </div>
           </div>
+          
+          {user.role === 'HEAD_TEACHER' && (
+            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600" data-testid="button-add-leave">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Leave
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Add Teacher Leave</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="teacherName">Teacher Name *</Label>
+                    <Input
+                      id="teacherName"
+                      value={newLeave.teacherName}
+                      onChange={(e) => setNewLeave(prev => ({ ...prev, teacherName: e.target.value }))}
+                      placeholder="Enter teacher name"
+                      data-testid="input-teacher-name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="leaveType">Leave Type</Label>
+                    <Select
+                      value={newLeave.leaveType}
+                      onValueChange={(value) => setNewLeave(prev => ({ ...prev, leaveType: value as any }))}
+                    >
+                      <SelectTrigger data-testid="select-leave-type">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="casual">Casual Leave</SelectItem>
+                        <SelectItem value="sick">Sick Leave</SelectItem>
+                        <SelectItem value="earned">Earned Leave</SelectItem>
+                        <SelectItem value="special">Special Leave</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="startDate">Start Date *</Label>
+                      <Input
+                        id="startDate"
+                        type="date"
+                        value={newLeave.startDate}
+                        onChange={(e) => setNewLeave(prev => ({ 
+                          ...prev, 
+                          startDate: e.target.value,
+                          numberOfDays: calculateDays(e.target.value, prev.endDate)
+                        }))}
+                        data-testid="input-start-date"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="endDate">End Date *</Label>
+                      <Input
+                        id="endDate"
+                        type="date"
+                        value={newLeave.endDate}
+                        onChange={(e) => setNewLeave(prev => ({ 
+                          ...prev, 
+                          endDate: e.target.value,
+                          numberOfDays: calculateDays(prev.startDate, e.target.value)
+                        }))}
+                        data-testid="input-end-date"
+                      />
+                    </div>
+                  </div>
+                  {newLeave.startDate && newLeave.endDate && (
+                    <p className="text-sm text-muted-foreground">
+                      Total Days: <span className="font-semibold">{calculateDays(newLeave.startDate, newLeave.endDate)}</span>
+                    </p>
+                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="reason">Reason *</Label>
+                    <Textarea
+                      id="reason"
+                      value={newLeave.reason}
+                      onChange={(e) => setNewLeave(prev => ({ ...prev, reason: e.target.value }))}
+                      placeholder="Enter reason for leave"
+                      rows={3}
+                      data-testid="input-reason"
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button variant="outline" onClick={() => setShowCreateDialog(false)} data-testid="button-cancel-leave">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleCreateLeave} data-testid="button-save-leave">
+                      Add Leave
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Calendar */}
           <Card className="lg:col-span-2 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-foreground">{monthName}</h2>
@@ -94,7 +311,6 @@ export default function Calendar() {
               </div>
             </div>
 
-            {/* Day Headers */}
             <div className="grid grid-cols-7 gap-2 mb-2">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
                 <div key={day} className="text-center text-xs font-semibold text-muted-foreground py-2">
@@ -103,7 +319,6 @@ export default function Calendar() {
               ))}
             </div>
 
-            {/* Calendar Days */}
             <div className="grid grid-cols-7 gap-2">
               {days.map((day, idx) => {
                 const isCurrentMonth = day.getMonth() === currentMonth;
@@ -128,14 +343,11 @@ export default function Calendar() {
                         {leavesForDay.slice(0, 2).map((leave) => (
                           <div
                             key={leave.id}
-                            className={`text-xs px-1 py-0.5 rounded truncate ${
-                              leave.status === 'approved'
-                                ? 'bg-amber-100 text-amber-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}
-                            title={leave.teacherName}
+                            className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer hover:opacity-80 border ${leaveTypeColors[leave.leaveType]}`}
+                            title={`${leave.teacherName} - ${leave.reason}`}
+                            onClick={() => handleViewLeave(leave)}
                           >
-                            {leave.teacherName.split(' ')[1]}
+                            {leave.teacherName.split(' ').slice(-1)[0]}
                           </div>
                         ))}
                         {leavesForDay.length > 2 && (
@@ -149,56 +361,101 @@ export default function Calendar() {
             </div>
           </Card>
 
-          {/* Sidebar - Pending & Today's Leaves */}
           <div className="space-y-6">
-            {/* Pending Leaves - Only for Head Teachers */}
-            {user.role === 'HEAD_TEACHER' && (
+            {(user.role === 'HEAD_TEACHER' || user.role === 'DEO' || user.role === 'DDEO' || user.role === 'AEO') && pendingLeaves.length > 0 && (
               <Card className="p-6">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-blue-600" />
-                  Pending Approvals
+                  Pending Approvals ({pendingLeaves.length})
                 </h3>
-                <div className="space-y-3">
-                  {pendingLeaves.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No pending leave requests</p>
-                  ) : (
-                    pendingLeaves.map((leave) => (
-                      <div key={leave.id} className="border border-border rounded-lg p-3 text-sm">
-                        <p className="font-medium text-foreground">{leave.teacherName}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {leave.startDate.toLocaleDateString()} - {leave.endDate.toLocaleDateString()}
-                        </p>
-                        <p className="text-xs text-muted-foreground capitalize">{leave.leaveType}</p>
+                <div className="space-y-3 max-h-64 overflow-y-auto">
+                  {pendingLeaves.map((leave) => (
+                    <div key={leave.id} className="border border-border rounded-lg p-3 text-sm">
+                      <p className="font-medium text-foreground">{leave.teacherName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {leave.startDate.toLocaleDateString()} - {leave.endDate.toLocaleDateString()}
+                      </p>
+                      <p className="text-xs text-muted-foreground capitalize">{leave.leaveType} • {leave.numberOfDays} days</p>
+                      <p className="text-xs text-muted-foreground mt-1">{leave.reason}</p>
+                      {user.role === 'HEAD_TEACHER' && (
                         <div className="flex gap-2 mt-2">
-                          <Button size="sm" variant="outline" className="h-7 text-xs flex-1" data-testid={`button-approve-${leave.id}`}>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-7 text-xs flex-1 hover:bg-green-50 hover:text-green-600 hover:border-green-200" 
+                            onClick={() => handleApprove(leave.id)}
+                            data-testid={`button-approve-${leave.id}`}
+                          >
                             <Check className="w-3 h-3 mr-1" />
                             Approve
                           </Button>
-                          <Button size="sm" variant="outline" className="h-7 text-xs flex-1" data-testid={`button-reject-${leave.id}`}>
-                            <AlertCircle className="w-3 h-3 mr-1" />
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-7 text-xs flex-1 hover:bg-red-50 hover:text-red-600 hover:border-red-200" 
+                            onClick={() => handleReject(leave.id)}
+                            data-testid={`button-reject-${leave.id}`}
+                          >
+                            <X className="w-3 h-3 mr-1" />
                             Reject
                           </Button>
                         </div>
-                      </div>
-                    ))
-                  )}
+                      )}
+                    </div>
+                  ))}
                 </div>
               </Card>
             )}
 
-            {/* Legend */}
+            <Card className="p-6">
+              <h3 className="font-semibold text-foreground mb-4">Upcoming Leaves</h3>
+              <div className="space-y-3 max-h-48 overflow-y-auto">
+                {approvedLeaves
+                  .filter(l => new Date(l.startDate) >= today)
+                  .slice(0, 5)
+                  .map((leave) => (
+                    <div 
+                      key={leave.id} 
+                      className="border border-border rounded-lg p-3 text-sm cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleViewLeave(leave)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium text-foreground">{leave.teacherName}</p>
+                        <span className={`text-xs px-2 py-0.5 rounded border ${leaveTypeColors[leave.leaveType]}`}>
+                          {leave.leaveType}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {leave.startDate.toLocaleDateString()} - {leave.endDate.toLocaleDateString()} ({leave.numberOfDays} days)
+                      </p>
+                    </div>
+                  ))}
+                {approvedLeaves.filter(l => new Date(l.startDate) >= today).length === 0 && (
+                  <p className="text-xs text-muted-foreground">No upcoming leaves</p>
+                )}
+              </div>
+            </Card>
+
             <Card className="p-6">
               <h3 className="font-semibold text-foreground mb-4">Legend</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-amber-100 rounded border border-amber-200" />
-                  <span className="text-muted-foreground">Approved Leave</span>
+                  <div className="w-4 h-4 bg-red-100 rounded border border-red-200" />
+                  <span className="text-muted-foreground">Sick Leave</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-blue-100 rounded border border-blue-200" />
-                  <span className="text-muted-foreground">Pending Leave</span>
+                  <span className="text-muted-foreground">Casual Leave</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-green-100 rounded border border-green-200" />
+                  <span className="text-muted-foreground">Earned Leave</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-purple-100 rounded border border-purple-200" />
+                  <span className="text-muted-foreground">Special Leave</span>
+                </div>
+                <div className="flex items-center gap-2 pt-2 border-t">
                   <div className="w-4 h-4 border-2 border-primary rounded" />
                   <span className="text-muted-foreground">Today</span>
                 </div>
@@ -207,6 +464,68 @@ export default function Calendar() {
           </div>
         </div>
       </div>
+
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Leave Details</span>
+              {user.role === 'HEAD_TEACHER' && selectedLeave?.schoolId === user.schoolId && (
+                <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)}>
+                  <Edit2 className="w-4 h-4" />
+                </Button>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedLeave && (
+            <div className="space-y-4 mt-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Teacher</span>
+                <span className="font-medium">{selectedLeave.teacherName}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">School</span>
+                <span className="font-medium">{selectedLeave.schoolName}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Leave Type</span>
+                <span className={`text-xs px-2 py-1 rounded border capitalize ${leaveTypeColors[selectedLeave.leaveType]}`}>
+                  {selectedLeave.leaveType}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Duration</span>
+                <span className="font-medium">{selectedLeave.numberOfDays} day(s)</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Dates</span>
+                <span className="font-medium">
+                  {selectedLeave.startDate.toLocaleDateString()} - {selectedLeave.endDate.toLocaleDateString()}
+                </span>
+              </div>
+              <div>
+                <span className="text-sm text-muted-foreground">Reason</span>
+                <p className="mt-1 text-sm bg-muted/50 rounded p-3">{selectedLeave.reason}</p>
+              </div>
+              {selectedLeave.approvedByName && (
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <span className="text-sm text-muted-foreground">Approved By</span>
+                  <span className="font-medium">{selectedLeave.approvedByName}</span>
+                </div>
+              )}
+              {selectedLeave.evidenceFileName && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Evidence</span>
+                  <Button variant="link" size="sm" className="h-auto p-0">
+                    <Eye className="w-3 h-3 mr-1" />
+                    {selectedLeave.evidenceFileName}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

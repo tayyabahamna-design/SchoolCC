@@ -20,6 +20,10 @@ import CreateActivity from "@/pages/CreateActivity";
 import CollaborativeForms from "@/pages/CollaborativeForms";
 import CreateCollaborativeForm from "@/pages/CreateCollaborativeForm";
 import ViewCollaborativeForm from "@/pages/ViewCollaborativeForm";
+import EditSchool from "@/pages/EditSchool";
+import Queries from "@/pages/Queries";
+import CreateQuery from "@/pages/CreateQuery";
+import ViewQuery from "@/pages/ViewQuery";
 import NotFound from "@/pages/not-found";
 
 function DashboardRoute() {
@@ -48,6 +52,10 @@ function Router() {
       <Route path="/collaborative-forms" component={CollaborativeForms} />
       <Route path="/create-collaborative-form" component={CreateCollaborativeForm} />
       <Route path="/collaborative-form/:formId" component={ViewCollaborativeForm} />
+      <Route path="/edit-school" component={EditSchool} />
+      <Route path="/queries" component={Queries} />
+      <Route path="/create-query" component={CreateQuery} />
+      <Route path="/query/:id" component={ViewQuery} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
