@@ -3,6 +3,32 @@ import { pgTable, text, varchar, date, boolean, integer, json, timestamp } from 
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Organization hierarchy tables
+export const districts = pgTable("districts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  code: text("code").notNull().unique(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const clusters = pgTable("clusters", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  code: text("code").notNull().unique(),
+  districtId: varchar("district_id").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const schools = pgTable("schools", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  code: text("code").notNull().unique(),
+  clusterId: varchar("cluster_id").notNull(),
+  districtId: varchar("district_id").notNull(),
+  address: text("address"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
@@ -49,6 +75,22 @@ export const requestAssignees = pgTable("request_assignees", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Organization insert schemas
+export const insertDistrictSchema = createInsertSchema(districts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertClusterSchema = createInsertSchema(clusters).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSchoolSchema = createInsertSchema(schools).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -65,6 +107,15 @@ export const insertRequestAssigneeSchema = createInsertSchema(requestAssignees).
   createdAt: true,
 });
 
+// Organization types
+export type InsertDistrict = z.infer<typeof insertDistrictSchema>;
+export type District = typeof districts.$inferSelect;
+export type InsertCluster = z.infer<typeof insertClusterSchema>;
+export type Cluster = typeof clusters.$inferSelect;
+export type InsertSchool = z.infer<typeof insertSchoolSchema>;
+export type School = typeof schools.$inferSelect;
+
+// User types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertDataRequest = z.infer<typeof insertDataRequestSchema>;
