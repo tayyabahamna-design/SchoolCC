@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, ChevronRight, Download, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User, Menu, BarChart3, Settings, Home } from 'lucide-react';
+import { LogOut, ChevronRight, Download, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User, Menu, BarChart3, Settings, Home, ImageIcon } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -751,6 +751,18 @@ export default function CEODashboard() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        navigate(`/album/${school.id}`);
+                        setShowExportModal(false);
+                      }}
+                      className="gap-2 h-9"
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      Album
+                    </Button>
                     <Select
                       value={selectedExportFormat}
                       onValueChange={(value) => setSelectedExportFormat(value as 'sheets' | 'docs')}
