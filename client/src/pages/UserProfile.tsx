@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Edit, Save, X, User } from "lucide-react";
+import { Loader2, Edit, Save, X, User, ArrowLeft } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -134,6 +134,15 @@ export default function UserProfile() {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
+      <Button
+        variant="ghost"
+        onClick={() => navigate('/dashboard')}
+        className="mb-4"
+        data-testid="button-back"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back to Dashboard
+      </Button>
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
