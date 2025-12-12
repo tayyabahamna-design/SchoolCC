@@ -47,7 +47,7 @@ export default function SchoolVisits() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate(user.role === 'CEO' ? '/ceo-dashboard' : '/dashboard')}
               data-testid="button-back"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -134,6 +134,31 @@ export default function SchoolVisits() {
                     </Button>
                   </div>
                 </div>
+
+                {/* GPS Location for completed visits */}
+                {visit.status === 'completed' && visit.gpsLocation && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="w-4 h-4 text-green-600" />
+                      <span className="font-medium text-foreground">GPS Tracked Location:</span>
+                      <span>
+                        {visit.gpsLocation.lat.toFixed(6)}, {visit.gpsLocation.lng.toFixed(6)}
+                      </span>
+                      {visit.gpsStartLocation && visit.gpsEndLocation && (
+                        <span className="ml-2 text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded">
+                          Verified
+                        </span>
+                      )}
+                    </div>
+                    {visit.startTime && visit.endTime && (
+                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                        <span>Start: {new Date(visit.startTime).toLocaleTimeString()}</span>
+                        <span>End: {new Date(visit.endTime).toLocaleTimeString()}</span>
+                        {visit.duration && <span>Duration: {visit.duration} mins</span>}
+                      </div>
+                    )}
+                  </div>
+                )}
               </Card>
             ))}
           </div>

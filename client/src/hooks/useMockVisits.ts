@@ -136,7 +136,7 @@ export function useMockVisits() {
 
   const getVisitsForUser = useCallback(
     (userId: string, userRole: string) => {
-      if (userRole === 'DEO' || userRole === 'DDEO') {
+      if (userRole === 'CEO' || userRole === 'DEO' || userRole === 'DDEO') {
         return visits;
       }
       if (userRole === 'AEO') {

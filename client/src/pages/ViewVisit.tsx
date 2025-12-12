@@ -14,7 +14,7 @@ export default function ViewVisit() {
   const { id } = useParams();
   const { user } = useAuth();
   const [, navigate] = useLocation();
-  const { getVisit, updateVisit, updateVisitIndicators, addIndicator, addVoiceNote, addPhoto, completeVisit } = useMockVisits();
+  const { getVisit, updateVisit, updateVisitIndicators, addVoiceNote, addPhoto, completeVisit } = useMockVisits();
   const [editing, setEditing] = useState(false);
   const [comments, setComments] = useState('');
   const [editedIndicators, setEditedIndicators] = useState<VisitIndicator[]>([]);

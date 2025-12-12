@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, ChevronRight, Download, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User, Menu, BarChart3, Settings, Home, ImageIcon } from 'lucide-react';
+import { LogOut, ChevronRight, Download, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User, Menu, BarChart3, Settings, Home, ImageIcon, MapPin } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -376,6 +376,15 @@ export default function CEODashboard() {
             {sidebarOpen && calculateAggregates.totalPendingRequests > 0 && (
               <Badge variant="destructive" className="ml-auto">{calculateAggregates.totalPendingRequests}</Badge>
             )}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3"
+            onClick={() => navigate('/school-visits')}
+            data-testid="button-school-visits"
+          >
+            <MapPin className="w-5 h-5" />
+            {sidebarOpen && <span>School Visits</span>}
           </Button>
           <Button
             variant="ghost"
