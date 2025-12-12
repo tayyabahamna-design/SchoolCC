@@ -3,8 +3,7 @@ import { useAuth } from '@/contexts/auth';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { LogOut, ChevronRight, ChevronDown, Download, Filter, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { LogOut, ChevronRight, Download, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User, Menu, BarChart3, Settings, Home, Bell } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 
 interface School {
   id: string;
@@ -48,22 +48,12 @@ interface DEO {
   ddeos: DDEO[];
 }
 
-interface HierarchyNode {
-  id: string;
-  name: string;
-  type: 'DEO' | 'DDEO' | 'AEO' | 'SCHOOL';
-  level: number;
-  expanded: boolean;
-}
-
 export default function CEODashboard() {
   const { user, logout } = useAuth();
   const [, navigate] = useLocation();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['deo-1', 'deo-2']));
-  const [selectedLevel, setSelectedLevel] = useState<'all' | 'deo' | 'ddeo' | 'aeo' | 'school'>('all');
   const [showExportModal, setShowExportModal] = useState(false);
   const [selectedExportFormat, setSelectedExportFormat] = useState<'sheets' | 'docs' | ''>('');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   if (!user || user.role !== 'CEO') {
     navigate('/');
@@ -180,552 +170,469 @@ export default function CEODashboard() {
     if (!school) return;
 
     console.log(`Exporting ${school.name} data to ${format === 'sheets' ? 'Google Sheets' : 'Google Docs'}`);
-    // TODO: Implement actual export functionality
     alert(`Exporting ${school.name} to ${format === 'sheets' ? 'Google Sheets' : 'Google Docs'}`);
   };
 
-  const toggleNode = (nodeId: string) => {
-    const newExpanded = new Set(expandedNodes);
-    if (newExpanded.has(nodeId)) {
-      newExpanded.delete(nodeId);
-    } else {
-      newExpanded.add(nodeId);
-    }
-    setExpandedNodes(newExpanded);
-  };
+  // Get top and bottom performing schools
+  const topSchools = useMemo(() => {
+    return [...getAllSchools].sort((a, b) => b.complianceScore - a.complianceScore).slice(0, 5);
+  }, [getAllSchools]);
 
-  const filteredData = mockData.filter(deo => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      deo.name.toLowerCase().includes(query) ||
-      deo.district.toLowerCase().includes(query) ||
-      deo.ddeos.some(ddeo =>
-        ddeo.name.toLowerCase().includes(query) ||
-        ddeo.aeos.some(aeo =>
-          aeo.name.toLowerCase().includes(query) ||
-          aeo.schools.some(school => school.name.toLowerCase().includes(query))
-        )
-      )
-    );
-  });
+  const schoolsNeedingAttention = useMemo(() => {
+    return getAllSchools.filter(s => s.pendingRequests > 2 || s.complianceScore < 85);
+  }, [getAllSchools]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">Mission Control</h1>
-            <p className="text-sm text-slate-600 mt-1">System-wide monitoring & analytics</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/profile')}
-              data-testid="button-profile"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Profile
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                logout();
-                navigate('/');
-              }}
-              data-testid="button-logout"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      {/* Sidebar */}
+      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-white border-r border-slate-200 transition-all duration-300 flex flex-col`}>
+        <div className="p-6 border-b border-slate-200">
+          <div className="flex items-center justify-between">
+            {sidebarOpen && <h2 className="font-bold text-xl gradient-text">SchoolCC</h2>}
+            <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(!sidebarOpen)}>
+              <Menu className="w-5 h-5" />
             </Button>
           </div>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-2">
+          <Button
+            variant="default"
+            className="w-full justify-start gap-3"
+            onClick={() => navigate('/ceo-dashboard')}
+          >
+            <Home className="w-5 h-5" />
+            {sidebarOpen && <span>Dashboard</span>}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3"
+            onClick={() => navigate('/data-requests')}
+          >
+            <FileText className="w-5 h-5" />
+            {sidebarOpen && <span>Requests</span>}
+            {sidebarOpen && calculateAggregates.totalPendingRequests > 0 && (
+              <Badge variant="destructive" className="ml-auto">{calculateAggregates.totalPendingRequests}</Badge>
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3"
+          >
+            <BarChart3 className="w-5 h-5" />
+            {sidebarOpen && <span>Analytics</span>}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3"
+            onClick={() => setShowExportModal(true)}
+          >
+            <Download className="w-5 h-5" />
+            {sidebarOpen && <span>Export Data</span>}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3"
+            onClick={() => navigate('/profile')}
+          >
+            <User className="w-5 h-5" />
+            {sidebarOpen && <span>Profile</span>}
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3"
+          >
+            <Settings className="w-5 h-5" />
+            {sidebarOpen && <span>Settings</span>}
+          </Button>
+        </nav>
+
+        <div className="p-4 border-t border-slate-200">
+          <Button
+            variant="outline"
+            className="w-full justify-start gap-3"
+            onClick={() => {
+              logout();
+              navigate('/');
+            }}
+          >
+            <LogOut className="w-5 h-5" />
+            {sidebarOpen && <span>Logout</span>}
+          </Button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">
-            Welcome back, <span className="cursor-pointer hover:text-primary" onClick={() => navigate('/profile')}>{user.name}</span>
-          </h2>
-          <p className="text-slate-600">You have system-wide visibility across all districts, regions, clusters, and schools.</p>
-        </div>
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-          <Card className="group relative overflow-hidden hover-lift">
-            <div className="p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
-                  <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <Building2 className="w-7 h-7 text-primary" />
-                  </div>
-                </div>
-                <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-                  <span className="text-xs font-semibold text-primary">Live</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Total Schools
-                </p>
-                <p className="text-5xl font-bold gradient-text tracking-tight">
-                  {calculateAggregates.totalSchools}
-                </p>
-                <p className="text-xs text-muted-foreground">Across all districts</p>
-              </div>
+      <div className="flex-1 overflow-auto">
+        {/* Header */}
+        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-slate-200">
+          <div className="px-8 py-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Mission Control</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Welcome back, <span className="font-semibold text-primary cursor-pointer hover:underline" onClick={() => navigate('/profile')}>{user.name}</span>
+              </p>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          </Card>
-
-          <Card className="group relative overflow-hidden hover-lift">
-            <div className="p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
-                  <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <Users className="w-7 h-7 text-primary" />
-                  </div>
-                </div>
-                <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-                  <span className="text-xs font-semibold text-primary">Live</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Total Teachers
-                </p>
-                <p className="text-5xl font-bold gradient-text tracking-tight">
-                  {calculateAggregates.totalTeachers}
-                </p>
-                <p className="text-xs text-muted-foreground">Active educators</p>
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          </Card>
-
-          <Card className="group relative overflow-hidden hover-lift">
-            <div className="p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
-                  <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <AlertCircle className="w-7 h-7 text-primary" />
-                  </div>
-                </div>
-                <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-                  <span className="text-xs font-semibold text-primary">Live</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Pending Requests
-                </p>
-                <p className="text-5xl font-bold gradient-text tracking-tight">
-                  {calculateAggregates.totalPendingRequests}
-                </p>
-                <p className="text-xs text-muted-foreground">Awaiting response</p>
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          </Card>
-
-          <Card className="group relative overflow-hidden hover-lift">
-            <div className="p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
-                  <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                    <CheckCircle className="w-7 h-7 text-primary" />
-                  </div>
-                </div>
-                <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-                  <span className="text-xs font-semibold text-primary">Live</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                  Avg Compliance
-                </p>
-                <p className="text-5xl font-bold gradient-text tracking-tight">
-                  {calculateAggregates.avgCompliance}%
-                </p>
-                <p className="text-xs text-muted-foreground">System-wide metric</p>
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          </Card>
-        </div>
-
-        {/* Search & Filter */}
-        <div className="mb-6 flex gap-3">
-          <div className="flex-1">
-            <Input
-              placeholder="Search by district, region, cluster, or school name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              data-testid="input-search"
-              className="w-full"
-            />
-          </div>
-          <Button variant="outline" size="sm" data-testid="button-export">
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
-        </div>
-
-        {/* Hierarchical Tree View */}
-        <Card className="p-6 bg-white border-slate-200">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <span>Organizational Hierarchy</span>
-            <span className="text-sm font-normal text-slate-600">Click to drill down</span>
-          </h3>
-
-          <div className="space-y-0 divide-y divide-slate-200">
-            {filteredData.map(deo => (
-              <div key={deo.id}>
-                {/* DEO Level */}
-                <div
-                  className="py-4 px-4 hover:bg-slate-50 cursor-pointer transition-colors rounded-lg mb-2"
-                  onClick={() => toggleNode(deo.id)}
-                  data-testid={`node-deo-${deo.id}`}
-                >
-                  <div className="flex items-center gap-3">
-                    {expandedNodes.has(deo.id) ? (
-                      <ChevronDown className="w-5 h-5 text-slate-400" />
-                    ) : (
-                      <ChevronRight className="w-5 h-5 text-slate-400" />
-                    )}
-                    <div className="flex-1">
-                      <div className="font-semibold text-slate-900">{deo.name}</div>
-                      <div className="text-sm text-slate-600">{deo.district}</div>
-                    </div>
-                    <div className="text-sm text-slate-600">
-                      {deo.ddeos.reduce((acc, d) => acc + d.aeos.reduce((a, ae) => a + ae.schools.length, 0), 0)} schools
-                    </div>
-                  </div>
-                </div>
-
-                {/* Expanded DDEO Level */}
-                {expandedNodes.has(deo.id) && (
-                  <div className="pl-8 space-y-2">
-                    {deo.ddeos.map(ddeo => (
-                      <div key={ddeo.id}>
-                        <div
-                          className="py-3 px-4 hover:bg-slate-50 cursor-pointer transition-colors rounded-lg"
-                          onClick={() => toggleNode(ddeo.id)}
-                          data-testid={`node-ddeo-${ddeo.id}`}
-                        >
-                          <div className="flex items-center gap-3">
-                            {expandedNodes.has(ddeo.id) ? (
-                              <ChevronDown className="w-4 h-4 text-slate-400" />
-                            ) : (
-                              <ChevronRight className="w-4 h-4 text-slate-400" />
-                            )}
-                            <div className="flex-1">
-                              <div className="font-medium text-slate-800">{ddeo.name}</div>
-                            </div>
-                            <div className="text-sm text-slate-600">
-                              {ddeo.aeos.reduce((a, ae) => a + ae.schools.length, 0)} schools
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Expanded AEO Level */}
-                        {expandedNodes.has(ddeo.id) && (
-                          <div className="pl-8 space-y-2 mt-2">
-                            {ddeo.aeos.map(aeo => (
-                              <div key={aeo.id}>
-                                <div
-                                  className="py-3 px-4 hover:bg-blue-50 cursor-pointer transition-colors rounded-lg border border-blue-100"
-                                  onClick={() => toggleNode(aeo.id)}
-                                  data-testid={`node-aeo-${aeo.id}`}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    {expandedNodes.has(aeo.id) ? (
-                                      <ChevronDown className="w-4 h-4 text-blue-600" />
-                                    ) : (
-                                      <ChevronRight className="w-4 h-4 text-blue-600" />
-                                    )}
-                                    <div className="flex-1">
-                                      <div className="font-medium text-blue-900">{aeo.name}</div>
-                                    </div>
-                                    <div className="text-sm text-blue-700 font-medium">{aeo.schools.length} schools</div>
-                                  </div>
-                                </div>
-
-                                {/* School Level */}
-                                {expandedNodes.has(aeo.id) && (
-                                  <div className="pl-8 space-y-2 mt-2">
-                                    {aeo.schools.map(school => (
-                                      <div
-                                        key={school.id}
-                                        className="py-3 px-4 hover:bg-emerald-50 cursor-pointer transition-colors rounded-lg border border-emerald-100"
-                                        data-testid={`node-school-${school.id}`}
-                                      >
-                                        <div className="flex items-center gap-3">
-                                          <Building2 className="w-4 h-4 text-emerald-600" />
-                                          <div className="flex-1">
-                                            <div className="font-medium text-emerald-900">{school.name}</div>
-                                            <div className="text-xs text-emerald-700 mt-1">
-                                              {school.headTeachers} Head · {school.teachers} Teachers · {school.pendingRequests} Pending
-                                            </div>
-                                          </div>
-                                          <div className="text-right">
-                                            <div className="text-sm font-semibold text-emerald-700">{school.complianceScore}%</div>
-                                            <div className="text-xs text-emerald-600">Compliance</div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-          <Card
-            className="group relative overflow-hidden cursor-pointer hover-lift"
-            onClick={() => navigate('/create-request')}
-            data-testid="button-create-request"
-          >
-            <div className="p-6">
-              <div className="mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <Plus className="w-6 h-6 text-primary" />
-                </div>
-              </div>
-              <h3 className="font-semibold text-base text-foreground mb-2">
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" onClick={() => navigate('/create-request')}>
+                <Plus className="w-4 h-4 mr-2" />
                 Create Request
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Send data requests to any level in the hierarchy
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all duration-300">
-                <span>Open</span>
-                <ChevronRight className="w-4 h-4" />
-              </div>
+              </Button>
+              <Button variant="outline" size="icon">
+                <Bell className="w-4 h-4" />
+              </Button>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          </Card>
-
-          <Card
-            className="group relative overflow-hidden cursor-pointer hover-lift"
-            onClick={() => navigate('/data-requests')}
-            data-testid="button-view-requests"
-          >
-            <div className="p-6">
-              <div className="mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <FileText className="w-6 h-6 text-primary" />
-                </div>
-              </div>
-              <h3 className="font-semibold text-base text-foreground mb-2">
-                View Requests
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Monitor all data requests across the system
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all duration-300">
-                <span>Open</span>
-                <ChevronRight className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          </Card>
-
-          <Card
-            className="group relative overflow-hidden cursor-pointer hover-lift"
-            data-testid="button-analytics"
-          >
-            <div className="p-6">
-              <div className="mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <TrendingUp className="w-6 h-6 text-primary" />
-                </div>
-              </div>
-              <h3 className="font-semibold text-base text-foreground mb-2">
-                View Analytics
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Detailed reports and trends across all DEOs
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all duration-300">
-                <span>Open</span>
-                <ChevronRight className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          </Card>
-
-          <Card
-            className="group relative overflow-hidden cursor-pointer hover-lift"
-            data-testid="button-escalations"
-          >
-            <div className="p-6">
-              <div className="mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <AlertCircle className="w-6 h-6 text-primary" />
-                </div>
-              </div>
-              <h3 className="font-semibold text-base text-foreground mb-2">
-                Escalations
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {calculateAggregates.totalPendingRequests} items flagged for action
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all duration-300">
-                <span>Open</span>
-                <ChevronRight className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          </Card>
-
-          <Card
-            className="group relative overflow-hidden cursor-pointer hover-lift"
-            data-testid="button-audit"
-          >
-            <div className="p-6">
-              <div className="mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <Clock className="w-6 h-6 text-primary" />
-                </div>
-              </div>
-              <h3 className="font-semibold text-base text-foreground mb-2">
-                Audit Trail
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Track all system changes and evidence submissions
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all duration-300">
-                <span>Open</span>
-                <ChevronRight className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          </Card>
-
-          <Card
-            className="group relative overflow-hidden cursor-pointer hover-lift"
-            onClick={() => setShowExportModal(true)}
-            data-testid="button-export-schools"
-          >
-            <div className="p-6">
-              <div className="mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                  <Download className="w-6 h-6 text-primary" />
-                </div>
-              </div>
-              <h3 className="font-semibold text-base text-foreground mb-2">
-                Export School Data
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Export data for all {calculateAggregates.totalSchools} schools
-              </p>
-              <div className="mt-4 flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all duration-300">
-                <span>Open</span>
-                <ChevronRight className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-          </Card>
+          </div>
         </div>
 
-        {/* Export School Data Modal */}
-        <Dialog open={showExportModal} onOpenChange={setShowExportModal}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold gradient-text">
-                Export School Data
-              </DialogTitle>
-              <DialogDescription>
-                Select a school and export format to download school data
-              </DialogDescription>
-            </DialogHeader>
+        <div className="p-8 space-y-8">
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <Card className="group relative overflow-hidden hover-lift">
+              <div className="p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
+                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <Building2 className="w-7 h-7 text-primary" />
+                    </div>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+                    <span className="text-xs font-semibold text-primary">Live</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                    Total Schools
+                  </p>
+                  <p className="text-5xl font-bold gradient-text tracking-tight">
+                    {calculateAggregates.totalSchools}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Across Rawalpindi district</p>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </Card>
 
-            <div className="mt-6 space-y-3">
-              {getAllSchools.map((school, index) => (
-                <div
-                  key={school.id}
-                  className="p-4 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-all duration-200"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center shrink-0">
-                        <Building2 className="w-5 h-5 text-primary" />
+            <Card className="group relative overflow-hidden hover-lift">
+              <div className="p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
+                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <Users className="w-7 h-7 text-primary" />
+                    </div>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+                    <span className="text-xs font-semibold text-primary">Live</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                    Total Teachers
+                  </p>
+                  <p className="text-5xl font-bold gradient-text tracking-tight">
+                    {calculateAggregates.totalTeachers}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Active educators</p>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </Card>
+
+            <Card className="group relative overflow-hidden hover-lift cursor-pointer" onClick={() => navigate('/data-requests')}>
+              <div className="p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
+                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <AlertCircle className="w-7 h-7 text-primary" />
+                    </div>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20">
+                    <span className="text-xs font-semibold text-red-600">Action Required</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                    Pending Requests
+                  </p>
+                  <p className="text-5xl font-bold gradient-text tracking-tight">
+                    {calculateAggregates.totalPendingRequests}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Click to review</p>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </Card>
+
+            <Card className="group relative overflow-hidden hover-lift">
+              <div className="p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
+                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <CheckCircle className="w-7 h-7 text-primary" />
+                    </div>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20">
+                    <span className="text-xs font-semibold text-green-600">Excellent</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                    Avg Compliance
+                  </p>
+                  <p className="text-5xl font-bold gradient-text tracking-tight">
+                    {calculateAggregates.avgCompliance}%
+                  </p>
+                  <p className="text-xs text-muted-foreground">District-wide metric</p>
+                </div>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </Card>
+          </div>
+
+          {/* Quick Overview Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Top Performing Schools */}
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  Top Performers
+                </h3>
+                <Badge variant="secondary">{topSchools.length} Schools</Badge>
+              </div>
+              <div className="space-y-3">
+                {topSchools.map((school, index) => (
+                  <div key={school.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500/10 to-emerald-500/10 flex items-center justify-center">
+                        <span className="text-sm font-bold text-green-600">#{index + 1}</span>
                       </div>
-                      <div className="min-w-0">
-                        <h4 className="font-semibold text-sm text-foreground truncate">
-                          {school.name}
-                        </h4>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {school.teachers} teachers · Compliance: {school.complianceScore}%
+                      <div>
+                        <p className="font-medium text-sm text-foreground">{school.name}</p>
+                        <p className="text-xs text-muted-foreground">{school.teachers} teachers</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-green-600">{school.complianceScore}%</p>
+                      <p className="text-xs text-muted-foreground">Compliance</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Schools Needing Attention */}
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-orange-600" />
+                  Needs Attention
+                </h3>
+                <Badge variant="destructive">{schoolsNeedingAttention.length} Schools</Badge>
+              </div>
+              <div className="space-y-3">
+                {schoolsNeedingAttention.slice(0, 5).map((school) => (
+                  <div key={school.id} className="flex items-center justify-between p-3 rounded-lg bg-orange-50 hover:bg-orange-100 transition-colors border border-orange-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
+                        <AlertCircle className="w-4 h-4 text-orange-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm text-foreground">{school.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {school.pendingRequests > 2 && `${school.pendingRequests} pending requests`}
+                          {school.pendingRequests > 2 && school.complianceScore < 85 && ' • '}
+                          {school.complianceScore < 85 && `${school.complianceScore}% compliance`}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Select
-                        value={selectedExportFormat}
-                        onValueChange={(value) => setSelectedExportFormat(value as 'sheets' | 'docs')}
-                      >
-                        <SelectTrigger className="w-[140px] h-9 text-xs">
-                          <SelectValue placeholder="Format" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="sheets">Google Sheets</SelectItem>
-                          <SelectItem value="docs">Google Docs</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          if (selectedExportFormat) {
-                            handleExportSchool(school.id, selectedExportFormat);
-                          }
-                        }}
-                        disabled={!selectedExportFormat}
-                        className="gap-2 h-9"
-                      >
-                        <Download className="w-4 h-4" />
-                        Export
-                      </Button>
-                    </div>
+                    <Button size="sm" variant="outline">
+                      Review
+                    </Button>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </Card>
+          </div>
 
-            <div className="mt-6 flex justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowExportModal(false);
-                  setSelectedExportFormat('');
-                }}
-              >
-                Close
+          {/* District Breakdown */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-primary" />
+                District Breakdown
+              </h3>
+              <Button variant="outline" size="sm" onClick={() => setShowExportModal(true)}>
+                <Download className="w-4 h-4 mr-2" />
+                Export All
               </Button>
             </div>
-          </DialogContent>
-        </Dialog>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {mockData[0].ddeos.map((ddeo) => {
+                const schoolCount = ddeo.aeos.reduce((acc, aeo) => acc + aeo.schools.length, 0);
+                const teacherCount = ddeo.aeos.reduce((acc, aeo) =>
+                  acc + aeo.schools.reduce((sum, s) => sum + s.teachers, 0), 0
+                );
+                const avgCompliance = Math.round(
+                  ddeo.aeos.reduce((acc, aeo) =>
+                    acc + aeo.schools.reduce((sum, s) => sum + s.complianceScore, 0), 0
+                  ) / schoolCount
+                );
+
+                return (
+                  <div key={ddeo.id} className="p-4 rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="font-semibold text-foreground">{ddeo.name}</h4>
+                        <p className="text-sm text-muted-foreground">{schoolCount} schools • {teacherCount} teachers</p>
+                      </div>
+                      <Badge variant={avgCompliance >= 85 ? "default" : "secondary"}>
+                        {avgCompliance}% avg
+                      </Badge>
+                    </div>
+                    <div className="space-y-2">
+                      {ddeo.aeos.map((aeo) => (
+                        <div key={aeo.id} className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{aeo.name}</span>
+                          <span className="font-medium">{aeo.schools.length} schools</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Recent Activity */}
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Clock className="w-5 h-5 text-primary" />
+                Recent Activity
+              </h3>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/data-requests')}>
+                View All
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">New data request submitted</p>
+                  <p className="text-xs text-muted-foreground mt-1">GGPS Dhoke Kala Khan • 2 hours ago</p>
+                </div>
+                <Badge variant="secondary">Pending</Badge>
+              </div>
+              <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">Request completed</p>
+                  <p className="text-xs text-muted-foreground mt-1">GGPS Bahria Town • 5 hours ago</p>
+                </div>
+                <Badge variant="default">Completed</Badge>
+              </div>
+              <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-5 h-5 text-orange-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">Follow-up required</p>
+                  <p className="text-xs text-muted-foreground mt-1">GGPS Morgah • 1 day ago</p>
+                </div>
+                <Badge variant="destructive">Urgent</Badge>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
+
+      {/* Export School Data Modal */}
+      <Dialog open={showExportModal} onOpenChange={setShowExportModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold gradient-text">
+              Export School Data
+            </DialogTitle>
+            <DialogDescription>
+              Select a school and export format to download school data
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-6 space-y-3">
+            {getAllSchools.map((school) => (
+              <div
+                key={school.id}
+                className="p-4 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-all duration-200"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center shrink-0">
+                      <Building2 className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-semibold text-sm text-foreground truncate">
+                        {school.name}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {school.teachers} teachers · Compliance: {school.complianceScore}%
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Select
+                      value={selectedExportFormat}
+                      onValueChange={(value) => setSelectedExportFormat(value as 'sheets' | 'docs')}
+                    >
+                      <SelectTrigger className="w-[140px] h-9 text-xs">
+                        <SelectValue placeholder="Format" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sheets">Google Sheets</SelectItem>
+                        <SelectItem value="docs">Google Docs</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (selectedExportFormat) {
+                          handleExportSchool(school.id, selectedExportFormat);
+                        }
+                      }}
+                      disabled={!selectedExportFormat}
+                      className="gap-2 h-9"
+                    >
+                      <Download className="w-4 h-4" />
+                      Export
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 flex justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowExportModal(false);
+                setSelectedExportFormat('');
+              }}
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
