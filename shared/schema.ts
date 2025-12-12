@@ -165,6 +165,42 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Queries table
+export const queries = pgTable("queries", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ticketNumber: text("ticket_number").notNull().unique(),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  senderId: varchar("sender_id").notNull(),
+  senderName: text("sender_name").notNull(),
+  senderRole: text("sender_role").notNull(),
+  senderSchoolId: varchar("sender_school_id"),
+  senderSchoolName: text("sender_school_name"),
+  recipientId: varchar("recipient_id").notNull(),
+  recipientName: text("recipient_name").notNull(),
+  recipientRole: text("recipient_role").notNull(),
+  status: text("status").notNull().default("open"), // open, in_progress, resolved, closed
+  priority: text("priority").notNull().default("medium"), // low, medium, high
+  category: text("category"),
+  attachmentUrl: text("attachment_url"),
+  attachmentFileName: text("attachment_file_name"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Query Responses table
+export const queryResponses = pgTable("query_responses", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  queryId: varchar("query_id").notNull().references(() => queries.id, { onDelete: "cascade" }),
+  senderId: varchar("sender_id").notNull(),
+  senderName: text("sender_name").notNull(),
+  senderRole: text("sender_role").notNull(),
+  message: text("message").notNull(),
+  attachmentUrl: text("attachment_url"),
+  attachmentFileName: text("attachment_file_name"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Organization insert schemas
 export const insertDistrictSchema = createInsertSchema(districts).omit({
   id: true,
@@ -202,6 +238,18 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
   createdAt: true,
 });
 
+export const insertQuerySchema = createInsertSchema(queries).omit({
+  id: true,
+  ticketNumber: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertQueryResponseSchema = createInsertSchema(queryResponses).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Organization types
 export type InsertDistrict = z.infer<typeof insertDistrictSchema>;
 export type District = typeof districts.$inferSelect;
@@ -219,3 +267,7 @@ export type InsertRequestAssignee = z.infer<typeof insertRequestAssigneeSchema>;
 export type RequestAssignee = typeof requestAssignees.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Notification = typeof notifications.$inferSelect;
+export type InsertQuery = z.infer<typeof insertQuerySchema>;
+export type Query = typeof queries.$inferSelect;
+export type InsertQueryResponse = z.infer<typeof insertQueryResponseSchema>;
+export type QueryResponse = typeof queryResponses.$inferSelect;

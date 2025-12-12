@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLocation } from 'wouter';
 import { ArrowLeft, Send, Upload, X } from 'lucide-react';
 import { useState } from 'react';
-import { useQueries } from '@/hooks/useQueries';
 import { realAEOs, realHeadmasters } from '@/data/realData';
 import { useToast } from '@/hooks/use-toast';
 
@@ -31,7 +30,6 @@ const priorities = [
 export default function CreateQuery() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
-  const { createQuery } = useQueries();
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -92,7 +90,7 @@ export default function CreateQuery() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.recipientId || !formData.subject || !formData.message) {
       toast({
         title: "Missing Information",
@@ -105,7 +103,7 @@ export default function CreateQuery() {
     setIsSubmitting(true);
 
     const selectedRecipient = recipientOptions.find(r => r.id === formData.recipientId);
-    
+
     if (!selectedRecipient) {
       toast({
         title: "Error",
@@ -116,32 +114,49 @@ export default function CreateQuery() {
       return;
     }
 
-    setTimeout(() => {
-      createQuery({
-        subject: formData.subject,
-        message: formData.message,
-        senderId: user.id,
-        senderName: user.name,
-        senderRole: user.role,
-        senderSchoolId: user.schoolId,
-        senderSchoolName: user.schoolName,
-        recipientId: selectedRecipient.id,
-        recipientName: selectedRecipient.name,
-        recipientRole: selectedRecipient.role,
-        priority: formData.priority,
-        category: formData.category,
-        attachmentUrl: attachment ? URL.createObjectURL(attachment) : undefined,
-        attachmentFileName: attachment?.name,
+    try {
+      const response = await fetch('/api/queries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: formData.subject,
+          message: formData.message,
+          senderId: user.id,
+          senderName: user.name,
+          senderRole: user.role,
+          senderSchoolId: user.schoolId,
+          senderSchoolName: user.schoolName,
+          recipientId: selectedRecipient.id,
+          recipientName: selectedRecipient.name,
+          recipientRole: selectedRecipient.role,
+          priority: formData.priority,
+          category: formData.category,
+          attachmentUrl: attachment ? URL.createObjectURL(attachment) : undefined,
+          attachmentFileName: attachment?.name,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit query');
+      }
 
       toast({
         title: "Query Submitted",
         description: "Your query has been sent successfully.",
       });
 
-      setIsSubmitting(false);
       navigate('/queries');
-    }, 1000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit query. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

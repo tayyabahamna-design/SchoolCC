@@ -384,5 +384,78 @@ export async function registerRoutes(
     }
   });
 
+  // Query endpoints
+  app.post("/api/queries", async (req, res) => {
+    try {
+      const query = await storage.createQuery(req.body);
+      res.json(query);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to create query" });
+    }
+  });
+
+  app.get("/api/queries", async (req, res) => {
+    try {
+      const { senderId, recipientId } = req.query;
+      let queries;
+
+      if (senderId) {
+        queries = await storage.getQueriesBySender(senderId as string);
+      } else if (recipientId) {
+        queries = await storage.getQueriesByRecipient(recipientId as string);
+      } else {
+        queries = await storage.getAllQueries();
+      }
+
+      res.json(queries);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch queries" });
+    }
+  });
+
+  app.get("/api/queries/:id", async (req, res) => {
+    try {
+      const query = await storage.getQuery(req.params.id);
+      if (!query) {
+        return res.status(404).json({ error: "Query not found" });
+      }
+      res.json(query);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch query" });
+    }
+  });
+
+  app.patch("/api/queries/:id/status", async (req, res) => {
+    try {
+      const { status } = req.body;
+      const query = await storage.updateQueryStatus(req.params.id, status);
+      res.json(query);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update query status" });
+    }
+  });
+
+  // Query Response endpoints
+  app.post("/api/queries/:id/responses", async (req, res) => {
+    try {
+      const response = await storage.createQueryResponse({
+        ...req.body,
+        queryId: req.params.id,
+      });
+      res.json(response);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to create response" });
+    }
+  });
+
+  app.get("/api/queries/:id/responses", async (req, res) => {
+    try {
+      const responses = await storage.getQueryResponses(req.params.id);
+      res.json(responses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch responses" });
+    }
+  });
+
   return httpServer;
 }

@@ -1,9 +1,9 @@
 import { db } from "./db";
-import { users, dataRequests, requestAssignees, districts, clusters, schools, notifications } from "@shared/schema";
+import { users, dataRequests, requestAssignees, districts, clusters, schools, notifications, queries, queryResponses } from "@shared/schema";
 import type {
   InsertUser, User, InsertDataRequest, DataRequest, InsertRequestAssignee, RequestAssignee,
   InsertDistrict, District, InsertCluster, Cluster, InsertSchool, School,
-  InsertNotification, Notification
+  InsertNotification, Notification, InsertQuery, Query, InsertQueryResponse, QueryResponse
 } from "@shared/schema";
 import { eq, and, or, inArray, desc } from "drizzle-orm";
 
@@ -60,6 +60,18 @@ export interface IStorage {
   getUnreadCount(userId: string): Promise<number>;
   markAsRead(notificationId: string): Promise<Notification>;
   markAllAsRead(userId: string): Promise<void>;
+
+  // Query operations
+  createQuery(query: InsertQuery): Promise<Query>;
+  getQuery(id: string): Promise<Query | undefined>;
+  getQueriesBySender(senderId: string): Promise<Query[]>;
+  getQueriesByRecipient(recipientId: string): Promise<Query[]>;
+  getAllQueries(): Promise<Query[]>;
+  updateQueryStatus(id: string, status: string): Promise<Query>;
+
+  // Query Response operations
+  createQueryResponse(response: InsertQueryResponse): Promise<QueryResponse>;
+  getQueryResponses(queryId: string): Promise<QueryResponse[]>;
 }
 
 export class DBStorage implements IStorage {
@@ -297,6 +309,74 @@ export class DBStorage implements IStorage {
       .update(notifications)
       .set({ isRead: true })
       .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+  }
+
+  // Query operations
+  async createQuery(query: InsertQuery): Promise<Query> {
+    // Generate ticket number
+    const existingQueries = await db.select().from(queries);
+    const ticketNumber = `TKT-${String(existingQueries.length + 1).padStart(3, '0')}`;
+
+    const [newQuery] = await db.insert(queries).values({
+      ...query,
+      ticketNumber,
+    }).returning();
+    return newQuery;
+  }
+
+  async getQuery(id: string): Promise<Query | undefined> {
+    const [query] = await db.select().from(queries).where(eq(queries.id, id));
+    return query;
+  }
+
+  async getQueriesBySender(senderId: string): Promise<Query[]> {
+    return await db
+      .select()
+      .from(queries)
+      .where(eq(queries.senderId, senderId))
+      .orderBy(desc(queries.createdAt));
+  }
+
+  async getQueriesByRecipient(recipientId: string): Promise<Query[]> {
+    return await db
+      .select()
+      .from(queries)
+      .where(eq(queries.recipientId, recipientId))
+      .orderBy(desc(queries.createdAt));
+  }
+
+  async getAllQueries(): Promise<Query[]> {
+    return await db.select().from(queries).orderBy(desc(queries.createdAt));
+  }
+
+  async updateQueryStatus(id: string, status: string): Promise<Query> {
+    const [updated] = await db
+      .update(queries)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(queries.id, id))
+      .returning();
+    return updated;
+  }
+
+  // Query Response operations
+  async createQueryResponse(response: InsertQueryResponse): Promise<QueryResponse> {
+    const [newResponse] = await db.insert(queryResponses).values(response).returning();
+
+    // Update query status to in_progress when a response is added
+    await db
+      .update(queries)
+      .set({ status: 'in_progress', updatedAt: new Date() })
+      .where(eq(queries.id, response.queryId));
+
+    return newResponse;
+  }
+
+  async getQueryResponses(queryId: string): Promise<QueryResponse[]> {
+    return await db
+      .select()
+      .from(queryResponses)
+      .where(eq(queryResponses.queryId, queryId))
+      .orderBy(queryResponses.createdAt);
   }
 
   // Generate Google Sheets from request responses
