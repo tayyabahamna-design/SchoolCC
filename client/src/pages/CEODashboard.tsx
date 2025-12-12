@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/auth';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 import { LogOut, ChevronRight, Download, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User, Menu, BarChart3, Settings, Home } from 'lucide-react';
 import {
   Dialog,
@@ -51,6 +52,7 @@ interface DEO {
 
 export default function CEODashboard() {
   const { user, logout } = useAuth();
+  const { toast } = useToast();
   const [, navigate] = useLocation();
   const [showExportModal, setShowExportModal] = useState(false);
   const [selectedExportFormat, setSelectedExportFormat] = useState<'sheets' | 'docs' | ''>('');
@@ -378,6 +380,7 @@ export default function CEODashboard() {
           <Button
             variant="ghost"
             className="w-full justify-start gap-3"
+            onClick={() => toast({ title: "Coming Soon", description: "Analytics feature is under development" })}
           >
             <BarChart3 className="w-5 h-5" />
             {sidebarOpen && <span>Analytics</span>}
@@ -401,6 +404,7 @@ export default function CEODashboard() {
           <Button
             variant="ghost"
             className="w-full justify-start gap-3"
+            onClick={() => toast({ title: "Coming Soon", description: "Settings feature is under development" })}
           >
             <Settings className="w-5 h-5" />
             {sidebarOpen && <span>Settings</span>}
