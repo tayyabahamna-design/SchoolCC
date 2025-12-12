@@ -46,59 +46,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   const login = async (phoneNumber: string, role: UserRole, password: string) => {
-    // Mock authentication
-    if (password.length >= 4) {
-      const mockUsers: Record<UserRole, Omit<User, 'phoneNumber'>> = {
-        CEO: {
-          id: 'ceo-1',
-          role: 'CEO',
-          name: 'CEO User',
-          districtId: 'district-1',
+    // Real authentication with API
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        DEO: {
-          id: 'deo-1',
-          role: 'DEO',
-          name: 'DEO User',
-          districtId: 'district-1',
-        },
-        DDEO: {
-          id: 'ddeo-1',
-          role: 'DDEO',
-          name: 'DDEO User',
-          districtId: 'district-1',
-        },
-        AEO: {
-          id: 'aeo-1',
-          role: 'AEO',
-          name: 'AEO User',
-          clusterId: 'cluster-1',
-          districtId: 'district-1',
-        },
-        HEAD_TEACHER: {
-          id: 'ht-1',
-          role: 'HEAD_TEACHER',
-          name: 'Head Teacher',
-          schoolId: 'SCH-001',
-          schoolName: 'GGPS Chakra',
-          clusterId: 'cluster-1',
-          districtId: 'district-1',
-        },
-        TEACHER: {
-          id: 'teacher-1',
-          role: 'TEACHER',
-          name: 'Teacher',
-          schoolId: 'SCH-001',
-          schoolName: 'GGPS Chakra',
-          clusterId: 'cluster-1',
-          districtId: 'district-1',
-        },
-      };
-
-      const userData = mockUsers[role];
-      setUser({
-        ...userData,
-        phoneNumber,
+        body: JSON.stringify({ phoneNumber, password }),
       });
+
+      if (!response.ok) {
+        throw new Error('Invalid credentials');
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
     }
   };
 

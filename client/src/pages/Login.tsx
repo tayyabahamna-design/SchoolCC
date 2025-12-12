@@ -18,9 +18,8 @@ const roles: { value: UserRole; label: string; description: string; icon: any }[
 export default function Login() {
   const { login } = useAuth();
   const [, navigate] = useLocation();
-  const [phoneNumber, setPhoneNumber] = useState('9876543210');
-  const [selectedRole, setSelectedRole] = useState<UserRole>('TEACHER');
-  const [password, setPassword] = useState('demo');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -30,10 +29,10 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(phoneNumber, selectedRole, password);
+      await login(phoneNumber, '' as UserRole, password);
       navigate('/dashboard');
     } catch (err) {
-      setError('Login failed. Please try again.');
+      setError('Invalid phone number or password. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -107,58 +106,12 @@ export default function Login() {
               </label>
               <Input
                 type="tel"
-                placeholder="Enter 10-digit number"
+                placeholder="Enter phone number (e.g., 03001000001)"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 data-testid="input-phone"
                 className="w-full h-12 text-base rounded-lg"
               />
-            </div>
-
-            {/* Role Selection */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                Select Your Role
-              </label>
-              <div className="grid grid-cols-3 gap-3">
-                {roles.map((role) => {
-                  const Icon = role.icon;
-                  return (
-                    <label
-                      key={role.value}
-                      className={`relative flex flex-col items-center p-4 rounded-xl cursor-pointer transition-all duration-200 ${
-                        selectedRole === role.value
-                          ? 'bg-blue-600 text-white shadow-lg scale-105'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                      }`}
-                      data-testid={`radio-role-${role.value}`}
-                    >
-                      <Icon className="w-8 h-8 mb-2" />
-                      <span className="text-xs font-semibold text-center leading-tight">
-                        {role.label}
-                      </span>
-                      {selectedRole === role.value && (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      )}
-                      <input
-                        type="radio"
-                        name="role"
-                        value={role.value}
-                        checked={selectedRole === role.value}
-                        onChange={(e) => setSelectedRole(e.target.value as UserRole)}
-                        className="sr-only"
-                      />
-                    </label>
-                  );
-                })}
-              </div>
-              {selectedRole && (
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                  {roles.find(r => r.value === selectedRole)?.description}
-                </p>
-              )}
             </div>
 
             {/* Password */}
@@ -174,7 +127,7 @@ export default function Login() {
                 data-testid="input-password"
                 className="w-full h-12 text-base rounded-lg"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Demo: Any 4+ characters</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Use credentials provided by your administrator</p>
             </div>
 
             {/* Error */}
@@ -188,7 +141,7 @@ export default function Login() {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={loading || phoneNumber.length < 10}
+              disabled={loading || !phoneNumber || !password}
               data-testid="button-login"
               className="w-full h-12 text-base font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               size="lg"
@@ -199,7 +152,7 @@ export default function Login() {
 
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-              Demo credentials pre-filled • Password: any 4+ characters
+              Default password for all accounts: admin123
             </p>
           </div>
         </Card>
