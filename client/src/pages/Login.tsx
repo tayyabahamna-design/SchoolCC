@@ -152,7 +152,7 @@ export default function Login() {
 
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-              For AEO accounts: Use phone number (03001000XXX) and default password: aeo123
+              Default password for all accounts: admin123
             </p>
           </div>
         </Card>
