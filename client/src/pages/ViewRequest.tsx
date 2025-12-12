@@ -231,6 +231,26 @@ export default function ViewRequest() {
                 </div>
               </div>
               <p className="mt-4 text-sm text-foreground">{request.description}</p>
+
+              {/* Description Voice Note Display */}
+              {request.descriptionVoiceUrl && (
+                <div className="mt-4 border border-border rounded-lg p-3 bg-blue-50">
+                  <p className="text-xs text-muted-foreground mb-2">Description Voice Note:</p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                      data-testid="button-play-description-voice"
+                    >
+                      <Play className="w-4 h-4" />
+                      Play Recording ({request.descriptionVoiceFileName || 'voice'})
+                    </Button>
+                    <span className="text-xs text-green-600 font-medium">✓ Voice note attached</span>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </Card>

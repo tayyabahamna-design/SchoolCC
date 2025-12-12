@@ -156,6 +156,9 @@ export default function CreateRequest() {
     }
 
     try {
+      // Get description voice note data if it exists
+      const descriptionVoice = recordedVoiceNotes['description'] && hasRecording('description');
+
       // Create the data request
       createRequest(
         title,
@@ -176,7 +179,9 @@ export default function CreateRequest() {
         user.role,
         user.schoolId,
         user.clusterId,
-        user.districtId
+        user.districtId,
+        descriptionVoice ? 'voice-description.wav' : undefined,
+        descriptionVoice ? 'Description Voice Note' : undefined
       );
 
       // Automatically create collaborative form for the same data

@@ -29,6 +29,8 @@ export interface DataRequest {
   id: string;
   title: string;
   description: string;
+  descriptionVoiceUrl?: string;
+  descriptionVoiceFileName?: string;
   createdBy: string;
   createdByName: string;
   createdByRole: string;
@@ -215,12 +217,16 @@ export function useMockDataRequests() {
       createdByRole: string,
       createdBySchoolId?: string,
       createdByClusterId?: string,
-      createdByDistrictId?: string
+      createdByDistrictId?: string,
+      descriptionVoiceUrl?: string,
+      descriptionVoiceFileName?: string
     ) => {
       const newRequest: DataRequest = {
         id: `req-${Date.now()}`,
         title,
         description,
+        descriptionVoiceUrl,
+        descriptionVoiceFileName,
         fields,
         createdBy,
         createdByName,

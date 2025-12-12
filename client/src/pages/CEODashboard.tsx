@@ -409,21 +409,38 @@ export default function CEODashboard() {
         </Card>
 
         {/* Quick Actions */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           <Card className="p-6 bg-gradient-to-br from-violet-50 to-violet-100 border-violet-200">
             <div className="flex items-start justify-between mb-4">
               <h3 className="font-semibold text-violet-900">Create Request</h3>
               <Plus className="w-5 h-5 text-violet-600" />
             </div>
             <p className="text-sm text-violet-800 mb-4">Send data requests to any level in the hierarchy.</p>
-            <Button 
-              size="sm" 
-              className="w-full bg-violet-600 hover:bg-violet-700 text-white" 
+            <Button
+              size="sm"
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white"
               onClick={() => navigate('/create-request')}
               data-testid="button-create-request"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Request
+            </Button>
+          </Card>
+
+          <Card className="p-6 bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="font-semibold text-indigo-900">View Requests</h3>
+              <FileText className="w-5 h-5 text-indigo-600" />
+            </div>
+            <p className="text-sm text-indigo-800 mb-4">Monitor all data requests across the system.</p>
+            <Button
+              size="sm"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+              onClick={() => navigate('/data-requests')}
+              data-testid="button-view-requests"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              All Requests
             </Button>
           </Card>
 
