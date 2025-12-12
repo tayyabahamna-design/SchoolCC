@@ -139,7 +139,7 @@ export const queries = pgTable("queries", {
 // Query responses table (for threading)
 export const queryResponses = pgTable("query_responses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  queryId: varchar("query_id").notNull(),
+  queryId: varchar("query_id").notNull().references(() => queries.id, { onDelete: "cascade" }),
   senderId: varchar("sender_id").notNull(),
   senderName: text("sender_name").notNull(),
   senderRole: text("sender_role").notNull(),
@@ -162,42 +162,6 @@ export const notifications = pgTable("notifications", {
   relatedId: varchar("related_id"), // ID of related entity (request, query, etc.)
   createdBy: varchar("created_by"),
   createdByName: text("created_by_name"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-// Queries table
-export const queries = pgTable("queries", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  ticketNumber: text("ticket_number").notNull().unique(),
-  subject: text("subject").notNull(),
-  message: text("message").notNull(),
-  senderId: varchar("sender_id").notNull(),
-  senderName: text("sender_name").notNull(),
-  senderRole: text("sender_role").notNull(),
-  senderSchoolId: varchar("sender_school_id"),
-  senderSchoolName: text("sender_school_name"),
-  recipientId: varchar("recipient_id").notNull(),
-  recipientName: text("recipient_name").notNull(),
-  recipientRole: text("recipient_role").notNull(),
-  status: text("status").notNull().default("open"), // open, in_progress, resolved, closed
-  priority: text("priority").notNull().default("medium"), // low, medium, high
-  category: text("category"),
-  attachmentUrl: text("attachment_url"),
-  attachmentFileName: text("attachment_file_name"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
-// Query Responses table
-export const queryResponses = pgTable("query_responses", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  queryId: varchar("query_id").notNull().references(() => queries.id, { onDelete: "cascade" }),
-  senderId: varchar("sender_id").notNull(),
-  senderName: text("sender_name").notNull(),
-  senderRole: text("sender_role").notNull(),
-  message: text("message").notNull(),
-  attachmentUrl: text("attachment_url"),
-  attachmentFileName: text("attachment_file_name"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
