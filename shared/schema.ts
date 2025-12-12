@@ -40,7 +40,18 @@ export const users = pgTable("users", {
   schoolName: text("school_name"),
   clusterId: varchar("cluster_id"),
   districtId: varchar("district_id"),
+  // Profile fields
+  fatherName: text("father_name"),
+  spouseName: text("spouse_name"),
+  email: text("email"),
+  residentialAddress: text("residential_address"),
+  cnic: text("cnic"),
+  dateOfBirth: date("date_of_birth"),
+  dateOfJoining: date("date_of_joining"),
+  qualification: text("qualification"),
+  profilePicture: text("profile_picture"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 export const dataRequests = pgTable("data_requests", {

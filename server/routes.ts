@@ -278,5 +278,55 @@ export async function registerRoutes(
     }
   });
 
+  // User Profile endpoints
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const user = await storage.getUser(req.params.id);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json({ ...user, password: undefined });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch user profile" });
+    }
+  });
+
+  app.patch("/api/users/:id", async (req, res) => {
+    try {
+      const {
+        name,
+        fatherName,
+        spouseName,
+        email,
+        residentialAddress,
+        cnic,
+        dateOfBirth,
+        dateOfJoining,
+        qualification,
+        profilePicture,
+      } = req.body;
+
+      const updateData: any = {
+        updatedAt: new Date(),
+      };
+
+      if (name !== undefined) updateData.name = name;
+      if (fatherName !== undefined) updateData.fatherName = fatherName;
+      if (spouseName !== undefined) updateData.spouseName = spouseName;
+      if (email !== undefined) updateData.email = email;
+      if (residentialAddress !== undefined) updateData.residentialAddress = residentialAddress;
+      if (cnic !== undefined) updateData.cnic = cnic;
+      if (dateOfBirth !== undefined) updateData.dateOfBirth = dateOfBirth;
+      if (dateOfJoining !== undefined) updateData.dateOfJoining = dateOfJoining;
+      if (qualification !== undefined) updateData.qualification = qualification;
+      if (profilePicture !== undefined) updateData.profilePicture = profilePicture;
+
+      const user = await storage.updateUser(req.params.id, updateData);
+      res.json({ ...user, password: undefined });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user profile" });
+    }
+  });
+
   return httpServer;
 }

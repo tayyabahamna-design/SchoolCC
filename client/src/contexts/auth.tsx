@@ -23,10 +23,10 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
   'TEACHER': 1,
 };
 
-// Direct subordinates for each role - CEO can assign to anyone in the hierarchy
+// Direct subordinates for each role - CEO can assign to anyone, DEO can assign to everyone except CEO
 export const VALID_ASSIGNEES: Record<UserRole, UserRole[]> = {
-  'CEO': ['DEO', 'DDEO', 'AEO', 'HEAD_TEACHER', 'TEACHER'],
-  'DEO': ['DDEO', 'AEO'],
+  'CEO': ['DEO', 'DDEO', 'AEO', 'HEAD_TEACHER', 'TEACHER'], // CEO is the king - can assign to anyone
+  'DEO': ['DDEO', 'AEO', 'HEAD_TEACHER', 'TEACHER'], // DEO can assign from DDEO down to Teacher
   'DDEO': [],
   'AEO': ['HEAD_TEACHER'],
   'HEAD_TEACHER': ['TEACHER'],

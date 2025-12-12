@@ -24,6 +24,7 @@ import EditSchool from "@/pages/EditSchool";
 import Queries from "@/pages/Queries";
 import CreateQuery from "@/pages/CreateQuery";
 import ViewQuery from "@/pages/ViewQuery";
+import UserProfile from "@/pages/UserProfile";
 import NotFound from "@/pages/not-found";
 
 function DashboardRoute() {
@@ -56,6 +57,7 @@ function Router() {
       <Route path="/queries" component={Queries} />
       <Route path="/create-query" component={CreateQuery} />
       <Route path="/query/:id" component={ViewQuery} />
+      <Route path="/profile" component={UserProfile} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

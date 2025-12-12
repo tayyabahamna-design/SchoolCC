@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/auth';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { LogOut, ChevronRight, ChevronDown, Download, Filter, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText } from 'lucide-react';
+import { LogOut, ChevronRight, ChevronDown, Download, Filter, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 interface School {
@@ -185,18 +185,29 @@ export default function CEODashboard() {
             <h1 className="text-3xl font-bold text-slate-900">Mission Control</h1>
             <p className="text-sm text-slate-600 mt-1">System-wide monitoring & analytics</p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              logout();
-              navigate('/');
-            }}
-            data-testid="button-logout"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/profile')}
+              data-testid="button-profile"
+            >
+              <User className="w-4 h-4 mr-2" />
+              Profile
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                logout();
+                navigate('/');
+              }}
+              data-testid="button-logout"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -204,7 +215,9 @@ export default function CEODashboard() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-slate-900 mb-2">Welcome back, {user.name}</h2>
+          <h2 className="text-xl font-semibold text-slate-900 mb-2">
+            Welcome back, <span className="cursor-pointer hover:text-primary" onClick={() => navigate('/profile')}>{user.name}</span>
+          </h2>
           <p className="text-slate-600">You have system-wide visibility across all districts, regions, clusters, and schools.</p>
         </div>
 
