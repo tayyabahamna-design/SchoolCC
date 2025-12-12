@@ -40,6 +40,7 @@ function Router() {
     <Switch>
       <Route path="/" component={DashboardRoute} />
       <Route path="/dashboard" component={DashboardRoute} />
+      <Route path="/ceo-dashboard" component={CEODashboard} />
       <Route path="/data-requests" component={DataRequests} />
       <Route path="/create-request" component={CreateRequest} />
       <Route path="/request/:id" component={ViewRequest} />
