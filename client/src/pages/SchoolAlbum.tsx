@@ -27,6 +27,21 @@ export default function SchoolAlbum() {
     return null;
   }
 
+  // Head teachers and teachers can only view their own school's album
+  if ((user.role === 'HEAD_TEACHER' || user.role === 'TEACHER') && user.schoolId !== schoolId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="p-8 text-center max-w-md">
+          <h2 className="text-lg font-semibold text-foreground mb-2">Access Restricted</h2>
+          <p className="text-muted-foreground mb-4">You can only view your own school's album.</p>
+          <Button onClick={() => navigate('/school-data')}>
+            Go Back
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
   const activities = getActivitiesForSchool(schoolId);
   const schoolName = SCHOOL_NAMES[schoolId] || 'School';
 
