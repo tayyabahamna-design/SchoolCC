@@ -87,9 +87,9 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar - Quick Actions */}
-      <aside className="hidden lg:flex flex-col w-72 glass border-r border-white/20 fixed left-0 top-0 h-screen z-40 animate-slideInLeft">
+      <aside className="hidden lg:flex flex-col w-72 bg-card/95 dark:bg-card backdrop-blur-xl border-r border-border fixed left-0 top-0 h-screen z-40 animate-slideInLeft">
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-white/20">
+        <div className="p-6 border-b border-border">
           <h1 className="text-xl font-bold gradient-text-gold">SchoolHub</h1>
           <p className="text-sm text-muted-foreground mt-1">{user.role.replace(/_/g, ' ')}</p>
         </div>
@@ -118,7 +118,7 @@ export default function Dashboard() {
               <>
                 <button
                   onClick={() => setActiveActivityForm('visit-selector')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-amber-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-amber-100/80 dark:hover:bg-amber-900/30 transition-all duration-300 group press-effect"
                   data-testid="button-plan-visit"
                 >
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -128,7 +128,7 @@ export default function Dashboard() {
                 </button>
                 <button
                   onClick={() => setActiveActivityForm('other-activity')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-emerald-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-emerald-100/80 dark:hover:bg-emerald-900/30 transition-all duration-300 group press-effect"
                   data-testid="button-log-activity"
                 >
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -142,7 +142,7 @@ export default function Dashboard() {
               <>
                 <button
                   onClick={() => navigate('/edit-school')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-teal-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group press-effect"
                   data-testid="button-edit-school"
                 >
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -152,7 +152,7 @@ export default function Dashboard() {
                 </button>
                 <button
                   onClick={() => navigate('/edit-school-data')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-purple-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-purple-100/80 dark:hover:bg-purple-900/30 transition-all duration-300 group press-effect"
                   data-testid="button-update-school-data"
                 >
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -162,7 +162,7 @@ export default function Dashboard() {
                 </button>
                 <button
                   onClick={() => navigate('/collaborative-forms')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-blue-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
                   data-testid="button-collaborative-forms"
                 >
                   <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -175,7 +175,7 @@ export default function Dashboard() {
             {(user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DEO' || user.role === 'DDEO') && (
               <button
                 onClick={() => navigate('/create-request')}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-violet-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-violet-100/80 dark:hover:bg-violet-900/30 transition-all duration-300 group press-effect"
                 data-testid="button-create-request"
               >
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-400 to-violet-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -191,7 +191,7 @@ export default function Dashboard() {
             
             <button
               onClick={() => navigate('/data-requests')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-slate-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-all duration-300 group press-effect"
               data-testid="button-view-requests"
             >
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-slate-400 to-slate-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -201,7 +201,7 @@ export default function Dashboard() {
             </button>
             <button
               onClick={() => navigate('/calendar')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-blue-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
               data-testid="button-view-calendar"
             >
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -211,7 +211,7 @@ export default function Dashboard() {
             </button>
             <button
               onClick={() => navigate('/school-data')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-teal-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group press-effect"
               data-testid="button-view-schools"
             >
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -222,7 +222,7 @@ export default function Dashboard() {
             {(user.role === 'AEO' || user.role === 'DEO' || user.role === 'DDEO') && (
               <button
                 onClick={() => navigate('/school-visits')}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-rose-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-rose-100/80 dark:hover:bg-rose-900/30 transition-all duration-300 group press-effect"
                 data-testid="button-view-visits"
               >
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-rose-400 to-rose-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -233,7 +233,7 @@ export default function Dashboard() {
             )}
             <button
               onClick={() => navigate('/queries')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-purple-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-purple-100/80 dark:hover:bg-purple-900/30 transition-all duration-300 group press-effect"
               data-testid="button-view-queries"
             >
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
@@ -245,10 +245,10 @@ export default function Dashboard() {
         </div>
 
         {/* Logout Button */}
-        <div className="p-4 border-t border-white/20">
+        <div className="p-4 border-t border-border">
           <Button
             variant="outline"
-            className="w-full justify-start rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300"
+            className="w-full justify-start rounded-xl hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-600 hover:border-red-200 dark:hover:border-red-800 transition-all duration-300"
             onClick={() => {
               logout();
               navigate('/');
@@ -264,7 +264,7 @@ export default function Dashboard() {
       {/* Main Content Area */}
       <div className="flex-1 lg:ml-72">
         {/* Mobile Header */}
-        <div className="lg:hidden glass border-b border-white/20 sticky top-0 z-50">
+        <div className="lg:hidden bg-card/95 dark:bg-card backdrop-blur-xl border-b border-border sticky top-0 z-50">
           <div className="px-4 py-4 flex items-center justify-between">
             <div>
               <h1 className="text-lg font-bold gradient-text-gold">SchoolHub</h1>
@@ -341,7 +341,7 @@ export default function Dashboard() {
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden lg:block glass border-b border-white/20 sticky top-0 z-30">
+        <div className="hidden lg:block bg-card/95 dark:bg-card backdrop-blur-xl border-b border-border sticky top-0 z-30">
           <div className="px-8 py-6 flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold gradient-text">Welcome back, {user.name}</h1>
@@ -362,7 +362,7 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold gradient-text mb-6">Staff Overview</h2>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 stagger-children">
                 {/* AEOs Card */}
-                <Card className="p-6 hover-lift glass border border-white/30 card-shine">
+                <Card className="p-6 hover-lift bg-card border border-border card-shine">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-foreground">AEOs</h3>
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
@@ -386,7 +386,7 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Head Teachers Card */}
-                <Card className="p-6 hover-lift glass border border-white/30 card-shine">
+                <Card className="p-6 hover-lift bg-card border border-border card-shine">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-foreground">Head Teachers</h3>
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg">
@@ -410,7 +410,7 @@ export default function Dashboard() {
                 </Card>
 
                 {/* Teachers Card */}
-                <Card className="p-6 hover-lift glass border border-white/30 card-shine">
+                <Card className="p-6 hover-lift bg-card border border-border card-shine">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-foreground">Teachers</h3>
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
@@ -449,7 +449,7 @@ export default function Dashboard() {
                 return (
                   <Card
                     key={idx}
-                    className="p-6 lg:p-8 hover-lift cursor-pointer card-shine glass border border-white/30"
+                    className="p-6 lg:p-8 hover-lift cursor-pointer card-shine bg-card border border-border"
                     onClick={() => navigate('/data-requests')}
                   >
                     <div className="flex items-start justify-between">
@@ -472,7 +472,7 @@ export default function Dashboard() {
           <div className="mb-12">
             <h2 className="text-2xl font-bold gradient-text mb-6">Your Activities</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children">
-              <Card className="p-6 hover-lift cursor-pointer glass border border-blue-200/50 card-shine">
+              <Card className="p-6 hover-lift cursor-pointer bg-card border border-blue-200/50 dark:border-blue-800/50 card-shine">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg animate-float" style={{animationDelay: '0s'}}>
                     <FileText className="w-6 h-6 text-white" />
@@ -483,7 +483,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </Card>
-              <Card className="p-6 hover-lift cursor-pointer glass border border-purple-200/50 card-shine">
+              <Card className="p-6 hover-lift cursor-pointer bg-card border border-purple-200/50 dark:border-purple-800/50 card-shine">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shadow-lg animate-float" style={{animationDelay: '0.5s'}}>
                     <Award className="w-6 h-6 text-white" />
@@ -494,7 +494,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </Card>
-              <Card className="p-6 hover-lift cursor-pointer glass border border-emerald-200/50 card-shine">
+              <Card className="p-6 hover-lift cursor-pointer bg-card border border-emerald-200/50 dark:border-emerald-800/50 card-shine">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg animate-float" style={{animationDelay: '1s'}}>
                     <Building2 className="w-6 h-6 text-white" />
@@ -505,7 +505,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </Card>
-              <Card className="p-6 hover-lift cursor-pointer glass border border-slate-200/50 card-shine">
+              <Card className="p-6 hover-lift cursor-pointer bg-card border border-slate-200/50 dark:border-slate-700/50 card-shine">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center shadow-lg animate-float" style={{animationDelay: '1.5s'}}>
                     <CheckSquare className="w-6 h-6 text-white" />
@@ -524,16 +524,16 @@ export default function Dashboard() {
         <div>
           <h2 className="text-2xl font-bold gradient-text mb-6">Recent Activity</h2>
           {userRequests.length === 0 ? (
-            <Card className="p-12 text-center glass border border-white/30">
+            <Card className="p-12 text-center bg-card border border-border">
               <p className="text-lg text-muted-foreground">No requests yet</p>
             </Card>
           ) : (
-            <Card className="p-0 overflow-hidden glass border border-white/30">
-              <ul className="divide-y divide-white/20">
+            <Card className="p-0 overflow-hidden bg-card border border-border">
+              <ul className="divide-y divide-border">
                 {userRequests.slice(0, 5).map((req, idx) => (
                   <li
                     key={req.id}
-                    className="flex items-center justify-between p-6 hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-transparent transition-all duration-300 cursor-pointer group"
+                    className="flex items-center justify-between p-6 hover:bg-amber-50/50 dark:hover:bg-amber-900/20 transition-all duration-300 cursor-pointer group"
                     onClick={() => navigate(`/request/${req.id}`)}
                     style={{animationDelay: `${idx * 0.1}s`}}
                   >
@@ -551,7 +551,7 @@ export default function Dashboard() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300"
+                      className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:text-amber-700 dark:hover:text-amber-400 hover:border-amber-300 dark:hover:border-amber-700"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/request/${req.id}`);
