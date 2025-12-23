@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import NotificationBell from '@/components/NotificationBell';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface School {
   id: string;
@@ -451,6 +452,7 @@ export default function CEODashboard() {
                 <Plus className="w-4 h-4 mr-2" />
                 Create Request
               </Button>
+              <ThemeToggle />
               <NotificationBell />
             </div>
           </div>

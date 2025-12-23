@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { useMockDataRequests, type DataRequest } from '@/hooks/useMockDataRequests';
 import { useLocation } from 'wouter';
 import { Plus, Download, ChevronRight, Clock, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useState, useEffect } from 'react';
 
 export default function DataRequests() {
@@ -69,7 +70,8 @@ export default function DataRequests() {
               <p className="text-sm text-muted-foreground">Manage and track all data requests</p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             {(user.role === 'CEO' || user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DEO' || user.role === 'DDEO') && (
               <Button
                 onClick={() => navigate('/create-request')}

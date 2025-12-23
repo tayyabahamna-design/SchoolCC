@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { AlertCircle, School, Check, Crown, Building2, Users, GraduationCap, UserCheck, BookOpen, Shield, TrendingUp, Eye } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const roles: { value: UserRole; label: string; description: string; icon: any }[] = [
   { value: 'CEO', label: 'CEO', description: 'System oversight, all data', icon: Crown },
@@ -52,7 +53,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 relative">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
 
         {/* Left Panel - Branding & Info */}

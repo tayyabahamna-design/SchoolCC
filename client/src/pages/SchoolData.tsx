@@ -6,6 +6,7 @@ import { useMockTeacherData, SchoolData as SchoolDataType } from '@/hooks/useMoc
 import { useLocation } from 'wouter';
 import { ArrowLeft, Download, Users, BookOpen, Droplet, Zap, BarChart3, ImageIcon, FileSpreadsheet, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function SchoolData() {
   const { user } = useAuth();
@@ -110,10 +111,13 @@ export default function SchoolData() {
               <p className="text-sm text-muted-foreground">Infrastructure, enrollment, and compliance records</p>
             </div>
           </div>
-          <Button variant="outline" data-testid="button-export-schools">
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button variant="outline" data-testid="button-export-schools">
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+          </div>
         </div>
       </div>
 

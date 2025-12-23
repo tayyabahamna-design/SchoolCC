@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useMockVisits } from '@/hooks/useMockVisits';
 import { useLocation } from 'wouter';
 import { ArrowLeft, Plus, MapPin, CheckCircle, Clock, Eye, Search, X } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function SchoolVisits() {
   const { user } = useAuth();
@@ -70,12 +71,15 @@ export default function SchoolVisits() {
               <p className="text-sm text-muted-foreground">Plan, conduct, and monitor school visits</p>
             </div>
           </div>
-          {user.role === 'AEO' && (
-            <Button onClick={() => navigate('/create-visit')} data-testid="button-create-visit">
-              <Plus className="w-4 h-4 mr-2" />
-              Plan Visit
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            {user.role === 'AEO' && (
+              <Button onClick={() => navigate('/create-visit')} data-testid="button-create-visit">
+                <Plus className="w-4 h-4 mr-2" />
+                Plan Visit
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
