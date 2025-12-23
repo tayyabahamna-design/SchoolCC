@@ -13,6 +13,7 @@ import MentoringVisitForm from '@/pages/MentoringVisitForm';
 import OfficeVisitForm from '@/pages/OfficeVisitForm';
 import OtherActivityForm from '@/pages/OtherActivityForm';
 import NotificationBell from '@/components/NotificationBell';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -346,7 +347,10 @@ export default function Dashboard() {
               <h1 className="text-2xl font-bold gradient-text">Welcome back, {user.name}</h1>
               <p className="text-base text-muted-foreground mt-1">Here's your dashboard overview</p>
             </div>
-            <NotificationBell />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <NotificationBell />
+            </div>
           </div>
         </div>
 
