@@ -18,14 +18,25 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
   const [, navigate] = useLocation();
   const { getRequestsForUser } = useMockDataRequests();
-  const { getTeacherStats } = useMockTeacherData();
+  const { getTeacherStats, getStaffStats } = useMockTeacherData();
   const { getVisitsForUser } = useMockVisits();
   const { getAllActivities } = useMockAEOActivities();
-  
+
   const [activeActivityForm, setActiveActivityForm] = useState<string | null>(null);
 
-  if (!user || user.role === 'CEO') {
+  if (!user) {
     navigate('/');
+    return null;
+  }
+
+  // Redirect CEO and DEO to their specific dashboards
+  if (user.role === 'CEO') {
+    navigate('/');
+    return null;
+  }
+
+  if (user.role === 'DEO') {
+    navigate('/deo-dashboard');
     return null;
   }
   
@@ -39,6 +50,7 @@ export default function Dashboard() {
     r.assignees.some((a) => a.userId === user.id && a.status === 'completed')
   ).length;
   const { totalTeachers, presentToday, onLeaveToday, absentToday } = getTeacherStats();
+  const staffStats = getStaffStats();
 
   const dashboardStats = {
     CEO: [
@@ -46,11 +58,7 @@ export default function Dashboard() {
       { label: 'Present Today', value: presentToday, icon: TrendingUp, color: 'bg-emerald-50' },
       { label: 'On Leave Today', value: onLeaveToday, icon: Calendar, color: 'bg-amber-50' },
     ],
-    DEO: [
-      { label: 'Total Teachers', value: totalTeachers, icon: Users, color: 'bg-blue-50' },
-      { label: 'Present Today', value: presentToday, icon: TrendingUp, color: 'bg-emerald-50' },
-      { label: 'On Leave Today', value: onLeaveToday, icon: Calendar, color: 'bg-amber-50' },
-    ],
+    DEO: null, // DEO will have custom staff overview section
     DDEO: [
       { label: 'Total Teachers', value: totalTeachers, icon: Users, color: 'bg-blue-50' },
       { label: 'Present Today', value: presentToday, icon: TrendingUp, color: 'bg-emerald-50' },
@@ -140,6 +148,16 @@ export default function Dashboard() {
                     <School className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-medium text-foreground">Edit School</span>
+                </button>
+                <button
+                  onClick={() => navigate('/edit-school-data')}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-gradient-to-r hover:from-purple-100/80 hover:to-transparent transition-all duration-300 group press-effect"
+                  data-testid="button-update-school-data"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <Edit className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Update School Data</span>
                 </button>
                 <button
                   onClick={() => navigate('/collaborative-forms')}
@@ -334,34 +352,116 @@ export default function Dashboard() {
 
         {/* Main Content */}
         <div className="px-4 lg:px-8 py-6 lg:py-8">
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-8 stagger-children">
-            {stats.map((stat, idx) => {
-              const Icon = stat.icon;
-              const gradients = [
-                'from-blue-500 to-blue-600',
-                'from-emerald-500 to-emerald-600',
-                'from-amber-500 to-amber-600',
-              ];
-              return (
-                <Card 
-                  key={idx} 
-                  className="p-6 lg:p-8 hover-lift cursor-pointer card-shine glass border border-white/30"
-                  onClick={() => navigate('/data-requests')}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm lg:text-base font-medium text-muted-foreground mb-2">{stat.label}</p>
-                      <p className="stat-number gradient-text">{stat.value}</p>
+          {/* DEO Staff Overview */}
+          {user.role === 'DEO' && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold gradient-text mb-6">Staff Overview</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 stagger-children">
+                {/* AEOs Card */}
+                <Card className="p-6 hover-lift glass border border-white/30 card-shine">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-foreground">AEOs</h3>
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+                      <Award className="w-6 h-6 text-white" />
                     </div>
-                    <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-gradient-to-br ${gradients[idx % 3]} flex items-center justify-center shadow-lg`}>
-                      <Icon className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Total</span>
+                      <span className="text-2xl font-bold gradient-text">{staffStats.aeos.total}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Present</span>
+                      <span className="text-lg font-semibold text-emerald-600">{staffStats.aeos.present}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">On Leave</span>
+                      <span className="text-lg font-semibold text-amber-600">{staffStats.aeos.onLeave}</span>
                     </div>
                   </div>
                 </Card>
-              );
-            })}
-          </div>
+
+                {/* Head Teachers Card */}
+                <Card className="p-6 hover-lift glass border border-white/30 card-shine">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-foreground">Head Teachers</h3>
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg">
+                      <Building2 className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Total</span>
+                      <span className="text-2xl font-bold gradient-text">{staffStats.headTeachers.total}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Present</span>
+                      <span className="text-lg font-semibold text-emerald-600">{staffStats.headTeachers.present}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">On Leave</span>
+                      <span className="text-lg font-semibold text-amber-600">{staffStats.headTeachers.onLeave}</span>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Teachers Card */}
+                <Card className="p-6 hover-lift glass border border-white/30 card-shine">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-foreground">Teachers</h3>
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Total</span>
+                      <span className="text-2xl font-bold gradient-text">{staffStats.teachers.total}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Present</span>
+                      <span className="text-lg font-semibold text-emerald-600">{staffStats.teachers.present}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">On Leave</span>
+                      <span className="text-lg font-semibold text-amber-600">{staffStats.teachers.onLeave}</span>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Stats Grid - For non-DEO roles */}
+          {stats && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-8 stagger-children">
+              {stats.map((stat, idx) => {
+                const Icon = stat.icon;
+                const gradients = [
+                  'from-blue-500 to-blue-600',
+                  'from-emerald-500 to-emerald-600',
+                  'from-amber-500 to-amber-600',
+                ];
+                return (
+                  <Card
+                    key={idx}
+                    className="p-6 lg:p-8 hover-lift cursor-pointer card-shine glass border border-white/30"
+                    onClick={() => navigate('/data-requests')}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm lg:text-base font-medium text-muted-foreground mb-2">{stat.label}</p>
+                        <p className="stat-number gradient-text">{stat.value}</p>
+                      </div>
+                      <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-gradient-to-br ${gradients[idx % 3]} flex items-center justify-center shadow-lg`}>
+                        <Icon className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
 
           {/* AEO Activity Summary */}
         {user.role === 'AEO' && activities && (
