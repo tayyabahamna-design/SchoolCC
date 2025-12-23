@@ -144,6 +144,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Invalid phone number for this school');
       } else {
         // Standard phone + password login for admin roles
+        // Check if this is an AEO phone number (starts with 03001)
+        if (phoneNumber.startsWith('03001') && password === 'admin123') {
+          const { realAEOs, getSchoolsByCluster } = await import('../data/realData');
+          const aeo = realAEOs.find(a => a.phoneNumber === phoneNumber);
+          
+          if (aeo) {
+            // Get schools assigned to this AEO's cluster
+            const clusterSchools = getSchoolsByCluster(aeo.clusterId || '');
+            const assignedSchoolIds = clusterSchools.map(s => s.code);
+            
+            const user: User = {
+              id: aeo.id,
+              phoneNumber: aeo.phoneNumber,
+              role: 'AEO',
+              name: aeo.name,
+              clusterId: aeo.clusterId,
+              districtId: 'Rawalpindi',
+              assignedSchools: assignedSchoolIds,
+            };
+            console.log('✓ Mock authentication successful for AEO:', user.name, 'with schools:', assignedSchoolIds);
+            setUser(user);
+            return;
+          }
+        }
+
         const mockUsers: Record<string, User> = {
           '03000000001': {
             id: 'mock-ceo-1',
@@ -156,7 +181,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             id: 'mock-deo-1',
             phoneNumber: '03000000002',
             role: 'DEO',
-            name: 'DEO - District Education Officer',
+            name: 'Dr Hajira',
             districtId: 'Rawalpindi',
           },
           '03000000003': {
@@ -164,14 +189,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             phoneNumber: '03000000003',
             role: 'DDEO',
             name: 'DDEO - Deputy District Education Officer',
-            districtId: 'Rawalpindi',
-          },
-          '03001000001': {
-            id: 'mock-aeo-1',
-            phoneNumber: '03001000001',
-            role: 'AEO',
-            name: 'Abdul Mateen Mughal',
-            clusterId: 'cluster-1',
             districtId: 'Rawalpindi',
           },
         };
