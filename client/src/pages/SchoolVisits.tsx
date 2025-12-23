@@ -1,18 +1,31 @@
+import { useState } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { useMockVisits } from '@/hooks/useMockVisits';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Plus, MapPin, CheckCircle, Clock, Eye } from 'lucide-react';
+import { ArrowLeft, Plus, MapPin, CheckCircle, Clock, Eye, Search, X } from 'lucide-react';
 
 export default function SchoolVisits() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const { getVisitsForUser } = useMockVisits();
+  const [searchQuery, setSearchQuery] = useState('');
 
   if (!user) return null;
 
   const userVisits = getVisitsForUser(user.id, user.role);
+  
+  const filteredVisits = userVisits.filter((visit) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      visit.schoolName.toLowerCase().includes(query) ||
+      visit.visitType.toLowerCase().includes(query) ||
+      visit.status.toLowerCase().includes(query)
+    );
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -68,7 +81,45 @@ export default function SchoolVisits() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {userVisits.length === 0 ? (
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search by school, type, or status..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10"
+              data-testid="input-search-visits"
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7"
+                onClick={() => setSearchQuery('')}
+                data-testid="button-clear-search"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Found {filteredVisits.length} visit{filteredVisits.length !== 1 ? 's' : ''} matching "{searchQuery}"
+            </p>
+          )}
+        </div>
+
+        {filteredVisits.length === 0 && searchQuery ? (
+          <Card className="p-12 text-center">
+            <p className="text-muted-foreground">No visits match your search</p>
+            <Button variant="outline" className="mt-4" onClick={() => setSearchQuery('')}>
+              Clear Search
+            </Button>
+          </Card>
+        ) : userVisits.length === 0 ? (
           <Card className="p-12 text-center">
             <p className="text-muted-foreground mb-4">No visits recorded</p>
             {user.role === 'AEO' && (
@@ -77,7 +128,7 @@ export default function SchoolVisits() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {userVisits.map((visit) => (
+            {filteredVisits.map((visit) => (
               <Card
                 key={visit.id}
                 className="p-6 hover:border-primary/30 transition-all cursor-pointer"

@@ -1,15 +1,17 @@
+import { useState } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useMockTeacherData, SchoolData as SchoolDataType } from '@/hooks/useMockTeacherData';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Download, Users, BookOpen, Droplet, Zap, BarChart3, ImageIcon, FileSpreadsheet } from 'lucide-react';
+import { ArrowLeft, Download, Users, BookOpen, Droplet, Zap, BarChart3, ImageIcon, FileSpreadsheet, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 export default function SchoolData() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const { getSchoolData, getSchoolById } = useMockTeacherData(user?.assignedSchools);
+  const [selectedSchool, setSelectedSchool] = useState<SchoolDataType | null>(null);
 
   if (!user) return null;
 
@@ -278,7 +280,13 @@ export default function SchoolData() {
 
                   <div className="flex flex-col gap-2">
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1" data-testid={`button-view-school-${school.id}`}>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex-1" 
+                        onClick={() => setSelectedSchool(school)}
+                        data-testid={`button-view-school-${school.id}`}
+                      >
                         View Details
                       </Button>
                       <Button

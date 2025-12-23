@@ -16,6 +16,8 @@ const SCHOOL_NAMES: Record<string, string> = {
   'school-3': 'Government Secondary School',
 };
 
+const DEFAULT_SCHOOL_ID = 'school-1';
+
 export default function SchoolAlbum() {
   const { schoolId } = useParams();
   const { user } = useAuth();
@@ -44,8 +46,9 @@ export default function SchoolAlbum() {
     );
   }
 
-  const activities = getActivitiesForSchool(schoolId);
-  const schoolName = SCHOOL_NAMES[schoolId] || 'School';
+  const effectiveSchoolId = SCHOOL_NAMES[schoolId] ? schoolId : DEFAULT_SCHOOL_ID;
+  const activities = getActivitiesForSchool(effectiveSchoolId);
+  const schoolName = SCHOOL_NAMES[schoolId] || 'School Album';
 
   const handleAddComment = (activityId: string) => {
     if (!commentText.trim()) return;

@@ -9,6 +9,7 @@ import { useMockVisits } from '@/hooks/useMockVisits';
 import { useMockAEOActivities } from '@/hooks/useMockAEOActivities';
 import { useMockDataRequests } from '@/hooks/useMockDataRequests';
 import NotificationBell from '@/components/NotificationBell';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   Building2,
   MapPin,
@@ -417,6 +418,7 @@ export default function DEODashboard() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <NotificationBell />
               <Button
                 variant="outline"
