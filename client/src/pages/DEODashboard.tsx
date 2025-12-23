@@ -121,12 +121,40 @@ export default function DEODashboard() {
     const top = sorted.slice(0, 3);
     const bottom = sorted.slice(-3).reverse();
 
-    // Recent activities
+    // Recent activities - map to common format
     const allActivities = [
-      ...activities.monitoring,
-      ...activities.mentoring,
-      ...activities.office,
-      ...activities.other,
+      ...activities.monitoring.map(m => ({
+        id: m.id,
+        aeoName: m.aeoName,
+        schoolName: m.schoolName,
+        date: m.visitDate,
+        activityType: 'monitoring' as const,
+        notes: m.generalRemarks,
+      })),
+      ...activities.mentoring.map(m => ({
+        id: m.id,
+        aeoName: m.aeoName,
+        schoolName: m.schoolName,
+        date: m.visitDate,
+        activityType: 'mentoring' as const,
+        notes: m.generalFeedback,
+      })),
+      ...activities.office.map(o => ({
+        id: o.id,
+        aeoName: o.aeoName,
+        schoolName: undefined,
+        date: o.visitDate,
+        activityType: 'office' as const,
+        notes: o.comments,
+      })),
+      ...activities.other.map(o => ({
+        id: o.id,
+        aeoName: o.aeoName,
+        schoolName: undefined,
+        date: o.activityDate,
+        activityType: 'other' as const,
+        notes: o.comments,
+      })),
     ]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 5);
