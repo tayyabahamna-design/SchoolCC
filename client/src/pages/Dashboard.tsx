@@ -589,7 +589,7 @@ export default function Dashboard() {
       {/* Activity Forms Modal */}
       {user.role === 'AEO' && activeActivityForm === 'visit-selector' && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scaleIn">
+          <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-scaleIn">
             <div className="p-8">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold text-foreground">Select Visit Type</h2>
@@ -674,7 +674,7 @@ export default function Dashboard() {
       {/* Monitoring Visit Form */}
       {activeActivityForm === 'monitoring' && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-4xl my-8 animate-slideUp">
+          <div className="w-full max-w-6xl my-8 animate-slideUp">
             <div className="bg-card rounded-2xl shadow-2xl">
               <MonitoringVisitForm onClose={() => setActiveActivityForm(null)} />
             </div>
@@ -685,7 +685,7 @@ export default function Dashboard() {
       {/* Mentoring Visit Form */}
       {activeActivityForm === 'mentoring' && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-4xl my-8 animate-slideUp">
+          <div className="w-full max-w-6xl my-8 animate-slideUp">
             <div className="bg-card rounded-2xl shadow-2xl">
               <MentoringVisitForm onClose={() => setActiveActivityForm(null)} />
             </div>
@@ -696,7 +696,7 @@ export default function Dashboard() {
       {/* Office Visit Form */}
       {activeActivityForm === 'office' && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-2xl my-8 animate-slideUp">
+          <div className="w-full max-w-5xl my-8 animate-slideUp">
             <div className="bg-card rounded-2xl shadow-2xl">
               <OfficeVisitForm onClose={() => setActiveActivityForm(null)} />
             </div>
@@ -707,7 +707,7 @@ export default function Dashboard() {
       {/* Other Activity Form */}
       {activeActivityForm === 'other-activity' && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-2xl my-8 animate-slideUp">
+          <div className="w-full max-w-5xl my-8 animate-slideUp">
             <div className="bg-card rounded-2xl shadow-2xl">
               <OtherActivityForm onClose={() => setActiveActivityForm(null)} />
             </div>
