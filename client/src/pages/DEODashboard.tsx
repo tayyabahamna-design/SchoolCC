@@ -907,9 +907,9 @@ export default function DEODashboard() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {schools.map((school) => (
-                <Card key={school.id} className="p-4 hover:shadow-md transition-shadow">
+                <Card key={school.id} className="p-4 hover:shadow-lg transition-all duration-300">
                   <h3 className="font-semibold text-lg mb-2">{school.name}</h3>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2 text-sm mb-4">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Compliance:</span>
                       <span className={`font-semibold ${
@@ -932,6 +932,50 @@ export default function DEODashboard() {
                       {school.compliance >= 90 ? 'Excellent' :
                        school.compliance >= 80 ? 'Good' : 'Needs Attention'}
                     </Badge>
+                  </div>
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+                    <p className="text-xs text-muted-foreground mb-2">Quick Actions</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-7 px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSchoolsModal(false);
+                          navigate(`/album/${school.id}`);
+                        }}
+                      >
+                        <Image className="w-3 h-3 mr-1" />
+                        Album
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-7 px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSchoolsModal(false);
+                          navigate('/school-data');
+                        }}
+                      >
+                        <Building2 className="w-3 h-3 mr-1" />
+                        Inventory
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-7 px-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSchoolsModal(false);
+                          navigate('/calendar');
+                        }}
+                      >
+                        <Calendar className="w-3 h-3 mr-1" />
+                        Calendar
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
