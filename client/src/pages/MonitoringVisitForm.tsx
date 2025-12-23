@@ -7,12 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Plus, Trash2, CheckCircle2 } from 'lucide-react';
 import { useMockAEOActivities, MonitoringVisitData } from '@/hooks/useMockAEOActivities';
 import { toast } from 'sonner';
+import { realSchools } from '@/data/realData';
 
-const SCHOOLS = [
-  'Government Primary School, Zone A',
-  'Government Upper Primary School',
-  'Government Secondary School',
-];
+// Use real schools from data
+const SCHOOLS = realSchools.map(school => `${school.name} (${school.emisNumber})`);
 
 interface Props {
   onClose?: () => void;

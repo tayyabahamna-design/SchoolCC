@@ -20,7 +20,6 @@ interface UserProfile {
   clusterId?: string;
   districtId?: string;
   fatherName?: string;
-  spouseName?: string;
   email?: string;
   residentialAddress?: string;
   cnic?: string;
@@ -246,18 +245,6 @@ export default function UserProfile() {
                   />
                 ) : (
                   <p className="mt-1 text-sm">{profile.fatherName || "Not provided"}</p>
-                )}
-              </div>
-
-              <div>
-                <Label>Spouse Name</Label>
-                {editMode ? (
-                  <Input
-                    value={editedProfile.spouseName || ""}
-                    onChange={(e) => handleChange("spouseName", e.target.value)}
-                  />
-                ) : (
-                  <p className="mt-1 text-sm">{profile.spouseName || "Not provided"}</p>
                 )}
               </div>
 

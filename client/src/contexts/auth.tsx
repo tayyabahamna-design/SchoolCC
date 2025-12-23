@@ -15,7 +15,6 @@ export interface User {
   districtId?: string;
   // Profile fields
   fatherName?: string;
-  spouseName?: string;
   email?: string;
   residentialAddress?: string;
   cnic?: string;
