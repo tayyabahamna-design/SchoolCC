@@ -27,6 +27,12 @@ export default function CreateVisit() {
 
   if (!user) return null;
 
+  // Only AEOs can plan visits
+  if (user.role !== 'AEO') {
+    navigate('/school-visits');
+    return null;
+  }
+
   const handleAddClass = () => {
     if (currentClass.trim() && !classesToObserve.includes(currentClass)) {
       setClassesToObserve([...classesToObserve, currentClass]);

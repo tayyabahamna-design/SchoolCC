@@ -57,7 +57,7 @@ export default function SchoolVisits() {
               <p className="text-sm text-muted-foreground">Plan, conduct, and monitor school visits</p>
             </div>
           </div>
-          {(user.role === 'AEO' || user.role === 'DEO' || user.role === 'DDEO') && (
+          {user.role === 'AEO' && (
             <Button onClick={() => navigate('/create-visit')} data-testid="button-create-visit">
               <Plus className="w-4 h-4 mr-2" />
               Plan Visit
