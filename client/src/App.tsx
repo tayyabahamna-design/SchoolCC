@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/auth";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import CEODashboard from "@/pages/CEODashboard";
+import DEODashboard from "@/pages/DEODashboard";
 import DataRequests from "@/pages/DataRequests";
 import CreateRequest from "@/pages/CreateRequest";
 import ViewRequest from "@/pages/ViewRequest";
@@ -21,11 +22,13 @@ import CollaborativeForms from "@/pages/CollaborativeForms";
 import CreateCollaborativeForm from "@/pages/CreateCollaborativeForm";
 import ViewCollaborativeForm from "@/pages/ViewCollaborativeForm";
 import EditSchool from "@/pages/EditSchool";
+import EditSchoolData from "@/pages/EditSchoolData";
 import Queries from "@/pages/Queries";
 import CreateQuery from "@/pages/CreateQuery";
 import ViewQuery from "@/pages/ViewQuery";
 import UserProfile from "@/pages/UserProfile";
 import NotFound from "@/pages/not-found";
+import { AnnouncementBar } from "@/components/AnnouncementBar";
 
 function DashboardRoute() {
   const { isAuthenticated, user } = useAuth();
@@ -34,33 +37,40 @@ function DashboardRoute() {
 }
 
 function Router() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   return (
-    <Switch>
-      <Route path="/" component={DashboardRoute} />
-      <Route path="/dashboard" component={DashboardRoute} />
-      <Route path="/data-requests" component={DataRequests} />
-      <Route path="/create-request" component={CreateRequest} />
-      <Route path="/request/:id" component={ViewRequest} />
-      <Route path="/calendar" component={Calendar} />
-      <Route path="/school-data" component={SchoolData} />
-      <Route path="/school-visits" component={SchoolVisits} />
-      <Route path="/create-visit" component={CreateVisit} />
-      <Route path="/visit/:id" component={ViewVisit} />
-      <Route path="/album/:schoolId" component={SchoolAlbum} />
-      <Route path="/create-activity/:schoolId" component={CreateActivity} />
-      <Route path="/collaborative-forms" component={CollaborativeForms} />
-      <Route path="/create-collaborative-form" component={CreateCollaborativeForm} />
-      <Route path="/collaborative-form/:formId" component={ViewCollaborativeForm} />
-      <Route path="/edit-school" component={EditSchool} />
-      <Route path="/queries" component={Queries} />
-      <Route path="/create-query" component={CreateQuery} />
-      <Route path="/query/:id" component={ViewQuery} />
-      <Route path="/profile" component={UserProfile} />
-      {/* Fallback to 404 */}
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      {/* Announcement Bar - Shows at top when logged in */}
+      {isAuthenticated && user && <AnnouncementBar districtId={user.districtId} />}
+
+      <Switch>
+        <Route path="/" component={DashboardRoute} />
+        <Route path="/dashboard" component={DashboardRoute} />
+        <Route path="/deo-dashboard" component={DEODashboard} />
+        <Route path="/data-requests" component={DataRequests} />
+        <Route path="/create-request" component={CreateRequest} />
+        <Route path="/request/:id" component={ViewRequest} />
+        <Route path="/calendar" component={Calendar} />
+        <Route path="/school-data" component={SchoolData} />
+        <Route path="/edit-school-data" component={EditSchoolData} />
+        <Route path="/school-visits" component={SchoolVisits} />
+        <Route path="/create-visit" component={CreateVisit} />
+        <Route path="/visit/:id" component={ViewVisit} />
+        <Route path="/album/:schoolId" component={SchoolAlbum} />
+        <Route path="/create-activity/:schoolId" component={CreateActivity} />
+        <Route path="/collaborative-forms" component={CollaborativeForms} />
+        <Route path="/create-collaborative-form" component={CreateCollaborativeForm} />
+        <Route path="/collaborative-form/:formId" component={ViewCollaborativeForm} />
+        <Route path="/edit-school" component={EditSchool} />
+        <Route path="/queries" component={Queries} />
+        <Route path="/create-query" component={CreateQuery} />
+        <Route path="/query/:id" component={ViewQuery} />
+        <Route path="/profile" component={UserProfile} />
+        {/* Fallback to 404 */}
+        <Route component={NotFound} />
+      </Switch>
+    </>
   );
 }
 

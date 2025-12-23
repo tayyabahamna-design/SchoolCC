@@ -1,9 +1,11 @@
 import { db } from "./db";
-import { users, dataRequests, requestAssignees, districts, clusters, schools, notifications, queries, queryResponses } from "@shared/schema";
+import { users, dataRequests, requestAssignees, districts, clusters, schools, notifications, queries, queryResponses, visitLogs, schoolAlbums, albumPhotos, albumComments, albumReactions, announcements } from "@shared/schema";
 import type {
   InsertUser, User, InsertDataRequest, DataRequest, InsertRequestAssignee, RequestAssignee,
   InsertDistrict, District, InsertCluster, Cluster, InsertSchool, School,
-  InsertNotification, Notification, InsertQuery, Query, InsertQueryResponse, QueryResponse
+  InsertNotification, Notification, InsertQuery, Query, InsertQueryResponse, QueryResponse,
+  InsertVisitLog, VisitLog, InsertSchoolAlbum, SchoolAlbum, InsertAlbumPhoto, AlbumPhoto,
+  InsertAlbumComment, AlbumComment, InsertAlbumReaction, AlbumReaction, InsertAnnouncement, Announcement
 } from "@shared/schema";
 import { eq, and, or, inArray, desc } from "drizzle-orm";
 
@@ -72,6 +74,41 @@ export interface IStorage {
   // Query Response operations
   createQueryResponse(response: InsertQueryResponse): Promise<QueryResponse>;
   getQueryResponses(queryId: string): Promise<QueryResponse[]>;
+
+  // Visit Log operations
+  createVisitLog(visitLog: InsertVisitLog): Promise<VisitLog>;
+  getActiveVisitForSchool(schoolId: string): Promise<VisitLog | undefined>;
+  endVisit(visitId: string): Promise<VisitLog>;
+  getVisitHistory(schoolId: string): Promise<VisitLog[]>;
+  getLatestVisitForSchool(schoolId: string): Promise<VisitLog | undefined>;
+
+  // School Album operations
+  createAlbum(album: InsertSchoolAlbum): Promise<SchoolAlbum>;
+  getAlbum(id: string): Promise<SchoolAlbum | undefined>;
+  getAlbumsForSchool(schoolId: string): Promise<SchoolAlbum[]>;
+  getAllGlobalBroadcasts(): Promise<SchoolAlbum[]>;
+  deleteAlbum(id: string): Promise<void>;
+
+  // Album Photo operations
+  addPhotoToAlbum(photo: InsertAlbumPhoto): Promise<AlbumPhoto>;
+  getAlbumPhotos(albumId: string): Promise<AlbumPhoto[]>;
+  deletePhoto(photoId: string): Promise<void>;
+
+  // Album Comment operations
+  addComment(comment: InsertAlbumComment): Promise<AlbumComment>;
+  getAlbumComments(albumId: string): Promise<AlbumComment[]>;
+  deleteComment(commentId: string): Promise<void>;
+
+  // Album Reaction operations
+  addReaction(reaction: InsertAlbumReaction): Promise<AlbumReaction>;
+  removeReaction(albumId: string, userId: string, reactionType: string): Promise<void>;
+  getAlbumReactions(albumId: string): Promise<AlbumReaction[]>;
+
+  // Announcement operations
+  createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement>;
+  getActiveAnnouncements(districtId?: string): Promise<Announcement[]>;
+  deactivateAnnouncement(id: string): Promise<Announcement>;
+  deleteAnnouncement(id: string): Promise<void>;
 }
 
 export class DBStorage implements IStorage {
@@ -464,6 +501,169 @@ export class DBStorage implements IStorage {
     });
 
     return { schoolSheetUrl, aggregatedSheetUrl };
+  }
+
+  // Visit Log operations
+  async createVisitLog(visitLog: InsertVisitLog): Promise<VisitLog> {
+    const result = await db.insert(visitLogs).values(visitLog).returning();
+    return result[0];
+  }
+
+  async getActiveVisitForSchool(schoolId: string): Promise<VisitLog | undefined> {
+    const result = await db.select()
+      .from(visitLogs)
+      .where(and(eq(visitLogs.schoolId, schoolId), eq(visitLogs.isActive, true)))
+      .limit(1);
+    return result[0];
+  }
+
+  async endVisit(visitId: string): Promise<VisitLog> {
+    const result = await db.update(visitLogs)
+      .set({ visitEndTime: new Date(), isActive: false })
+      .where(eq(visitLogs.id, visitId))
+      .returning();
+    return result[0];
+  }
+
+  async getVisitHistory(schoolId: string): Promise<VisitLog[]> {
+    return await db.select()
+      .from(visitLogs)
+      .where(eq(visitLogs.schoolId, schoolId))
+      .orderBy(desc(visitLogs.visitStartTime));
+  }
+
+  async getLatestVisitForSchool(schoolId: string): Promise<VisitLog | undefined> {
+    const result = await db.select()
+      .from(visitLogs)
+      .where(eq(visitLogs.schoolId, schoolId))
+      .orderBy(desc(visitLogs.visitStartTime))
+      .limit(1);
+    return result[0];
+  }
+
+  // School Album operations
+  async createAlbum(album: InsertSchoolAlbum): Promise<SchoolAlbum> {
+    const result = await db.insert(schoolAlbums).values(album).returning();
+    return result[0];
+  }
+
+  async getAlbum(id: string): Promise<SchoolAlbum | undefined> {
+    const result = await db.select().from(schoolAlbums).where(eq(schoolAlbums.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getAlbumsForSchool(schoolId: string): Promise<SchoolAlbum[]> {
+    return await db.select()
+      .from(schoolAlbums)
+      .where(eq(schoolAlbums.schoolId, schoolId))
+      .orderBy(desc(schoolAlbums.createdAt));
+  }
+
+  async getAllGlobalBroadcasts(): Promise<SchoolAlbum[]> {
+    return await db.select()
+      .from(schoolAlbums)
+      .where(eq(schoolAlbums.isGlobalBroadcast, true))
+      .orderBy(desc(schoolAlbums.createdAt));
+  }
+
+  async deleteAlbum(id: string): Promise<void> {
+    await db.delete(schoolAlbums).where(eq(schoolAlbums.id, id));
+  }
+
+  // Album Photo operations
+  async addPhotoToAlbum(photo: InsertAlbumPhoto): Promise<AlbumPhoto> {
+    const result = await db.insert(albumPhotos).values(photo).returning();
+    return result[0];
+  }
+
+  async getAlbumPhotos(albumId: string): Promise<AlbumPhoto[]> {
+    return await db.select()
+      .from(albumPhotos)
+      .where(eq(albumPhotos.albumId, albumId))
+      .orderBy(desc(albumPhotos.uploadedAt));
+  }
+
+  async deletePhoto(photoId: string): Promise<void> {
+    await db.delete(albumPhotos).where(eq(albumPhotos.id, photoId));
+  }
+
+  // Album Comment operations
+  async addComment(comment: InsertAlbumComment): Promise<AlbumComment> {
+    const result = await db.insert(albumComments).values(comment).returning();
+    return result[0];
+  }
+
+  async getAlbumComments(albumId: string): Promise<AlbumComment[]> {
+    return await db.select()
+      .from(albumComments)
+      .where(eq(albumComments.albumId, albumId))
+      .orderBy(desc(albumComments.createdAt));
+  }
+
+  async deleteComment(commentId: string): Promise<void> {
+    await db.delete(albumComments).where(eq(albumComments.id, commentId));
+  }
+
+  // Album Reaction operations
+  async addReaction(reaction: InsertAlbumReaction): Promise<AlbumReaction> {
+    const result = await db.insert(albumReactions).values(reaction).returning();
+    return result[0];
+  }
+
+  async removeReaction(albumId: string, userId: string, reactionType: string): Promise<void> {
+    await db.delete(albumReactions)
+      .where(
+        and(
+          eq(albumReactions.albumId, albumId),
+          eq(albumReactions.userId, userId),
+          eq(albumReactions.reactionType, reactionType)
+        )
+      );
+  }
+
+  async getAlbumReactions(albumId: string): Promise<AlbumReaction[]> {
+    return await db.select()
+      .from(albumReactions)
+      .where(eq(albumReactions.albumId, albumId));
+  }
+
+  // Announcement operations
+  async createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement> {
+    const result = await db.insert(announcements).values(announcement).returning();
+    return result[0];
+  }
+
+  async getActiveAnnouncements(districtId?: string): Promise<Announcement[]> {
+    const now = new Date();
+
+    if (districtId) {
+      return await db.select()
+        .from(announcements)
+        .where(
+          and(
+            eq(announcements.isActive, true),
+            eq(announcements.districtId, districtId)
+          )
+        )
+        .orderBy(desc(announcements.createdAt));
+    }
+
+    return await db.select()
+      .from(announcements)
+      .where(eq(announcements.isActive, true))
+      .orderBy(desc(announcements.createdAt));
+  }
+
+  async deactivateAnnouncement(id: string): Promise<Announcement> {
+    const result = await db.update(announcements)
+      .set({ isActive: false })
+      .where(eq(announcements.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteAnnouncement(id: string): Promise<void> {
+    await db.delete(announcements).where(eq(announcements.id, id));
   }
 }
 

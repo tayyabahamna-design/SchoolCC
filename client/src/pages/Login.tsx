@@ -18,8 +18,10 @@ const roles: { value: UserRole; label: string; description: string; icon: any }[
 export default function Login() {
   const { login } = useAuth();
   const [, navigate] = useLocation();
+  const [loginMode, setLoginMode] = useState<'standard' | 'school'>('standard');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [emisNumber, setEmisNumber] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -29,10 +31,20 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(phoneNumber, '' as UserRole, password);
+      if (loginMode === 'school') {
+        // For teachers and headmasters: use EMIS + Phone
+        await login(phoneNumber, '' as UserRole, emisNumber);
+      } else {
+        // For admin roles: use Phone + Password
+        await login(phoneNumber, '' as UserRole, password);
+      }
       navigate('/dashboard');
     } catch (err) {
-      setError('Invalid phone number or password. Please try again.');
+      if (loginMode === 'school') {
+        setError('Invalid EMIS number or phone number. Please try again.');
+      } else {
+        setError('Invalid phone number or password. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -98,37 +110,107 @@ export default function Login() {
             <p className="text-gray-600 dark:text-gray-400">Sign in to continue your monitoring journey</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            {/* Phone Number */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Phone Number
-              </label>
-              <Input
-                type="tel"
-                placeholder="Enter phone number (e.g., 03001000001)"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                data-testid="input-phone"
-                className="w-full h-12 text-base rounded-lg"
-              />
-            </div>
+          {/* Login Mode Switcher */}
+          <div className="flex gap-2 p-1 mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setLoginMode('standard')}
+              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
+                loginMode === 'standard'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              Admin Login
+            </button>
+            <button
+              type="button"
+              onClick={() => setLoginMode('school')}
+              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
+                loginMode === 'school'
+                  ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              School Staff Login
+            </button>
+          </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Password
-              </label>
-              <Input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                data-testid="input-password"
-                className="w-full h-12 text-base rounded-lg"
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Use credentials provided by your administrator</p>
-            </div>
+          <form onSubmit={handleLogin} className="space-y-6">
+            {loginMode === 'standard' ? (
+              <>
+                {/* Phone Number */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number
+                  </label>
+                  <Input
+                    type="tel"
+                    placeholder="Enter phone number (e.g., 03000000002)"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    data-testid="input-phone"
+                    className="w-full h-12 text-base rounded-lg"
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Password
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    data-testid="input-password"
+                    className="w-full h-12 text-base rounded-lg"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    For CEO, DEO, DDEO, AEO roles
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* EMIS Number */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    School EMIS Number
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Enter EMIS number (e.g., 37330227)"
+                    value={emisNumber}
+                    onChange={(e) => setEmisNumber(e.target.value)}
+                    data-testid="input-emis"
+                    className="w-full h-12 text-base rounded-lg"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Your school's unique EMIS identifier
+                  </p>
+                </div>
+
+                {/* Phone Number */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number
+                  </label>
+                  <Input
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    data-testid="input-phone-school"
+                    className="w-full h-12 text-base rounded-lg"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    For Teachers and Head Teachers
+                  </p>
+                </div>
+              </>
+            )}
 
             {/* Error */}
             {error && (
@@ -141,7 +223,11 @@ export default function Login() {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={loading || !phoneNumber || !password}
+              disabled={
+                loading ||
+                !phoneNumber ||
+                (loginMode === 'standard' ? !password : !emisNumber)
+              }
               data-testid="button-login"
               className="w-full h-12 text-base font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               size="lg"
@@ -152,7 +238,10 @@ export default function Login() {
 
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
             <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-              Default password for all accounts: admin123
+              {loginMode === 'standard'
+                ? 'Default password for admin accounts: admin123'
+                : 'Use your school EMIS number and registered phone number'
+              }
             </p>
           </div>
         </Card>

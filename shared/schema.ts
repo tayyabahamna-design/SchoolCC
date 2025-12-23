@@ -27,6 +27,36 @@ export const schools = pgTable("schools", {
   clusterId: varchar("cluster_id").notNull(),
   districtId: varchar("district_id").notNull(),
   address: text("address"),
+  // Attendance tracking
+  totalStudents: integer("total_students").default(0),
+  presentStudents: integer("present_students").default(0),
+  absentStudents: integer("absent_students").default(0),
+  totalTeachers: integer("total_teachers").default(0),
+  presentTeachers: integer("present_teachers").default(0),
+  absentTeachers: integer("absent_teachers").default(0),
+  // Infrastructure tracking
+  totalToilets: integer("total_toilets").default(0),
+  workingToilets: integer("working_toilets").default(0),
+  brokenToilets: integer("broken_toilets").default(0),
+  isDrinkingWaterAvailable: boolean("is_drinking_water_available").default(false),
+  // Inventory tracking (example assets)
+  desksNew: integer("desks_new").default(0),
+  desksInUse: integer("desks_in_use").default(0),
+  desksBroken: integer("desks_broken").default(0),
+  fansNew: integer("fans_new").default(0),
+  fansInUse: integer("fans_in_use").default(0),
+  fansBroken: integer("fans_broken").default(0),
+  chairsNew: integer("chairs_new").default(0),
+  chairsInUse: integer("chairs_in_use").default(0),
+  chairsBroken: integer("chairs_broken").default(0),
+  blackboardsNew: integer("blackboards_new").default(0),
+  blackboardsInUse: integer("blackboards_in_use").default(0),
+  blackboardsBroken: integer("blackboards_broken").default(0),
+  computersNew: integer("computers_new").default(0),
+  computersInUse: integer("computers_in_use").default(0),
+  computersBroken: integer("computers_broken").default(0),
+  // Last updated timestamp for tracking
+  dataLastUpdated: timestamp("data_last_updated"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -168,6 +198,79 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Visit Logs table - tracks AEO visits to schools
+export const visitLogs = pgTable("visit_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  schoolId: varchar("school_id").notNull(),
+  schoolName: text("school_name").notNull(),
+  aeoId: varchar("aeo_id").notNull(),
+  aeoName: text("aeo_name").notNull(),
+  visitStartTime: timestamp("visit_start_time").notNull(),
+  visitEndTime: timestamp("visit_end_time"),
+  isActive: boolean("is_active").notNull().default(true), // True when AEO is currently on-site
+  notes: text("notes"), // Optional visit notes
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// School Albums table - persistent storage for school activities
+export const schoolAlbums = pgTable("school_albums", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  schoolId: varchar("school_id").notNull(),
+  schoolName: text("school_name").notNull(),
+  title: text("title").notNull(), // Tag for grouping (e.g., "Plantation Day")
+  description: text("description"),
+  createdBy: varchar("created_by").notNull(),
+  createdByName: text("created_by_name").notNull(),
+  createdByRole: text("created_by_role").notNull(),
+  isGlobalBroadcast: boolean("is_global_broadcast").notNull().default(false), // True if created by DEO/DDEO/AEO
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Album Photos table - stores individual photos with captions
+export const albumPhotos = pgTable("album_photos", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  albumId: varchar("album_id").notNull().references(() => schoolAlbums.id, { onDelete: "cascade" }),
+  photoUrl: text("photo_url").notNull(), // URL to uploaded photo
+  photoFileName: text("photo_file_name").notNull(),
+  caption: text("caption"),
+  uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
+});
+
+// Album Comments table - comments on activities
+export const albumComments = pgTable("album_comments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  albumId: varchar("album_id").notNull().references(() => schoolAlbums.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull(),
+  userName: text("user_name").notNull(),
+  userRole: text("user_role").notNull(),
+  comment: text("comment").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Album Reactions table - emoji reactions to activities
+export const albumReactions = pgTable("album_reactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  albumId: varchar("album_id").notNull().references(() => schoolAlbums.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull(),
+  userName: text("user_name").notNull(),
+  reactionType: text("reaction_type").notNull(), // like, love, clap, celebrate
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Announcements table - district-wide alerts
+export const announcements = pgTable("announcements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  message: text("message").notNull(),
+  createdBy: varchar("created_by").notNull(),
+  createdByName: text("created_by_name").notNull(),
+  createdByRole: text("created_by_role").notNull(),
+  districtId: varchar("district_id"), // If district-specific
+  isActive: boolean("is_active").notNull().default(true), // Can be deactivated
+  priority: text("priority").notNull().default("medium"), // low, medium, high
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at"), // Optional expiration date
+});
+
 // Organization insert schemas
 export const insertDistrictSchema = createInsertSchema(districts).omit({
   id: true,
@@ -217,6 +320,36 @@ export const insertQueryResponseSchema = createInsertSchema(queryResponses).omit
   createdAt: true,
 });
 
+export const insertVisitLogSchema = createInsertSchema(visitLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSchoolAlbumSchema = createInsertSchema(schoolAlbums).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAlbumPhotoSchema = createInsertSchema(albumPhotos).omit({
+  id: true,
+  uploadedAt: true,
+});
+
+export const insertAlbumCommentSchema = createInsertSchema(albumComments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAlbumReactionSchema = createInsertSchema(albumReactions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAnnouncementSchema = createInsertSchema(announcements).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Organization types
 export type InsertDistrict = z.infer<typeof insertDistrictSchema>;
 export type District = typeof districts.$inferSelect;
@@ -238,3 +371,15 @@ export type InsertQuery = z.infer<typeof insertQuerySchema>;
 export type Query = typeof queries.$inferSelect;
 export type InsertQueryResponse = z.infer<typeof insertQueryResponseSchema>;
 export type QueryResponse = typeof queryResponses.$inferSelect;
+export type InsertVisitLog = z.infer<typeof insertVisitLogSchema>;
+export type VisitLog = typeof visitLogs.$inferSelect;
+export type InsertSchoolAlbum = z.infer<typeof insertSchoolAlbumSchema>;
+export type SchoolAlbum = typeof schoolAlbums.$inferSelect;
+export type InsertAlbumPhoto = z.infer<typeof insertAlbumPhotoSchema>;
+export type AlbumPhoto = typeof albumPhotos.$inferSelect;
+export type InsertAlbumComment = z.infer<typeof insertAlbumCommentSchema>;
+export type AlbumComment = typeof albumComments.$inferSelect;
+export type InsertAlbumReaction = z.infer<typeof insertAlbumReactionSchema>;
+export type AlbumReaction = typeof albumReactions.$inferSelect;
+export type InsertAnnouncement = z.infer<typeof insertAnnouncementSchema>;
+export type Announcement = typeof announcements.$inferSelect;

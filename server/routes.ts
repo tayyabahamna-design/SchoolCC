@@ -457,5 +457,461 @@ export async function registerRoutes(
     }
   });
 
+  // Visit Logs endpoints
+  app.post("/api/visits", async (req, res) => {
+    try {
+      const visitLog = await storage.createVisitLog(req.body);
+      res.json(visitLog);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to create visit log" });
+    }
+  });
+
+  app.get("/api/visits/active/:schoolId", async (req, res) => {
+    try {
+      const activeVisit = await storage.getActiveVisitForSchool(req.params.schoolId);
+      res.json(activeVisit || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch active visit" });
+    }
+  });
+
+  app.patch("/api/visits/:id/end", async (req, res) => {
+    try {
+      const visit = await storage.endVisit(req.params.id);
+      res.json(visit);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to end visit" });
+    }
+  });
+
+  app.get("/api/visits/history/:schoolId", async (req, res) => {
+    try {
+      const history = await storage.getVisitHistory(req.params.schoolId);
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch visit history" });
+    }
+  });
+
+  app.get("/api/visits/latest/:schoolId", async (req, res) => {
+    try {
+      const latestVisit = await storage.getLatestVisitForSchool(req.params.schoolId);
+      res.json(latestVisit || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch latest visit" });
+    }
+  });
+
+  // School Albums endpoints
+  app.post("/api/albums", async (req, res) => {
+    try {
+      const album = await storage.createAlbum(req.body);
+      res.json(album);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to create album" });
+    }
+  });
+
+  app.get("/api/albums/:id", async (req, res) => {
+    try {
+      const album = await storage.getAlbum(req.params.id);
+      if (!album) {
+        return res.status(404).json({ error: "Album not found" });
+      }
+      const photos = await storage.getAlbumPhotos(req.params.id);
+      const comments = await storage.getAlbumComments(req.params.id);
+      const reactions = await storage.getAlbumReactions(req.params.id);
+      res.json({ ...album, photos, comments, reactions });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch album" });
+    }
+  });
+
+  app.get("/api/albums/school/:schoolId", async (req, res) => {
+    try {
+      const albums = await storage.getAlbumsForSchool(req.params.schoolId);
+      res.json(albums);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch albums" });
+    }
+  });
+
+  app.get("/api/albums/broadcasts/all", async (req, res) => {
+    try {
+      const broadcasts = await storage.getAllGlobalBroadcasts();
+      res.json(broadcasts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch global broadcasts" });
+    }
+  });
+
+  app.delete("/api/albums/:id", async (req, res) => {
+    try {
+      await storage.deleteAlbum(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete album" });
+    }
+  });
+
+  // Album Photos endpoints
+  app.post("/api/albums/:albumId/photos", async (req, res) => {
+    try {
+      const photo = await storage.addPhotoToAlbum({
+        ...req.body,
+        albumId: req.params.albumId,
+      });
+      res.json(photo);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to add photo" });
+    }
+  });
+
+  app.delete("/api/photos/:photoId", async (req, res) => {
+    try {
+      await storage.deletePhoto(req.params.photoId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete photo" });
+    }
+  });
+
+  // Album Comments endpoints
+  app.post("/api/albums/:albumId/comments", async (req, res) => {
+    try {
+      const comment = await storage.addComment({
+        ...req.body,
+        albumId: req.params.albumId,
+      });
+      res.json(comment);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to add comment" });
+    }
+  });
+
+  app.delete("/api/comments/:commentId", async (req, res) => {
+    try {
+      await storage.deleteComment(req.params.commentId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete comment" });
+    }
+  });
+
+  // Album Reactions endpoints
+  app.post("/api/albums/:albumId/reactions", async (req, res) => {
+    try {
+      const reaction = await storage.addReaction({
+        ...req.body,
+        albumId: req.params.albumId,
+      });
+      res.json(reaction);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to add reaction" });
+    }
+  });
+
+  app.delete("/api/albums/:albumId/reactions", async (req, res) => {
+    try {
+      const { userId, reactionType } = req.query as any;
+      await storage.removeReaction(req.params.albumId, userId, reactionType);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to remove reaction" });
+    }
+  });
+
+  // Announcements endpoints
+  app.post("/api/announcements", async (req, res) => {
+    try {
+      const announcement = await storage.createAnnouncement(req.body);
+      res.json(announcement);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to create announcement" });
+    }
+  });
+
+  app.get("/api/announcements", async (req, res) => {
+    try {
+      const { districtId } = req.query as any;
+      const announcements = await storage.getActiveAnnouncements(districtId);
+      res.json(announcements);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch announcements" });
+    }
+  });
+
+  app.patch("/api/announcements/:id/deactivate", async (req, res) => {
+    try {
+      const announcement = await storage.deactivateAnnouncement(req.params.id);
+      res.json(announcement);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to deactivate announcement" });
+    }
+  });
+
+  app.delete("/api/announcements/:id", async (req, res) => {
+    try {
+      await storage.deleteAnnouncement(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete announcement" });
+    }
+  });
+
+  // Excel Export endpoint for complete school data
+  app.get("/api/export/schools/excel", async (req, res) => {
+    try {
+      const XLSX = await import('xlsx');
+      const { districtId, clusterId } = req.query as any;
+      let schools;
+
+      if (clusterId) {
+        schools = await storage.getSchoolsByCluster(clusterId);
+      } else if (districtId) {
+        schools = await storage.getSchoolsByDistrict(districtId);
+      } else {
+        schools = await storage.getAllSchools();
+      }
+
+      // Get latest visit for each school
+      const schoolsWithVisits = await Promise.all(
+        schools.map(async (school) => {
+          const latestVisit = await storage.getLatestVisitForSchool(school.id);
+          return { ...school, latestVisit };
+        })
+      );
+
+      // Transform data for Excel
+      const excelData = schoolsWithVisits.map((school) => ({
+        'School Name': school.name,
+        'EMIS Number': school.emisNumber,
+        'Cluster': school.clusterId,
+        'District': school.districtId,
+        'Total Students': school.totalStudents || 0,
+        'Present Students': school.presentStudents || 0,
+        'Absent Students': school.absentStudents || 0,
+        'Student Attendance %': school.totalStudents ?
+          ((school.presentStudents || 0) / school.totalStudents * 100).toFixed(1) + '%' : 'N/A',
+        'Total Teachers': school.totalTeachers || 0,
+        'Present Teachers': school.presentTeachers || 0,
+        'Absent Teachers': school.absentTeachers || 0,
+        'Total Toilets': school.totalToilets || 0,
+        'Working Toilets': school.workingToilets || 0,
+        'Broken Toilets': school.brokenToilets || 0,
+        'Drinking Water': school.isDrinkingWaterAvailable ? 'Yes' : 'No',
+        'Desks (New/Use/Broken)': `${school.desksNew || 0}/${school.desksInUse || 0}/${school.desksBroken || 0}`,
+        'Fans (New/Use/Broken)': `${school.fansNew || 0}/${school.fansInUse || 0}/${school.fansBroken || 0}`,
+        'Chairs (New/Use/Broken)': `${school.chairsNew || 0}/${school.chairsInUse || 0}/${school.chairsBroken || 0}`,
+        'Blackboards (New/Use/Broken)': `${school.blackboardsNew || 0}/${school.blackboardsInUse || 0}/${school.blackboardsBroken || 0}`,
+        'Computers (New/Use/Broken)': `${school.computersNew || 0}/${school.computersInUse || 0}/${school.computersBroken || 0}`,
+        'Latest AEO Visit': school.latestVisit ?
+          new Date(school.latestVisit.visitStartTime).toLocaleString() : 'No visits',
+        'Latest AEO Name': school.latestVisit ? school.latestVisit.aeoName : 'N/A',
+        'Data Last Updated': school.dataLastUpdated ?
+          new Date(school.dataLastUpdated).toLocaleString() : 'Never',
+      }));
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(excelData);
+
+      // Set column widths
+      ws['!cols'] = [
+        { wch: 30 }, // School Name
+        { wch: 15 }, // EMIS Number
+        { wch: 15 }, // Cluster
+        { wch: 15 }, // District
+        { wch: 12 }, // Total Students
+        { wch: 14 }, // Present Students
+        { wch: 13 }, // Absent Students
+        { wch: 18 }, // Attendance %
+        { wch: 12 }, // Total Teachers
+        { wch: 14 }, // Present Teachers
+        { wch: 13 }, // Absent Teachers
+        { wch: 12 }, // Total Toilets
+        { wch: 15 }, // Working Toilets
+        { wch: 13 }, // Broken Toilets
+        { wch: 14 }, // Drinking Water
+        { wch: 22 }, // Desks
+        { wch: 22 }, // Fans
+        { wch: 22 }, // Chairs
+        { wch: 25 }, // Blackboards
+        { wch: 25 }, // Computers
+        { wch: 20 }, // Latest Visit
+        { wch: 20 }, // AEO Name
+        { wch: 20 }, // Data Last Updated
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Schools Data');
+
+      // Generate buffer
+      const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+      // Set response headers
+      res.setHeader('Content-Disposition', 'attachment; filename=schools-report.xlsx');
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.send(buffer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to export schools data" });
+    }
+  });
+
+  // ZIP Download endpoint for album photos
+  app.get("/api/albums/:albumId/download/zip", async (req, res) => {
+    try {
+      const JSZip = (await import('jszip')).default;
+      const album = await storage.getAlbum(req.params.albumId);
+      if (!album) {
+        return res.status(404).json({ error: "Album not found" });
+      }
+
+      const photos = await storage.getAlbumPhotos(req.params.albumId);
+
+      const zip = new JSZip();
+      const folder = zip.folder(album.title || 'Album');
+
+      // Add a README with album info
+      folder?.file('README.txt',
+        `Album: ${album.title}\nSchool: ${album.schoolName}\nCreated by: ${album.createdByName}\nDate: ${new Date(album.createdAt).toLocaleString()}\n\nTotal Photos: ${photos.length}`
+      );
+
+      // Note: In a real implementation, you would fetch actual photo files
+      // For now, we'll create placeholder text files with photo metadata
+      photos.forEach((photo, index) => {
+        const photoInfo = `Photo ${index + 1}\nCaption: ${photo.caption || 'No caption'}\nUploaded: ${new Date(photo.uploadedAt).toLocaleString()}\nURL: ${photo.photoUrl}`;
+        folder?.file(`photo_${index + 1}_info.txt`, photoInfo);
+      });
+
+      const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
+
+      res.setHeader('Content-Disposition', `attachment; filename=${album.title.replace(/[^a-z0-9]/gi, '_')}.zip`);
+      res.setHeader('Content-Type', 'application/zip');
+      res.send(zipBuffer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate ZIP file" });
+    }
+  });
+
+  // DOCX Report endpoint for album
+  app.get("/api/albums/:albumId/download/docx", async (req, res) => {
+    try {
+      const { Document, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import('docx');
+      const { Packer } = await import('docx');
+
+      const album = await storage.getAlbum(req.params.albumId);
+      if (!album) {
+        return res.status(404).json({ error: "Album not found" });
+      }
+
+      const photos = await storage.getAlbumPhotos(req.params.albumId);
+      const comments = await storage.getAlbumComments(req.params.albumId);
+
+      // Create document sections
+      const docSections: any[] = [
+        new Paragraph({
+          text: album.title,
+          heading: HeadingLevel.HEADING_1,
+          alignment: AlignmentType.CENTER,
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({ text: `School: ${album.schoolName}`, bold: true }),
+          ],
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({ text: `Created by: ${album.createdByName} (${album.createdByRole})` }),
+          ],
+        }),
+        new Paragraph({
+          children: [
+            new TextRun({ text: `Date: ${new Date(album.createdAt).toLocaleString()}` }),
+          ],
+        }),
+        new Paragraph({ text: '' }), // Empty line
+        new Paragraph({
+          text: album.description || 'No description provided',
+          italics: true,
+        }),
+        new Paragraph({ text: '' }), // Empty line
+        new Paragraph({
+          text: 'Photos',
+          heading: HeadingLevel.HEADING_2,
+        }),
+      ];
+
+      // Add photo entries
+      photos.forEach((photo, index) => {
+        docSections.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: `Photo ${index + 1}`, bold: true }),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: `Caption: ${photo.caption || 'No caption'}` }),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: `Uploaded: ${new Date(photo.uploadedAt).toLocaleString()}` }),
+            ],
+          }),
+          new Paragraph({ text: '' }) // Empty line
+        );
+      });
+
+      // Add comments section
+      if (comments.length > 0) {
+        docSections.push(
+          new Paragraph({
+            text: 'Comments',
+            heading: HeadingLevel.HEADING_2,
+          })
+        );
+
+        comments.forEach((comment) => {
+          docSections.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `${comment.userName}: `, bold: true }),
+                new TextRun({ text: comment.comment }),
+              ],
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: new Date(comment.createdAt).toLocaleString(),
+                  size: 18,
+                  italics: true
+                }),
+              ],
+            }),
+            new Paragraph({ text: '' })
+          );
+        });
+      }
+
+      // Create document
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: docSections,
+        }],
+      });
+
+      const buffer = await Packer.toBuffer(doc);
+
+      res.setHeader('Content-Disposition', `attachment; filename=${album.title.replace(/[^a-z0-9]/gi, '_')}_report.docx`);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+      res.send(buffer);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate DOCX report" });
+    }
+  });
+
   return httpServer;
 }
