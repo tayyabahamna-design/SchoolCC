@@ -30,14 +30,16 @@ export default function ViewRequest() {
       if (userAssignee && !editedAssignee) {
         setEditedAssignee(userAssignee);
       }
-      if (!requestTitle && request.title) {
+      // Only initialize once when request loads
+      if (request.title && requestTitle === '') {
         setRequestTitle(request.title);
         setRequestDescription(request.description);
         setRequestPriority(request.priority);
         setRequestDueDate(request.dueDate.toISOString().split('T')[0]);
       }
     }
-  }, [request, user, editedAssignee, requestTitle]);
+    // Remove requestTitle from dependencies to prevent infinite loop
+  }, [request, user, editedAssignee]);
 
   if (!request || !user) {
     return null;
