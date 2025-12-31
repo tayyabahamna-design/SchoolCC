@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { ROLE_HIERARCHY, UserRole } from '@/contexts/auth';
-import { realAEOs } from '@/data/realData';
 
 export interface DataField {
   id: string;
@@ -46,83 +45,7 @@ export interface DataRequest {
   isArchived: boolean;
 }
 
-// Mock data
-const mockRequests: DataRequest[] = [
-  {
-    id: 'req-1',
-    title: 'Monthly Attendance Verification',
-    description: 'Verify attendance records for December 2024',
-    createdBy: 'aeo-1',
-    createdByName: realAEOs[0].name,
-    createdByRole: 'AEO',
-    createdAt: new Date('2024-12-01'),
-    dueDate: new Date('2024-12-05'),
-    status: 'active',
-    priority: 'high',
-    isArchived: false,
-    fields: [
-      { id: 'f1', name: 'Total Students', type: 'number', required: true },
-      { id: 'f2', name: 'Present Today', type: 'number', required: true },
-      { id: 'f3', name: 'Attendance Report', type: 'file', required: false },
-      { id: 'f4', name: 'Photo of Register', type: 'photo', required: true },
-    ],
-    assignees: [
-      {
-        id: 'a1',
-        userId: 'teacher-1',
-        userName: 'Teacher 1',
-        userRole: 'TEACHER',
-        schoolId: 'school-1',
-        schoolName: 'Demo School',
-        status: 'pending',
-        fields: [
-          { id: 'f1', name: 'Total Students', type: 'number', required: true },
-          { id: 'f2', name: 'Present Today', type: 'number', required: true, value: 42 },
-          { id: 'f3', name: 'Attendance Report', type: 'file', required: false },
-          { id: 'f4', name: 'Photo of Register', type: 'photo', required: true },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'req-2',
-    title: 'Infrastructure Status Check',
-    description: 'Report on school infrastructure - water, toilets, electricity',
-    createdBy: 'aeo-2',
-    createdByName: realAEOs[1].name,
-    createdByRole: 'AEO',
-    createdAt: new Date('2024-11-28'),
-    dueDate: new Date('2024-12-10'),
-    status: 'active',
-    priority: 'medium',
-    isArchived: false,
-    fields: [
-      { id: 'f1', name: 'Water Available', type: 'text', required: true },
-      { id: 'f2', name: 'Working Toilets (Count)', type: 'number', required: true },
-      { id: 'f3', name: 'Electricity Status', type: 'text', required: true },
-      { id: 'f4', name: 'Infrastructure Photos', type: 'photo', required: true },
-      { id: 'f5', name: 'Issues Voice Note', type: 'voice_note', required: false },
-    ],
-    assignees: [
-      {
-        id: 'a2',
-        userId: 'ht-1',
-        userName: 'Head Teacher',
-        userRole: 'HEAD_TEACHER',
-        schoolId: 'school-1',
-        schoolName: 'Demo School',
-        status: 'pending',
-        fields: [
-          { id: 'f1', name: 'Water Available', type: 'text', required: true, value: 'Yes, 2 taps functioning' },
-          { id: 'f2', name: 'Working Toilets (Count)', type: 'number', required: true, value: 3 },
-          { id: 'f3', name: 'Electricity Status', type: 'text', required: true },
-          { id: 'f4', name: 'Infrastructure Photos', type: 'photo', required: true },
-          { id: 'f5', name: 'Issues Voice Note', type: 'voice_note', required: false },
-        ],
-      },
-    ],
-  },
-];
+// No mock data - all requests will come from the API/database
 
 // Helper to load and parse requests from localStorage
 const loadRequestsFromStorage = (): DataRequest[] => {
@@ -140,10 +63,10 @@ const loadRequestsFromStorage = (): DataRequest[] => {
         })),
       }));
     } catch {
-      return mockRequests;
+      return [];
     }
   }
-  return mockRequests;
+  return [];
 };
 
 export function useMockDataRequests() {
