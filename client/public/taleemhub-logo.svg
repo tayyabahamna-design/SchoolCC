@@ -1,29 +1,55 @@
 <svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Open book icon -->
-  <path d="M200 195 L200 260 L250 240 L300 260 L300 195" stroke="#3D9970" stroke-width="8" fill="none"/>
-  <path d="M200 195 C200 180, 210 170, 225 170 L275 170 C290 170, 300 180, 300 195" stroke="#3D9970" stroke-width="8" fill="none"/>
+  <!-- Circular background -->
+  <circle cx="250" cy="250" r="240" fill="white" stroke="#1E5A8E" stroke-width="8"/>
 
-  <!-- Pages -->
-  <path d="M210 200 L210 250" stroke="#52B788" stroke-width="2"/>
-  <path d="M220 200 L220 250" stroke="#52B788" stroke-width="2"/>
-  <path d="M230 200 L230 250" stroke="#52B788" stroke-width="2"/>
-  <path d="M270 200 L270 250" stroke="#52B788" stroke-width="2"/>
-  <path d="M280 200 L280 250" stroke="#52B788" stroke-width="2"/>
-  <path d="M290 200 L290 250" stroke="#52B788" stroke-width="2"/>
+  <!-- Network nodes and connections -->
+  <g opacity="0.8">
+    <!-- Connection lines -->
+    <line x1="250" y1="150" x2="200" y2="180" stroke="#7B3FA0" stroke-width="2"/>
+    <line x1="250" y1="150" x2="300" y2="180" stroke="#7B3FA0" stroke-width="2"/>
+    <line x1="250" y1="150" x2="220" y2="200" stroke="#7B3FA0" stroke-width="2"/>
+    <line x1="250" y1="150" x2="280" y2="200" stroke="#7B3FA0" stroke-width="2"/>
+    <line x1="250" y1="150" x2="180" y2="220" stroke="#7B3FA0" stroke-width="2"/>
+    <line x1="250" y1="150" x2="320" y2="220" stroke="#7B3FA0" stroke-width="2"/>
 
-  <!-- Knowledge dots/sparkles above book -->
-  <circle cx="250" cy="160" r="5" fill="#40B5C4"/>
-  <circle cx="225" cy="170" r="4" fill="#40B5C4"/>
-  <circle cx="275" cy="170" r="4" fill="#40B5C4"/>
-  <circle cx="235" cy="180" r="3" fill="#40B5C4"/>
-  <circle cx="265" cy="180" r="3" fill="#40B5C4"/>
+    <!-- Network nodes -->
+    <circle cx="250" cy="150" r="6" fill="#7B3FA0"/>
+    <circle cx="200" cy="180" r="5" fill="#7B3FA0"/>
+    <circle cx="300" cy="180" r="5" fill="#7B3FA0"/>
+    <circle cx="220" cy="200" r="5" fill="#7B3FA0"/>
+    <circle cx="280" cy="200" r="5" fill="#7B3FA0"/>
+    <circle cx="180" cy="220" r="5" fill="#7B3FA0"/>
+    <circle cx="320" cy="220" r="5" fill="#7B3FA0"/>
+  </g>
 
-  <!-- Network/connection lines -->
-  <line x1="250" y1="160" x2="235" y2="180" stroke="#40B5C4" stroke-width="1.5"/>
-  <line x1="250" y1="160" x2="265" y2="180" stroke="#40B5C4" stroke-width="1.5"/>
-  <line x1="225" y1="170" x2="235" y2="180" stroke="#40B5C4" stroke-width="1.5"/>
-  <line x1="275" y1="170" x2="265" y2="180" stroke="#40B5C4" stroke-width="1.5"/>
+  <!-- Brain with upward arrow -->
+  <g transform="translate(250, 180)">
+    <!-- Brain shape -->
+    <ellipse cx="0" cy="0" rx="25" ry="22" fill="#7B3FA0"/>
+    <!-- Brain details -->
+    <path d="M -15 -5 Q -10 0 -15 5 M -5 -8 Q 0 -3 -5 2 M 5 -8 Q 0 -3 5 2 M 15 -5 Q 10 0 15 5"
+          stroke="white" stroke-width="1.5" fill="none"/>
+    <!-- Upward arrow -->
+    <path d="M 0 -30 L -8 -20 M 0 -30 L 8 -20 M 0 -30 L 0 -10"
+          stroke="#7B3FA0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
 
-  <!-- TaleemHub text -->
-  <text x="250" y="310" font-family="Inter, sans-serif" font-size="48" font-weight="600" fill="#3D9970" text-anchor="middle">Taleemhub</text>
+  <!-- Open book -->
+  <g transform="translate(250, 260)">
+    <!-- Book pages -->
+    <path d="M -50 0 Q -50 -10 -40 -15 L -40 30 Q -50 25 -50 15 Z" fill="#1E5A8E"/>
+    <path d="M 50 0 Q 50 -10 40 -15 L 40 30 Q 50 25 50 15 Z" fill="#2B7CB8"/>
+    <path d="M -40 -15 L 0 -20 L 40 -15" stroke="#1E5A8E" stroke-width="2" fill="none"/>
+    <path d="M -40 30 L 0 35 L 40 30" stroke="#1E5A8E" stroke-width="2" fill="none"/>
+
+    <!-- Book spine/center -->
+    <line x1="0" y1="-20" x2="0" y2="35" stroke="#1E5A8E" stroke-width="3"/>
+
+    <!-- Book curve effect -->
+    <path d="M -40 -15 Q -20 -18 0 -20 Q 20 -18 40 -15" stroke="white" stroke-width="8" fill="none" opacity="0.3"/>
+  </g>
+
+  <!-- Taleemhub text -->
+  <text x="250" y="380" font-family="'Inter', 'Arial', sans-serif" font-size="68" font-weight="700"
+        fill="#1E5A8E" text-anchor="middle" letter-spacing="-1">Taleemhub</text>
 </svg>
