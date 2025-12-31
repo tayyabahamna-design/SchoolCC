@@ -63,15 +63,15 @@ export default function Login() {
         {/* Left Panel - Branding & Info */}
         <div className="hidden lg:flex flex-col justify-center space-y-8 p-12">
           <div className="space-y-6">
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-2xl">
-              <School className="w-14 h-14 text-white" />
+            <div className="inline-flex items-center justify-center w-32 h-32">
+              <img src="/taleemhub-logo.svg" alt="TaleemHub Logo" className="w-full h-full" />
             </div>
             <div>
               <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                School Command Center
+                TaleemHub
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-300">
-                Empowering education leaders with comprehensive monitoring and management tools
+                Education Command Center for Rawalpindi District
               </p>
             </div>
           </div>

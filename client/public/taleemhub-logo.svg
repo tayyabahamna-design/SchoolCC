@@ -1,0 +1,29 @@
+<svg width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Open book icon -->
+  <path d="M200 195 L200 260 L250 240 L300 260 L300 195" stroke="#3D9970" stroke-width="8" fill="none"/>
+  <path d="M200 195 C200 180, 210 170, 225 170 L275 170 C290 170, 300 180, 300 195" stroke="#3D9970" stroke-width="8" fill="none"/>
+
+  <!-- Pages -->
+  <path d="M210 200 L210 250" stroke="#52B788" stroke-width="2"/>
+  <path d="M220 200 L220 250" stroke="#52B788" stroke-width="2"/>
+  <path d="M230 200 L230 250" stroke="#52B788" stroke-width="2"/>
+  <path d="M270 200 L270 250" stroke="#52B788" stroke-width="2"/>
+  <path d="M280 200 L280 250" stroke="#52B788" stroke-width="2"/>
+  <path d="M290 200 L290 250" stroke="#52B788" stroke-width="2"/>
+
+  <!-- Knowledge dots/sparkles above book -->
+  <circle cx="250" cy="160" r="5" fill="#40B5C4"/>
+  <circle cx="225" cy="170" r="4" fill="#40B5C4"/>
+  <circle cx="275" cy="170" r="4" fill="#40B5C4"/>
+  <circle cx="235" cy="180" r="3" fill="#40B5C4"/>
+  <circle cx="265" cy="180" r="3" fill="#40B5C4"/>
+
+  <!-- Network/connection lines -->
+  <line x1="250" y1="160" x2="235" y2="180" stroke="#40B5C4" stroke-width="1.5"/>
+  <line x1="250" y1="160" x2="265" y2="180" stroke="#40B5C4" stroke-width="1.5"/>
+  <line x1="225" y1="170" x2="235" y2="180" stroke="#40B5C4" stroke-width="1.5"/>
+  <line x1="275" y1="170" x2="265" y2="180" stroke="#40B5C4" stroke-width="1.5"/>
+
+  <!-- TaleemHub text -->
+  <text x="250" y="310" font-family="Inter, sans-serif" font-size="48" font-weight="600" fill="#3D9970" text-anchor="middle">Taleemhub</text>
+</svg>

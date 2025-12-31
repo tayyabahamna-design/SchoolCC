@@ -90,7 +90,7 @@ export default function Dashboard() {
       <aside className="hidden lg:flex flex-col w-72 bg-card/95 dark:bg-card backdrop-blur-xl border-r border-border fixed left-0 top-0 h-screen z-40 animate-slideInLeft">
         {/* Sidebar Header */}
         <div className="p-6 border-b border-border">
-          <h1 className="text-xl font-bold gradient-text-gold">SchoolHub</h1>
+          <h1 className="text-xl font-bold gradient-text-gold">TaleemHub</h1>
           <p className="text-sm text-muted-foreground mt-1">{user.role.replace(/_/g, ' ')}</p>
         </div>
         
@@ -267,7 +267,7 @@ export default function Dashboard() {
         <div className="lg:hidden bg-card/95 dark:bg-card backdrop-blur-xl border-b border-border sticky top-0 z-50">
           <div className="px-4 py-4 flex items-center justify-between">
             <div>
-              <h1 className="text-lg font-bold gradient-text-gold">SchoolHub</h1>
+              <h1 className="text-lg font-bold gradient-text-gold">TaleemHub</h1>
               <p className="text-sm text-muted-foreground">{user.name} • {user.role.replace(/_/g, ' ')}</p>
             </div>
             <Button
