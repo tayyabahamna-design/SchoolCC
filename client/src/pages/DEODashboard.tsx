@@ -10,6 +10,7 @@ import { useMockAEOActivities } from '@/hooks/useMockAEOActivities';
 import { useMockDataRequests } from '@/hooks/useMockDataRequests';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { MetricCard } from '@/components/dashboard';
 import {
   Building2,
   MapPin,
@@ -593,311 +594,202 @@ export default function DEODashboard() {
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-          {/* Schools Overview Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-blue-500"
+          <MetricCard
+            value={schools.length}
+            label="Total Schools"
+            icon={Building2}
+            iconGradient="from-blue-500 to-blue-600"
+            borderColor="border-l-blue-500"
+            showChevron
             onClick={() => setShowSchoolsModal(true)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                <Building2 className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{schools.length}</h3>
-            <p className="text-sm text-muted-foreground mb-3">Total Schools</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Excellent (≥90%)</span>
-                <Badge className="bg-green-500">{excellentSchools.length}</Badge>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Good (80-90%)</span>
-                <Badge className="bg-blue-500">{goodSchools.length}</Badge>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Needs Attention</span>
-                <Badge className="bg-red-500">{needsAttentionSchools.length}</Badge>
-              </div>
-            </div>
-          </Card>
+            breakdown={[
+              { label: 'Excellent (≥90%)', value: excellentSchools.length, valueColor: 'bg-green-500' },
+              { label: 'Good (80-90%)', value: goodSchools.length, valueColor: 'bg-blue-500' },
+              { label: 'Needs Attention', value: needsAttentionSchools.length, valueColor: 'bg-red-500' },
+            ]}
+          />
 
-          {/* Active Visits Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-purple-500"
+          <MetricCard
+            value={activeVisits.length}
+            label="Active AEO Visits"
+            icon={MapPin}
+            iconGradient="from-purple-500 to-purple-600"
+            borderColor="border-l-purple-500"
+            showChevron
             onClick={() => setShowVisitsModal(true)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
-                <MapPin className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{activeVisits.length}</h3>
-            <p className="text-sm text-muted-foreground mb-3">Active AEO Visits</p>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-              <span className="text-xs text-green-600 font-medium">Live Tracking</span>
-            </div>
-          </Card>
+            breakdown={[
+              { label: 'Live Tracking', value: '', showAsBadge: false, valueColor: 'text-green-600 font-medium' },
+            ]}
+          />
 
-          {/* Total Staff Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-teal-500"
+          <MetricCard
+            value={totalStaff}
+            label="Total Staff"
+            icon={UsersRound}
+            iconGradient="from-teal-500 to-teal-600"
+            borderColor="border-l-teal-500"
+            showChevron
             onClick={() => setShowStaffModal(true)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg">
-                <UsersRound className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{totalStaff}</h3>
-            <p className="text-sm text-muted-foreground mb-3">Total Staff</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">AEOs</span>
-                <span className="font-medium">{staffStats.aeos.total}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Head Teachers</span>
-                <span className="font-medium">{staffStats.headTeachers.total}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Teachers</span>
-                <span className="font-medium">{staffStats.teachers.total}</span>
-              </div>
-            </div>
-          </Card>
+            breakdown={[
+              { label: 'AEOs', value: staffStats.aeos.total, showAsBadge: false },
+              { label: 'Head Teachers', value: staffStats.headTeachers.total, showAsBadge: false },
+              { label: 'Teachers', value: staffStats.teachers.total, showAsBadge: false },
+            ]}
+          />
 
-          {/* Staff Present Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-green-500"
+          <MetricCard
+            value={totalPresent}
+            label="Staff Present Today"
+            icon={UserCheck}
+            iconGradient="from-green-500 to-green-600"
+            borderColor="border-l-green-500"
+            showChevron
             onClick={() => setShowStaffModal(true)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
-                <UserCheck className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{totalPresent}</h3>
-            <p className="text-sm text-muted-foreground mb-3">Staff Present Today</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">AEOs</span>
-                <Badge className="bg-green-500">{staffStats.aeos.present}</Badge>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Head Teachers</span>
-                <Badge className="bg-green-500">{staffStats.headTeachers.present}</Badge>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Teachers</span>
-                <Badge className="bg-green-500">{staffStats.teachers.present}</Badge>
-              </div>
-            </div>
-          </Card>
+            breakdown={[
+              { label: 'AEOs', value: staffStats.aeos.present, valueColor: 'bg-green-500' },
+              { label: 'Head Teachers', value: staffStats.headTeachers.present, valueColor: 'bg-green-500' },
+              { label: 'Teachers', value: staffStats.teachers.present, valueColor: 'bg-green-500' },
+            ]}
+          />
 
-          {/* Staff Absent Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-red-500"
+          <MetricCard
+            value={totalAbsent}
+            label="Staff Absent Today"
+            icon={UserX}
+            iconGradient="from-red-500 to-red-600"
+            borderColor="border-l-red-500"
+            showChevron
             onClick={() => setShowStaffModal(true)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg">
-                <UserX className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{totalAbsent}</h3>
-            <p className="text-sm text-muted-foreground mb-3">Staff Absent Today</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">AEOs</span>
-                <Badge className="bg-red-500">{staffStats.aeos.total - staffStats.aeos.present}</Badge>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Head Teachers</span>
-                <Badge className="bg-red-500">{staffStats.headTeachers.total - staffStats.headTeachers.present}</Badge>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">Teachers</span>
-                <Badge className="bg-red-500">{staffStats.teachers.total - staffStats.teachers.present}</Badge>
-              </div>
-            </div>
-          </Card>
+            breakdown={[
+              { label: 'AEOs', value: staffStats.aeos.total - staffStats.aeos.present, valueColor: 'bg-red-500' },
+              { label: 'Head Teachers', value: staffStats.headTeachers.total - staffStats.headTeachers.present, valueColor: 'bg-red-500' },
+              { label: 'Teachers', value: staffStats.teachers.total - staffStats.teachers.present, valueColor: 'bg-red-500' },
+            ]}
+          />
 
-          {/* Pending Requests Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-amber-500"
+          <MetricCard
+            value={pendingRequests.length}
+            label="Pending Requests"
+            icon={FileText}
+            iconGradient="from-amber-500 to-amber-600"
+            borderColor="border-l-amber-500"
+            showChevron
             onClick={() => setShowRequestsModal(true)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg">
-                <FileText className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{pendingRequests.length}</h3>
-            <p className="text-sm text-muted-foreground mb-3">Pending Requests</p>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">High Priority</span>
-                <Badge className="bg-red-500">{highPriorityCount}</Badge>
-              </div>
-              {overdueCount > 0 && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Overdue</span>
-                  <Badge className="bg-red-600">{overdueCount}</Badge>
-                </div>
-              )}
-            </div>
-          </Card>
+            breakdown={[
+              { label: 'High Priority', value: highPriorityCount, valueColor: 'bg-red-500' },
+              ...(overdueCount > 0 ? [{ label: 'Overdue', value: overdueCount, valueColor: 'bg-red-600' }] : []),
+            ]}
+          />
 
-          {/* School Performance Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-emerald-500"
+          <MetricCard
+            value={`${avgCompliance}%`}
+            label="Average Compliance"
+            icon={Award}
+            iconGradient="from-emerald-500 to-emerald-600"
+            borderColor="border-l-emerald-500"
+            showChevron
             onClick={() => setShowPerformanceModal(true)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
-                <Award className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{avgCompliance}%</h3>
-            <p className="text-sm text-muted-foreground mb-3">Average Compliance</p>
-            <div className="text-xs text-muted-foreground">
-              View top performers and schools needing attention
-            </div>
-          </Card>
+            breakdown={[
+              { label: 'View top performers and schools needing attention', value: '', showAsBadge: false },
+            ]}
+          />
 
-          {/* Recent Activities Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-slate-500"
+          <MetricCard
+            value={recentActivities.length}
+            label="Recent Activities"
+            icon={Activity}
+            iconGradient="from-slate-500 to-slate-600"
+            borderColor="border-l-slate-500"
+            showChevron
             onClick={() => setShowActivitiesModal(true)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center shadow-lg">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{recentActivities.length}</h3>
-            <p className="text-sm text-muted-foreground mb-3">Recent Activities</p>
-            <div className="text-xs text-muted-foreground">
-              Latest AEO field activities and visits
-            </div>
-          </Card>
+            breakdown={[
+              { label: 'Latest AEO field activities and visits', value: '', showAsBadge: false },
+            ]}
+          />
 
-          {/* School Inventory Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-indigo-500"
+          <MetricCard
+            value="School Inventory"
+            label="View and manage school data"
+            icon={Building2}
+            iconGradient="from-indigo-500 to-indigo-600"
+            borderColor="border-l-indigo-500"
+            showChevron
             onClick={() => navigate('/school-data')}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                <Building2 className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">School Inventory</h3>
-            <p className="text-sm text-muted-foreground mb-3">View and manage school data</p>
-            <div className="text-xs text-muted-foreground">
-              Infrastructure, resources, and facilities
-            </div>
-          </Card>
+            size="md"
+            breakdown={[
+              { label: 'Infrastructure, resources, and facilities', value: '', showAsBadge: false },
+            ]}
+          />
 
-          {/* School Albums Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-pink-500"
+          <MetricCard
+            value="School Albums"
+            label="View school photos and activities"
+            icon={Image}
+            iconGradient="from-pink-500 to-pink-600"
+            borderColor="border-l-pink-500"
+            showChevron
             onClick={() => navigate('/school-data')}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center shadow-lg">
-                <Image className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">School Albums</h3>
-            <p className="text-sm text-muted-foreground mb-3">View school photos and activities</p>
-            <div className="text-xs text-muted-foreground">
-              Photos from all schools in the district
-            </div>
-          </Card>
+            size="md"
+            breakdown={[
+              { label: 'Photos from all schools in the district', value: '', showAsBadge: false },
+            ]}
+          />
 
-          {/* All Data Requests Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-violet-500"
+          <MetricCard
+            value="All Requests"
+            label="View all data requests"
+            icon={FileText}
+            iconGradient="from-violet-500 to-violet-600"
+            borderColor="border-l-violet-500"
+            showChevron
             onClick={() => navigate('/data-requests')}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center shadow-lg">
-                <FileText className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">All Requests</h3>
-            <p className="text-sm text-muted-foreground mb-3">View all data requests</p>
-            <div className="text-xs text-muted-foreground">
-              Manage and track request status
-            </div>
-          </Card>
+            size="md"
+            breakdown={[
+              { label: 'Manage and track request status', value: '', showAsBadge: false },
+            ]}
+          />
 
-          {/* Leave Calendar Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-sky-500"
+          <MetricCard
+            value="Leave Calendar"
+            label="View staff leave schedules"
+            icon={Calendar}
+            iconGradient="from-sky-500 to-sky-600"
+            borderColor="border-l-sky-500"
+            showChevron
             onClick={() => navigate('/calendar')}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center shadow-lg">
-                <Calendar className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Leave Calendar</h3>
-            <p className="text-sm text-muted-foreground mb-3">View staff leave schedules</p>
-            <div className="text-xs text-muted-foreground">
-              Track absences and approvals
-            </div>
-          </Card>
+            size="md"
+            breakdown={[
+              { label: 'Track absences and approvals', value: '', showAsBadge: false },
+            ]}
+          />
 
-          {/* School Visits Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-rose-500"
+          <MetricCard
+            value="School Visits"
+            label="View all scheduled visits"
+            icon={MapPin}
+            iconGradient="from-rose-500 to-rose-600"
+            borderColor="border-l-rose-500"
+            showChevron
             onClick={() => navigate('/school-visits')}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center shadow-lg">
-                <MapPin className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">School Visits</h3>
-            <p className="text-sm text-muted-foreground mb-3">View all scheduled visits</p>
-            <div className="text-xs text-muted-foreground">
-              Plan and track field visits
-            </div>
-          </Card>
+            size="md"
+            breakdown={[
+              { label: 'Plan and track field visits', value: '', showAsBadge: false },
+            ]}
+          />
 
-          {/* Queries Card */}
-          <Card
-            className="p-6 hover:shadow-xl transition-all duration-300 cursor-pointer border-l-4 border-l-fuchsia-500"
+          <MetricCard
+            value="Queries"
+            label="View and respond to queries"
+            icon={MessageSquare}
+            iconGradient="from-fuchsia-500 to-fuchsia-600"
+            borderColor="border-l-fuchsia-500"
+            showChevron
             onClick={() => navigate('/queries')}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-500 to-fuchsia-600 flex items-center justify-center shadow-lg">
-                <MessageSquare className="w-6 h-6 text-white" />
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Queries</h3>
-            <p className="text-sm text-muted-foreground mb-3">View and respond to queries</p>
-            <div className="text-xs text-muted-foreground">
-              Staff queries and support requests
-            </div>
-          </Card>
+            size="md"
+            breakdown={[
+              { label: 'Staff queries and support requests', value: '', showAsBadge: false },
+            ]}
+          />
 
         </div>
       </main>

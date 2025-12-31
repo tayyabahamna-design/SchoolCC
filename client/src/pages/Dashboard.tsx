@@ -14,6 +14,7 @@ import OfficeVisitForm from '@/pages/OfficeVisitForm';
 import OtherActivityForm from '@/pages/OtherActivityForm';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { MetricCard } from '@/components/dashboard';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -361,77 +362,44 @@ export default function Dashboard() {
             <div className="mb-8">
               <h2 className="text-2xl font-bold gradient-text mb-6">Staff Overview</h2>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 stagger-children">
-                {/* AEOs Card */}
-                <Card className="p-6 hover-lift bg-card border border-border card-shine">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">AEOs</h3>
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
-                      <Award className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Total</span>
-                      <span className="text-2xl font-bold gradient-text">{staffStats.aeos.total}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Present</span>
-                      <span className="text-lg font-semibold text-emerald-600">{staffStats.aeos.present}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">On Leave</span>
-                      <span className="text-lg font-semibold text-amber-600">{staffStats.aeos.onLeave}</span>
-                    </div>
-                  </div>
-                </Card>
+                <MetricCard
+                  value={staffStats.aeos.total}
+                  label="AEOs"
+                  icon={Award}
+                  iconGradient="from-purple-500 to-purple-600"
+                  size="lg"
+                  breakdown={[
+                    { label: 'Present', value: staffStats.aeos.present, valueColor: 'text-emerald-600', showAsBadge: false },
+                    { label: 'On Leave', value: staffStats.aeos.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
+                  ]}
+                  className="hover-lift card-shine"
+                />
 
-                {/* Head Teachers Card */}
-                <Card className="p-6 hover-lift bg-card border border-border card-shine">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">Head Teachers</h3>
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center shadow-lg">
-                      <Building2 className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Total</span>
-                      <span className="text-2xl font-bold gradient-text">{staffStats.headTeachers.total}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Present</span>
-                      <span className="text-lg font-semibold text-emerald-600">{staffStats.headTeachers.present}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">On Leave</span>
-                      <span className="text-lg font-semibold text-amber-600">{staffStats.headTeachers.onLeave}</span>
-                    </div>
-                  </div>
-                </Card>
+                <MetricCard
+                  value={staffStats.headTeachers.total}
+                  label="Head Teachers"
+                  icon={Building2}
+                  iconGradient="from-teal-500 to-teal-600"
+                  size="lg"
+                  breakdown={[
+                    { label: 'Present', value: staffStats.headTeachers.present, valueColor: 'text-emerald-600', showAsBadge: false },
+                    { label: 'On Leave', value: staffStats.headTeachers.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
+                  ]}
+                  className="hover-lift card-shine"
+                />
 
-                {/* Teachers Card */}
-                <Card className="p-6 hover-lift bg-card border border-border card-shine">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">Teachers</h3>
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                      <Users className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Total</span>
-                      <span className="text-2xl font-bold gradient-text">{staffStats.teachers.total}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Present</span>
-                      <span className="text-lg font-semibold text-emerald-600">{staffStats.teachers.present}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">On Leave</span>
-                      <span className="text-lg font-semibold text-amber-600">{staffStats.teachers.onLeave}</span>
-                    </div>
-                  </div>
-                </Card>
+                <MetricCard
+                  value={staffStats.teachers.total}
+                  label="Teachers"
+                  icon={Users}
+                  iconGradient="from-blue-500 to-blue-600"
+                  size="lg"
+                  breakdown={[
+                    { label: 'Present', value: staffStats.teachers.present, valueColor: 'text-emerald-600', showAsBadge: false },
+                    { label: 'On Leave', value: staffStats.teachers.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
+                  ]}
+                  className="hover-lift card-shine"
+                />
               </div>
             </div>
           )}
@@ -440,28 +408,22 @@ export default function Dashboard() {
           {stats && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-8 stagger-children">
               {stats.map((stat, idx) => {
-                const Icon = stat.icon;
                 const gradients = [
                   'from-blue-500 to-blue-600',
                   'from-emerald-500 to-emerald-600',
                   'from-amber-500 to-amber-600',
                 ];
                 return (
-                  <Card
+                  <MetricCard
                     key={idx}
-                    className="p-6 lg:p-8 hover-lift cursor-pointer card-shine bg-card border border-border"
+                    value={stat.value}
+                    label={stat.label}
+                    icon={stat.icon}
+                    iconGradient={gradients[idx % 3]}
+                    size="xl"
                     onClick={() => navigate('/data-requests')}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-sm lg:text-base font-medium text-muted-foreground mb-2">{stat.label}</p>
-                        <p className="stat-number gradient-text">{stat.value}</p>
-                      </div>
-                      <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-gradient-to-br ${gradients[idx % 3]} flex items-center justify-center shadow-lg`}>
-                        <Icon className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
-                      </div>
-                    </div>
-                  </Card>
+                    className="hover-lift card-shine"
+                  />
                 );
               })}
             </div>
@@ -472,66 +434,46 @@ export default function Dashboard() {
           <div className="mb-12">
             <h2 className="text-2xl font-bold gradient-text mb-6">Your Activities</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children">
-              <Card 
-                className="p-6 hover-lift cursor-pointer bg-card border border-blue-200/50 dark:border-blue-800/50 card-shine"
+              <MetricCard
+                value={activities.monitoring.length}
+                label="Monitoring"
+                icon={FileText}
+                iconGradient="from-blue-400 to-blue-600"
+                size="xl"
                 onClick={() => setActiveActivityForm('monitoring')}
+                className="hover-lift card-shine border-blue-200/50 dark:border-blue-800/50"
                 data-testid="card-monitoring-activity"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg animate-float" style={{animationDelay: '0s'}}>
-                    <FileText className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Monitoring</p>
-                    <p className="text-3xl font-bold gradient-text">{activities.monitoring.length}</p>
-                  </div>
-                </div>
-              </Card>
-              <Card 
-                className="p-6 hover-lift cursor-pointer bg-card border border-purple-200/50 dark:border-purple-800/50 card-shine"
+              />
+              <MetricCard
+                value={activities.mentoring.length}
+                label="Mentoring"
+                icon={Award}
+                iconGradient="from-purple-400 to-purple-600"
+                size="xl"
                 onClick={() => setActiveActivityForm('mentoring')}
+                className="hover-lift card-shine border-purple-200/50 dark:border-purple-800/50"
                 data-testid="card-mentoring-activity"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center shadow-lg animate-float" style={{animationDelay: '0.5s'}}>
-                    <Award className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Mentoring</p>
-                    <p className="text-3xl font-bold gradient-text">{activities.mentoring.length}</p>
-                  </div>
-                </div>
-              </Card>
-              <Card 
-                className="p-6 hover-lift cursor-pointer bg-card border border-emerald-200/50 dark:border-emerald-800/50 card-shine"
+              />
+              <MetricCard
+                value={activities.office.length}
+                label="Office"
+                icon={Building2}
+                iconGradient="from-emerald-400 to-emerald-600"
+                size="xl"
                 onClick={() => setActiveActivityForm('office')}
+                className="hover-lift card-shine border-emerald-200/50 dark:border-emerald-800/50"
                 data-testid="card-office-activity"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg animate-float" style={{animationDelay: '1s'}}>
-                    <Building2 className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Office</p>
-                    <p className="text-3xl font-bold gradient-text">{activities.office.length}</p>
-                  </div>
-                </div>
-              </Card>
-              <Card 
-                className="p-6 hover-lift cursor-pointer bg-card border border-slate-200/50 dark:border-slate-700/50 card-shine"
+              />
+              <MetricCard
+                value={activities.other.length}
+                label="Other"
+                icon={CheckSquare}
+                iconGradient="from-slate-400 to-slate-600"
+                size="xl"
                 onClick={() => setActiveActivityForm('other-activity')}
+                className="hover-lift card-shine border-slate-200/50 dark:border-slate-700/50"
                 data-testid="card-other-activity"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-400 to-slate-600 flex items-center justify-center shadow-lg animate-float" style={{animationDelay: '1.5s'}}>
-                    <CheckSquare className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Other</p>
-                    <p className="text-3xl font-bold gradient-text">{activities.other.length}</p>
-                  </div>
-                </div>
-              </Card>
+              />
             </div>
           </div>
         )}

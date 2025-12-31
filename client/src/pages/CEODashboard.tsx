@@ -22,6 +22,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { MetricCard } from '@/components/dashboard';
 
 interface School {
   id: string;
@@ -461,109 +462,58 @@ export default function CEODashboard() {
         <div className="p-8 space-y-8">
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            <Card className="group relative overflow-hidden hover-lift">
-              <div className="p-8">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
-                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <Building2 className="w-7 h-7 text-primary" />
-                    </div>
-                  </div>
-                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-                    <span className="text-xs font-semibold text-primary">Live</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                    Total Schools
-                  </p>
-                  <p className="text-5xl font-bold gradient-text tracking-tight">
-                    {calculateAggregates.totalSchools}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Across Rawalpindi district</p>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </Card>
+            <MetricCard
+              value={calculateAggregates.totalSchools}
+              label="Total Schools"
+              icon={Building2}
+              iconGradient="from-blue-500 to-blue-600"
+              size="xl"
+              badge={{ text: "Live", variant: "secondary", className: "bg-primary/10 text-primary" }}
+              breakdown={[
+                { label: "Across Rawalpindi district", value: "", showAsBadge: false }
+              ]}
+              className="hover-lift group relative overflow-hidden"
+            />
 
-            <Card className="group relative overflow-hidden hover-lift">
-              <div className="p-8">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
-                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <Users className="w-7 h-7 text-primary" />
-                    </div>
-                  </div>
-                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-                    <span className="text-xs font-semibold text-primary">Live</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                    Total Teachers
-                  </p>
-                  <p className="text-5xl font-bold gradient-text tracking-tight">
-                    {calculateAggregates.totalTeachers}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Active educators</p>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </Card>
+            <MetricCard
+              value={calculateAggregates.totalTeachers}
+              label="Total Teachers"
+              icon={Users}
+              iconGradient="from-purple-500 to-purple-600"
+              size="xl"
+              badge={{ text: "Live", variant: "secondary", className: "bg-primary/10 text-primary" }}
+              breakdown={[
+                { label: "Active educators", value: "", showAsBadge: false }
+              ]}
+              className="hover-lift group relative overflow-hidden"
+            />
 
-            <Card className="group relative overflow-hidden hover-lift cursor-pointer" onClick={() => navigate('/data-requests')}>
-              <div className="p-8">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
-                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <AlertCircle className="w-7 h-7 text-primary" />
-                    </div>
-                  </div>
-                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20">
-                    <span className="text-xs font-semibold text-red-600">Action Required</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                    Pending Requests
-                  </p>
-                  <p className="text-5xl font-bold gradient-text tracking-tight">
-                    {calculateAggregates.totalPendingRequests}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Click to review</p>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </Card>
+            <MetricCard
+              value={calculateAggregates.totalPendingRequests}
+              label="Pending Requests"
+              icon={AlertCircle}
+              iconGradient="from-red-500 to-orange-500"
+              size="xl"
+              onClick={() => navigate('/data-requests')}
+              badge={{ text: "Action Required", variant: "destructive", className: "bg-red-500/10 text-red-600" }}
+              breakdown={[
+                { label: "Click to review", value: "", showAsBadge: false }
+              ]}
+              className="hover-lift group relative overflow-hidden cursor-pointer"
+            />
 
-            <Card className="group relative overflow-hidden hover-lift">
-              <div className="p-8">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl blur-xl" />
-                    <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <CheckCircle className="w-7 h-7 text-primary" />
-                    </div>
-                  </div>
-                  <div className="px-3 py-1 rounded-full bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20">
-                    <span className="text-xs font-semibold text-green-600">Excellent</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                    Avg Compliance
-                  </p>
-                  <p className="text-5xl font-bold gradient-text tracking-tight">
-                    {calculateAggregates.avgCompliance}%
-                  </p>
-                  <p className="text-xs text-muted-foreground">District-wide metric</p>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </Card>
+            <MetricCard
+              value={`${calculateAggregates.avgCompliance}%`}
+              label="Avg Compliance"
+              icon={CheckCircle}
+              iconGradient="from-green-500 to-emerald-500"
+              size="xl"
+              badge={{ text: "Excellent", variant: "secondary", className: "bg-green-500/10 text-green-600" }}
+              breakdown={[
+                { label: "District-wide metric", value: "", showAsBadge: false }
+              ]}
+              className="hover-lift group relative overflow-hidden"
+            />
           </div>
 
           {/* Quick Overview Section */}
