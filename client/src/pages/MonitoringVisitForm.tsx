@@ -208,15 +208,6 @@ export default function MonitoringVisitForm({ onClose }: Props) {
       <h2 className="text-lg font-semibold text-foreground mb-4">Basic Information</h2>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-muted-foreground mb-2">Tehsil</label>
-          <Input
-            placeholder="Enter tehsil name"
-            value={formData.tehsil || ''}
-            onChange={(e) => handleInputChange('tehsil', e.target.value)}
-            data-testid="input-tehsil"
-          />
-        </div>
-        <div>
           <label className="block text-sm font-medium text-muted-foreground mb-2">Markaz</label>
           <Input
             placeholder="Enter markaz name"
