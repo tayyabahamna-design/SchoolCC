@@ -8,9 +8,9 @@ import { useLocation } from 'wouter';
 import { ArrowLeft, MapPin } from 'lucide-react';
 
 const SCHOOLS = [
-  { id: 'school-1', name: 'Government Primary School, Zone A' },
-  { id: 'school-2', name: 'Government Upper Primary School' },
-  { id: 'school-3', name: 'Government Secondary School' },
+  { id: 'school-1', name: 'GOVERNMENT PRIMARY SCHOOL, ZONE A' },
+  { id: 'school-2', name: 'GOVERNMENT UPPER PRIMARY SCHOOL' },
+  { id: 'school-3', name: 'GOVERNMENT SECONDARY SCHOOL' },
 ];
 
 export default function CreateVisit() {

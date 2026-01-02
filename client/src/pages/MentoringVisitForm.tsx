@@ -8,7 +8,7 @@ import { useActivities, MentoringVisitData, MENTORING_AREAS } from '@/contexts/a
 import { toast } from 'sonner';
 import { realSchools } from '@/data/realData';
 
-const SCHOOLS = realSchools.map(school => `${school.name} (${school.emisNumber})`);
+const SCHOOLS = realSchools.map(school => `${school.name.toUpperCase()} (${school.emisNumber})`);
 
 const SUBJECTS = ['English', 'Urdu', 'Mathematics', 'Science', 'Social Studies', 'General'];
 
