@@ -218,7 +218,7 @@ export default function Signup() {
                   <SelectContent>
                     <SelectItem value="DEO">District Education Officer</SelectItem>
                     <SelectItem value="DDEO">Deputy DEO</SelectItem>
-                    <SelectItem value="AEO">Area Education Officer</SelectItem>
+                    <SelectItem value="AEO">Assistant Education Officer</SelectItem>
                     <SelectItem value="HEAD_TEACHER">Head Teacher</SelectItem>
                     <SelectItem value="TEACHER">Teacher</SelectItem>
                     <SelectItem value="COACH">Coach (Read-only)</SelectItem>

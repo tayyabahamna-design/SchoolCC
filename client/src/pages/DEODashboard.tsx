@@ -989,7 +989,7 @@ export default function DEODashboard() {
               <div>
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <Award className="w-5 h-5 text-purple-500" />
-                  Area Education Officers ({staffStats.aeos.total})
+                  Assistant Education Officers ({staffStats.aeos.total})
                 </h3>
                 <div className="grid gap-2">
                   {staff.filter(s => s.role === 'AEO').map((member) => (

@@ -50,7 +50,7 @@ const AVAILABLE_ROLES: { value: UserRole; label: string }[] = [
   { value: 'CEO', label: 'CEO' },
   { value: 'DEO', label: 'District Education Officer' },
   { value: 'DDEO', label: 'Deputy DEO' },
-  { value: 'AEO', label: 'Area Education Officer' },
+  { value: 'AEO', label: 'Assistant Education Officer' },
   { value: 'HEAD_TEACHER', label: 'Head Teacher' },
   { value: 'TEACHER', label: 'Teacher' },
   { value: 'COACH', label: 'Coach' },

@@ -11,7 +11,7 @@ const roles: { value: UserRole; label: string; description: string; icon: any }[
   { value: 'CEO', label: 'CEO', description: 'System oversight, all data', icon: Crown },
   { value: 'DEO', label: 'District Education Officer', description: 'Full access, all data', icon: Building2 },
   { value: 'DDEO', label: 'Deputy DEO', description: 'Regional oversight', icon: Users },
-  { value: 'AEO', label: 'Area Education Officer', description: 'Cluster management', icon: GraduationCap },
+  { value: 'AEO', label: 'Assistant Education Officer', description: 'Cluster management', icon: GraduationCap },
   { value: 'HEAD_TEACHER', label: 'Head Teacher', description: 'School management', icon: UserCheck },
   { value: 'TEACHER', label: 'Teacher', description: 'Assign to me', icon: BookOpen },
   { value: 'COACH', label: 'Coach', description: 'Read-only monitoring', icon: Eye },
