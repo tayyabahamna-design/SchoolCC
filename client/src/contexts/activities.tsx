@@ -344,84 +344,68 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addMonitoringVisit = useCallback(async (visit: MonitoringVisitData) => {
-    try {
-      const response = await fetch('/api/activities/monitoring', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(visit),
-      });
-      if (response.ok) {
-        const savedVisit = await response.json();
-        setMonitoringVisits((prev) => [...prev, savedVisit]);
-      } else {
-        console.error('Failed to save monitoring visit');
-        // Still add to local state for UI update
-        setMonitoringVisits((prev) => [...prev, visit]);
-      }
-    } catch (error) {
-      console.error('Error saving monitoring visit:', error);
-      setMonitoringVisits((prev) => [...prev, visit]);
+    // Omit frontend-generated id - server will generate it
+    const { id, ...visitData } = visit as any;
+    const response = await fetch('/api/activities/monitoring', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(visitData),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to save monitoring visit' }));
+      throw new Error(error.details || error.error || 'Failed to save monitoring visit');
     }
+    const savedVisit = await response.json();
+    setMonitoringVisits((prev) => [...prev, savedVisit]);
+    return savedVisit;
   }, []);
 
   const addMentoringVisit = useCallback(async (visit: MentoringVisitData) => {
-    try {
-      const response = await fetch('/api/activities/mentoring', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(visit),
-      });
-      if (response.ok) {
-        const savedVisit = await response.json();
-        setMentoringVisits((prev) => [...prev, savedVisit]);
-      } else {
-        console.error('Failed to save mentoring visit');
-        setMentoringVisits((prev) => [...prev, visit]);
-      }
-    } catch (error) {
-      console.error('Error saving mentoring visit:', error);
-      setMentoringVisits((prev) => [...prev, visit]);
+    const { id, ...visitData } = visit as any;
+    const response = await fetch('/api/activities/mentoring', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(visitData),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to save mentoring visit' }));
+      throw new Error(error.details || error.error || 'Failed to save mentoring visit');
     }
+    const savedVisit = await response.json();
+    setMentoringVisits((prev) => [...prev, savedVisit]);
+    return savedVisit;
   }, []);
 
   const addOfficeVisit = useCallback(async (visit: OfficeVisitData) => {
-    try {
-      const response = await fetch('/api/activities/office', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(visit),
-      });
-      if (response.ok) {
-        const savedVisit = await response.json();
-        setOfficeVisits((prev) => [...prev, savedVisit]);
-      } else {
-        console.error('Failed to save office visit');
-        setOfficeVisits((prev) => [...prev, visit]);
-      }
-    } catch (error) {
-      console.error('Error saving office visit:', error);
-      setOfficeVisits((prev) => [...prev, visit]);
+    const { id, ...visitData } = visit as any;
+    const response = await fetch('/api/activities/office', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(visitData),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to save office visit' }));
+      throw new Error(error.details || error.error || 'Failed to save office visit');
     }
+    const savedVisit = await response.json();
+    setOfficeVisits((prev) => [...prev, savedVisit]);
+    return savedVisit;
   }, []);
 
   const addOtherActivity = useCallback(async (activity: OtherActivityData) => {
-    try {
-      const response = await fetch('/api/activities/other', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(activity),
-      });
-      if (response.ok) {
-        const savedActivity = await response.json();
-        setOtherActivities((prev) => [...prev, savedActivity]);
-      } else {
-        console.error('Failed to save other activity');
-        setOtherActivities((prev) => [...prev, activity]);
-      }
-    } catch (error) {
-      console.error('Error saving other activity:', error);
-      setOtherActivities((prev) => [...prev, activity]);
+    const { id, ...activityData } = activity as any;
+    const response = await fetch('/api/activities/other', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(activityData),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Failed to save other activity' }));
+      throw new Error(error.details || error.error || 'Failed to save other activity');
     }
+    const savedActivity = await response.json();
+    setOtherActivities((prev) => [...prev, savedActivity]);
+    return savedActivity;
   }, []);
 
   const getAllActivities = useCallback(() => {
