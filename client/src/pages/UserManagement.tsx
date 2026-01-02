@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/auth';
+import { useAuth, UserRole } from '@/contexts/auth';
 import { useLocation } from 'wouter';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, UserCheck, UserX, CheckCircle, XCircle, Trash2, ArrowLeft } from 'lucide-react';
+import { Users, UserCheck, UserX, CheckCircle, XCircle, Trash2, ArrowLeft, Plus, Edit } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface UserAccount {
@@ -20,14 +24,36 @@ interface UserAccount {
   createdAt: string;
 }
 
+const AVAILABLE_ROLES: { value: UserRole; label: string }[] = [
+  { value: 'CEO', label: 'CEO' },
+  { value: 'DEO', label: 'District Education Officer' },
+  { value: 'DDEO', label: 'Deputy DEO' },
+  { value: 'AEO', label: 'Area Education Officer' },
+  { value: 'HEAD_TEACHER', label: 'Head Teacher' },
+  { value: 'TEACHER', label: 'Teacher' },
+  { value: 'COACH', label: 'Coach' },
+];
+
 export default function UserManagement() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [allUsers, setAllUsers] = useState<UserAccount[]>([]);
   const [pendingUsers, setPendingUsers] = useState<UserAccount[]>([]);
   const [activeUsers, setActiveUsers] = useState<UserAccount[]>([]);
   const [restrictedUsers, setRestrictedUsers] = useState<UserAccount[]>([]);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserAccount | null>(null);
+  const [creating, setCreating] = useState(false);
+  
+  // Create user form state
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserPhone, setNewUserPhone] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserRole, setNewUserRole] = useState<UserRole>('TEACHER');
+  const [newUserSchool, setNewUserSchool] = useState('');
 
   // Permission check
   if (!user || user.role !== 'DEO') {
@@ -54,9 +80,10 @@ export default function UserManagement() {
       }
 
       if (allUsersRes.ok) {
-        const allUsers = await allUsersRes.json();
-        setActiveUsers(allUsers.filter((u: UserAccount) => u.status === 'active'));
-        setRestrictedUsers(allUsers.filter((u: UserAccount) => u.status === 'restricted'));
+        const usersData = await allUsersRes.json();
+        setAllUsers(usersData);
+        setActiveUsers(usersData.filter((u: UserAccount) => u.status === 'active'));
+        setRestrictedUsers(usersData.filter((u: UserAccount) => u.status === 'restricted'));
       }
     } catch (error) {
       toast({
@@ -200,6 +227,80 @@ export default function UserManagement() {
     }
   };
 
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newUserName,
+          phoneNumber: newUserPhone,
+          password: newUserPassword,
+          role: newUserRole,
+          schoolName: newUserSchool || undefined,
+          status: 'active',
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to create user');
+      }
+
+      toast({
+        title: 'Success',
+        description: 'User account created successfully',
+      });
+
+      // Reset form
+      setNewUserName('');
+      setNewUserPhone('');
+      setNewUserPassword('');
+      setNewUserRole('TEACHER');
+      setNewUserSchool('');
+      setShowCreateDialog(false);
+      fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create user',
+        variant: 'destructive',
+      });
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleEditRole = async (userId: string, newRole: string) => {
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole, adminId: user.id }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update role');
+
+      toast({
+        title: 'Success',
+        description: 'User role updated',
+      });
+
+      setShowEditDialog(false);
+      setEditingUser(null);
+      fetchUsers();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update user role',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const UserCard = ({ user: userAccount, actions }: { user: UserAccount; actions: React.ReactNode }) => (
     <Card className="p-4">
       <div className="flex items-start justify-between">
@@ -214,12 +315,26 @@ export default function UserManagement() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div>
+            <div className="flex items-center gap-2">
               <span className="text-muted-foreground">Role:</span>
-              <Badge className="ml-2">{userAccount.role}</Badge>
+              <Badge className="ml-1">{userAccount.role}</Badge>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Status:</span>
+              <Badge 
+                className={`ml-1 ${
+                  userAccount.status === 'active' 
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
+                    : userAccount.status === 'pending'
+                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
+                    : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                }`}
+              >
+                {userAccount.status}
+              </Badge>
             </div>
             {userAccount.schoolName && (
-              <div>
+              <div className="col-span-2">
                 <span className="text-muted-foreground">School:</span>
                 <span className="ml-2 font-medium">{userAccount.schoolName}</span>
               </div>
@@ -251,26 +366,236 @@ export default function UserManagement() {
           Back to Dashboard
         </Button>
 
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">User Management</h1>
-          <p className="text-muted-foreground">Manage account requests and user access</p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">User Management</h1>
+            <p className="text-muted-foreground">Manage account requests and user access</p>
+          </div>
+          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-add-user">
+                <Plus className="w-4 h-4 mr-2" />
+                Add New User
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Create New User</DialogTitle>
+                <DialogDescription>
+                  Add a new user account with any role
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreateUser} className="space-y-4">
+                <div>
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={newUserName}
+                    onChange={(e) => setNewUserName(e.target.value)}
+                    placeholder="Enter full name"
+                    required
+                    data-testid="input-new-user-name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    value={newUserPhone}
+                    onChange={(e) => setNewUserPhone(e.target.value)}
+                    placeholder="e.g., 03001234567"
+                    required
+                    data-testid="input-new-user-phone"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={newUserPassword}
+                    onChange={(e) => setNewUserPassword(e.target.value)}
+                    placeholder="Enter password"
+                    required
+                    data-testid="input-new-user-password"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="role">Role</Label>
+                  <Select value={newUserRole} onValueChange={(val) => setNewUserRole(val as UserRole)}>
+                    <SelectTrigger data-testid="select-new-user-role">
+                      <SelectValue placeholder="Select role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {AVAILABLE_ROLES.map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="school">School Name (Optional)</Label>
+                  <Input
+                    id="school"
+                    value={newUserSchool}
+                    onChange={(e) => setNewUserSchool(e.target.value)}
+                    placeholder="For teachers and head teachers"
+                    data-testid="input-new-user-school"
+                  />
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)} className="flex-1">
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={creating} className="flex-1" data-testid="button-create-user-submit">
+                    {creating ? 'Creating...' : 'Create User'}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        <Tabs defaultValue="pending" className="space-y-6">
-          <TabsList>
+        {/* Edit Role Dialog */}
+        <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Change User Role</DialogTitle>
+              <DialogDescription>
+                Update role for {editingUser?.name}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Select
+                value={editingUser?.role || ''}
+                onValueChange={(val) => editingUser && handleEditRole(editingUser.id, val)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select new role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AVAILABLE_ROLES.map((role) => (
+                    <SelectItem key={role.value} value={role.value}>
+                      {role.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Tabs defaultValue="all" className="space-y-6">
+          <TabsList className="flex-wrap">
+            <TabsTrigger value="all">
+              <Users className="w-4 h-4 mr-2" />
+              All Users ({allUsers.length})
+            </TabsTrigger>
             <TabsTrigger value="pending">
               <Users className="w-4 h-4 mr-2" />
-              Pending Requests ({pendingUsers.length})
+              Pending ({pendingUsers.length})
             </TabsTrigger>
             <TabsTrigger value="active">
               <UserCheck className="w-4 h-4 mr-2" />
-              Active Users ({activeUsers.length})
+              Active ({activeUsers.length})
             </TabsTrigger>
             <TabsTrigger value="restricted">
               <UserX className="w-4 h-4 mr-2" />
               Restricted ({restrictedUsers.length})
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="all" className="space-y-4">
+            {loading ? (
+              <p>Loading...</p>
+            ) : allUsers.length === 0 ? (
+              <Card className="p-8 text-center text-muted-foreground">
+                No users found
+              </Card>
+            ) : (
+              allUsers.map((userAccount) => (
+                <UserCard
+                  key={userAccount.id}
+                  user={userAccount}
+                  actions={
+                    <>
+                      {userAccount.status === 'pending' ? (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => handleApprove(userAccount.id)}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleReject(userAccount.id)}
+                          >
+                            <XCircle className="w-4 h-4 mr-1" />
+                            Reject
+                          </Button>
+                        </>
+                      ) : userAccount.status === 'restricted' ? (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => handleUnrestrict(userAccount.id)}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <UserCheck className="w-4 h-4 mr-1" />
+                            Unrestrict
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleRemove(userAccount.id)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Remove
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingUser(userAccount);
+                              setShowEditDialog(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            Edit Role
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleRestrict(userAccount.id)}
+                          >
+                            <UserX className="w-4 h-4 mr-1" />
+                            Restrict
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleRemove(userAccount.id)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Remove
+                          </Button>
+                        </>
+                      )}
+                    </>
+                  }
+                />
+              ))
+            )}
+          </TabsContent>
 
           <TabsContent value="pending" className="space-y-4">
             {loading ? (
@@ -312,6 +637,10 @@ export default function UserManagement() {
           <TabsContent value="active" className="space-y-4">
             {loading ? (
               <p>Loading...</p>
+            ) : activeUsers.length === 0 ? (
+              <Card className="p-8 text-center text-muted-foreground">
+                No active users
+              </Card>
             ) : (
               activeUsers.map((userAccount) => (
                 <UserCard
@@ -319,6 +648,18 @@ export default function UserManagement() {
                   user={userAccount}
                   actions={
                     <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setEditingUser(userAccount);
+                          setShowEditDialog(true);
+                        }}
+                        data-testid={`button-edit-${userAccount.id}`}
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit Role
+                      </Button>
                       <Button
                         size="sm"
                         variant="outline"
