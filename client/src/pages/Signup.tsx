@@ -9,20 +9,20 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 import type { UserRole } from '@/contexts/auth';
 
-// All 16 schools in the district
+// All 16 schools in the district (uppercase)
 const ALL_SCHOOLS = [
-  "GBPS Dhoke Ziarat",
+  "GBPS DHOKE ZIARAT",
   "GES JAWA",
-  "GGES Anwar ul Islam Kamalabad",
-  "GGES Kotha Kallan",
-  "GGES Pind Habtal",
+  "GGES ANWAR UL ISLAM KAMALABAD",
+  "GGES KOTHA KALLAN",
+  "GGES PIND HABTAL",
   "GGPS ARAZI SOHAL",
-  "GGPS Carriage Factory",
-  "GGPS Chakra",
-  "GGPS Dhok Munshi",
+  "GGPS CARRIAGE FACTORY",
+  "GGPS CHAKRA",
+  "GGPS DHOK MUNSHI",
   "GGPS RAIKA MAIRA",
-  "GGPS Westridge 1",
-  "GMPS Khabba Barala",
+  "GGPS WESTRIDGE 1",
+  "GMPS KHABBA BARALA",
   "GPS CHAK DENAL",
   "GPS DHAMIAL",
   "GPS MILLAT ISLAMIA",
