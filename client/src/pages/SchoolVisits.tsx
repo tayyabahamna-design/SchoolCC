@@ -142,7 +142,7 @@ export default function SchoolVisits() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">School</p>
-                    <p className="font-semibold text-foreground">{visit.schoolName}</p>
+                    <p className="font-semibold text-foreground uppercase">{visit.schoolName}</p>
                   </div>
 
                   <div>

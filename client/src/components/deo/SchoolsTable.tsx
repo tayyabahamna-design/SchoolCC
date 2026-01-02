@@ -200,7 +200,7 @@ export function SchoolsTable({ districtId }: SchoolsTableProps) {
                   }`}
                 >
                   <td className="p-3">
-                    <div className="font-medium">{school.name}</div>
+                    <div className="font-medium uppercase">{school.name}</div>
                     <div className="text-sm text-muted-foreground">{school.emisNumber}</div>
                   </td>
 

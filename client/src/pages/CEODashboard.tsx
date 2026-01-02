@@ -535,7 +535,7 @@ export default function CEODashboard() {
                         <span className="text-sm font-bold text-green-600">#{index + 1}</span>
                       </div>
                       <div>
-                        <p className="font-medium text-sm text-foreground">{school.name}</p>
+                        <p className="font-medium text-sm text-foreground uppercase">{school.name}</p>
                         <p className="text-xs text-muted-foreground">{school.teachers} teachers</p>
                       </div>
                     </div>
@@ -565,7 +565,7 @@ export default function CEODashboard() {
                         <AlertCircle className="w-4 h-4 text-orange-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm text-foreground">{school.name}</p>
+                        <p className="font-medium text-sm text-foreground uppercase">{school.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {school.pendingRequests > 2 && `${school.pendingRequests} pending requests`}
                           {school.pendingRequests > 2 && school.complianceScore < 85 && ' • '}
@@ -703,7 +703,7 @@ export default function CEODashboard() {
                       <Building2 className="w-5 h-5 text-primary" />
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-semibold text-sm text-foreground truncate">
+                      <h4 className="font-semibold text-sm text-foreground truncate uppercase">
                         {school.name}
                       </h4>
                       <p className="text-xs text-muted-foreground mt-0.5">

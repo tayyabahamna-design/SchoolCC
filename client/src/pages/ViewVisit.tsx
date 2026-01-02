@@ -109,7 +109,7 @@ export default function ViewVisit() {
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <h1 className="text-2xl font-bold text-foreground ml-4">{visit.schoolName}</h1>
+            <h1 className="text-2xl font-bold text-foreground ml-4 uppercase">{visit.schoolName}</h1>
           </div>
           {canEdit && !editing && (
             <Button onClick={() => setEditing(true)} data-testid="button-edit">
