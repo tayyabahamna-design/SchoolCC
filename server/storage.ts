@@ -1,11 +1,13 @@
 import { db } from "./db";
-import { users, dataRequests, requestAssignees, districts, clusters, schools, notifications, queries, queryResponses, visitLogs, schoolAlbums, albumPhotos, albumComments, albumReactions, announcements } from "@shared/schema";
+import { users, dataRequests, requestAssignees, districts, clusters, schools, notifications, queries, queryResponses, visitLogs, schoolAlbums, albumPhotos, albumComments, albumReactions, announcements, monitoringVisits, mentoringVisits, officeVisits, otherActivities } from "@shared/schema";
 import type {
   InsertUser, User, InsertDataRequest, DataRequest, InsertRequestAssignee, RequestAssignee,
   InsertDistrict, District, InsertCluster, Cluster, InsertSchool, School,
   InsertNotification, Notification, InsertQuery, Query, InsertQueryResponse, QueryResponse,
   InsertVisitLog, VisitLog, InsertSchoolAlbum, SchoolAlbum, InsertAlbumPhoto, AlbumPhoto,
-  InsertAlbumComment, AlbumComment, InsertAlbumReaction, AlbumReaction, InsertAnnouncement, Announcement
+  InsertAlbumComment, AlbumComment, InsertAlbumReaction, AlbumReaction, InsertAnnouncement, Announcement,
+  InsertMonitoringVisit, MonitoringVisit, InsertMentoringVisit, MentoringVisit,
+  InsertOfficeVisit, OfficeVisit, InsertOtherActivity, OtherActivity
 } from "@shared/schema";
 import { eq, and, or, inArray, desc } from "drizzle-orm";
 
@@ -113,6 +115,26 @@ export interface IStorage {
   getActiveAnnouncements(districtId?: string): Promise<Announcement[]>;
   deactivateAnnouncement(id: string): Promise<Announcement>;
   deleteAnnouncement(id: string): Promise<void>;
+
+  // Monitoring Visit operations
+  createMonitoringVisit(visit: InsertMonitoringVisit): Promise<MonitoringVisit>;
+  getMonitoringVisitsByAeo(aeoId: string): Promise<MonitoringVisit[]>;
+  getAllMonitoringVisits(): Promise<MonitoringVisit[]>;
+
+  // Mentoring Visit operations
+  createMentoringVisit(visit: InsertMentoringVisit): Promise<MentoringVisit>;
+  getMentoringVisitsByAeo(aeoId: string): Promise<MentoringVisit[]>;
+  getAllMentoringVisits(): Promise<MentoringVisit[]>;
+
+  // Office Visit operations
+  createOfficeVisit(visit: InsertOfficeVisit): Promise<OfficeVisit>;
+  getOfficeVisitsByAeo(aeoId: string): Promise<OfficeVisit[]>;
+  getAllOfficeVisits(): Promise<OfficeVisit[]>;
+
+  // Other Activity operations
+  createOtherActivity(activity: InsertOtherActivity): Promise<OtherActivity>;
+  getOtherActivitiesByAeo(aeoId: string): Promise<OtherActivity[]>;
+  getAllOtherActivities(): Promise<OtherActivity[]>;
 }
 
 export class DBStorage implements IStorage {
@@ -681,6 +703,82 @@ export class DBStorage implements IStorage {
 
   async deleteAnnouncement(id: string): Promise<void> {
     await db.delete(announcements).where(eq(announcements.id, id));
+  }
+
+  // Monitoring Visit operations
+  async createMonitoringVisit(visit: InsertMonitoringVisit): Promise<MonitoringVisit> {
+    const result = await db.insert(monitoringVisits).values(visit).returning();
+    return result[0];
+  }
+
+  async getMonitoringVisitsByAeo(aeoId: string): Promise<MonitoringVisit[]> {
+    return await db.select()
+      .from(monitoringVisits)
+      .where(eq(monitoringVisits.aeoId, aeoId))
+      .orderBy(desc(monitoringVisits.createdAt));
+  }
+
+  async getAllMonitoringVisits(): Promise<MonitoringVisit[]> {
+    return await db.select()
+      .from(monitoringVisits)
+      .orderBy(desc(monitoringVisits.createdAt));
+  }
+
+  // Mentoring Visit operations
+  async createMentoringVisit(visit: InsertMentoringVisit): Promise<MentoringVisit> {
+    const result = await db.insert(mentoringVisits).values(visit).returning();
+    return result[0];
+  }
+
+  async getMentoringVisitsByAeo(aeoId: string): Promise<MentoringVisit[]> {
+    return await db.select()
+      .from(mentoringVisits)
+      .where(eq(mentoringVisits.aeoId, aeoId))
+      .orderBy(desc(mentoringVisits.createdAt));
+  }
+
+  async getAllMentoringVisits(): Promise<MentoringVisit[]> {
+    return await db.select()
+      .from(mentoringVisits)
+      .orderBy(desc(mentoringVisits.createdAt));
+  }
+
+  // Office Visit operations
+  async createOfficeVisit(visit: InsertOfficeVisit): Promise<OfficeVisit> {
+    const result = await db.insert(officeVisits).values(visit).returning();
+    return result[0];
+  }
+
+  async getOfficeVisitsByAeo(aeoId: string): Promise<OfficeVisit[]> {
+    return await db.select()
+      .from(officeVisits)
+      .where(eq(officeVisits.aeoId, aeoId))
+      .orderBy(desc(officeVisits.createdAt));
+  }
+
+  async getAllOfficeVisits(): Promise<OfficeVisit[]> {
+    return await db.select()
+      .from(officeVisits)
+      .orderBy(desc(officeVisits.createdAt));
+  }
+
+  // Other Activity operations
+  async createOtherActivity(activity: InsertOtherActivity): Promise<OtherActivity> {
+    const result = await db.insert(otherActivities).values(activity).returning();
+    return result[0];
+  }
+
+  async getOtherActivitiesByAeo(aeoId: string): Promise<OtherActivity[]> {
+    return await db.select()
+      .from(otherActivities)
+      .where(eq(otherActivities.aeoId, aeoId))
+      .orderBy(desc(otherActivities.createdAt));
+  }
+
+  async getAllOtherActivities(): Promise<OtherActivity[]> {
+    return await db.select()
+      .from(otherActivities)
+      .orderBy(desc(otherActivities.createdAt));
   }
 }
 
