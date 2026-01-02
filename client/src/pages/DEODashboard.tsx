@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useMockTeacherData } from '@/hooks/useMockTeacherData';
 import { useMockVisits } from '@/hooks/useMockVisits';
-import { useMockAEOActivities } from '@/hooks/useMockAEOActivities';
+import { useActivities } from '@/contexts/activities';
 import { useMockDataRequests } from '@/hooks/useMockDataRequests';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -65,7 +65,7 @@ export default function DEODashboard() {
   const [, navigate] = useLocation();
   const { getSchoolData, getStaffStats, staff: staffMembers } = useMockTeacherData();
   const { getVisitsForUser } = useMockVisits();
-  const { getAllActivities } = useMockAEOActivities();
+  const { getAllActivities } = useActivities();
   const { getRequestsForUser } = useMockDataRequests();
 
   const [showSchoolsModal, setShowSchoolsModal] = useState(false);

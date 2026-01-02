@@ -1,10 +1,10 @@
 import { useAuth } from '@/contexts/auth';
+import { useActivities } from '@/contexts/activities';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useMockDataRequests } from '@/hooks/useMockDataRequests';
 import { useMockTeacherData } from '@/hooks/useMockTeacherData';
 import { useMockVisits } from '@/hooks/useMockVisits';
-import { useMockAEOActivities } from '@/hooks/useMockAEOActivities';
 import { useLocation } from 'wouter';
 import { useState, useEffect } from 'react';
 import { LogOut, Plus, FileText, TrendingUp, Users, Calendar, Building2, MapPin, ClipboardList, CheckSquare, Award, ChevronRight, User, MessageSquare, Edit, School } from 'lucide-react';
@@ -22,7 +22,7 @@ export default function Dashboard() {
   const { getRequestsForUser } = useMockDataRequests();
   const { getTeacherStats, getStaffStats, teachers, leaves } = useMockTeacherData(user?.assignedSchools);
   const { getVisitsForUser } = useMockVisits();
-  const { getAllActivities } = useMockAEOActivities();
+  const { getAllActivities } = useActivities();
 
   const [activeActivityForm, setActiveActivityForm] = useState<string | null>(null);
   const [userRequests, setUserRequests] = useState<any[]>([]);

@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Check, CheckCircle2, Upload, X } from 'lucide-react';
-import { useMockAEOActivities, OfficeVisitData } from '@/hooks/useMockAEOActivities';
+import { useActivities, OfficeVisitData } from '@/contexts/activities';
 import { toast } from 'sonner';
 
 const STEPS = ['Visit Details', 'Activities Completed', 'Comments', 'Evidence (Optional)'];
@@ -24,7 +24,7 @@ interface Props {
 
 export default function OfficeVisitForm({ onClose }: Props) {
   const { user } = useAuth();
-  const { addOfficeVisit } = useMockAEOActivities();
+  const { addOfficeVisit } = useActivities();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<OfficeVisitData>>({

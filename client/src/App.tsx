@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider, useAuth } from "@/contexts/auth";
+import { ActivitiesProvider } from "@/contexts/activities";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import CEODashboard from "@/pages/CEODashboard";
@@ -85,8 +86,10 @@ function App() {
       <ThemeProvider>
         <TooltipProvider>
           <AuthProvider>
-            <Toaster />
-            <Router />
+            <ActivitiesProvider>
+              <Toaster />
+              <Router />
+            </ActivitiesProvider>
           </AuthProvider>
         </TooltipProvider>
       </ThemeProvider>

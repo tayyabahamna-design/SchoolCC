@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, ArrowRight, CheckCircle2, Check, Upload, X } from 'lucide-react';
-import { useMockAEOActivities, OtherActivityData, OTHER_ACTIVITIES_LIST } from '@/hooks/useMockAEOActivities';
+import { useActivities, OtherActivityData, OTHER_ACTIVITIES_LIST } from '@/contexts/activities';
 import { toast } from 'sonner';
 
 const STEPS = [
@@ -28,7 +28,7 @@ interface Props {
 
 export default function OtherActivityForm({ onClose }: Props) {
   const { user } = useAuth();
-  const { addOtherActivity } = useMockAEOActivities();
+  const { addOtherActivity } = useActivities();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<OtherActivityData>>({

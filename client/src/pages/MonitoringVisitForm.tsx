@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, ArrowRight, CheckCircle2, Check, Upload, X } from 'lucide-react';
-import { useMockAEOActivities, MonitoringVisitData } from '@/hooks/useMockAEOActivities';
+import { useActivities, MonitoringVisitData } from '@/contexts/activities';
 import { toast } from 'sonner';
 import { realSchools } from '@/data/realData';
 
@@ -32,7 +32,7 @@ interface Props {
 
 export default function MonitoringVisitForm({ onClose }: Props) {
   const { user } = useAuth();
-  const { addMonitoringVisit } = useMockAEOActivities();
+  const { addMonitoringVisit } = useActivities();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<MonitoringVisitData>>({

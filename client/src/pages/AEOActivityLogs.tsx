@@ -3,12 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useLocation } from 'wouter';
 import { ArrowLeft, Calendar, Clock, FileText, Award, CheckSquare } from 'lucide-react';
-import { useMockAEOActivities } from '@/hooks/useMockAEOActivities';
+import { useActivities } from '@/contexts/activities';
 
 export default function AEOActivityLogs() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
-  const { getAllActivities } = useMockAEOActivities();
+  const { getAllActivities } = useActivities();
   const activities = getAllActivities();
 
   if (!user || user.role !== 'AEO') {

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, ArrowRight, Check, Upload, Trash2, CheckCircle2, Mic, Square, Play, X } from 'lucide-react';
-import { useMockAEOActivities, MentoringVisitData, MentoringVisitArea } from '@/hooks/useMockAEOActivities';
+import { useActivities, MentoringVisitData, MENTORING_AREAS } from '@/contexts/activities';
 import { toast } from 'sonner';
 import { realSchools } from '@/data/realData';
 
@@ -33,7 +33,8 @@ interface Props {
 
 export default function MentoringVisitForm({ onClose }: Props) {
   const { user } = useAuth();
-  const { addMentoringVisit, mentoringAreas } = useMockAEOActivities();
+  const { addMentoringVisit } = useActivities();
+  const mentoringAreas = MENTORING_AREAS;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<MentoringVisitData>>({
