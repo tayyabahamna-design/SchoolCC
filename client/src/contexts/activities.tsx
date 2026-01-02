@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 
 export const OTHER_ACTIVITIES_LIST = [
   'Attending in-service/departmental training',
@@ -302,67 +302,126 @@ interface ActivitiesContextType {
 
 const ActivitiesContext = createContext<ActivitiesContextType | undefined>(undefined);
 
-// Helper functions for localStorage persistence
-const STORAGE_KEYS = {
-  monitoring: 'taleemhub_monitoring_visits',
-  mentoring: 'taleemhub_mentoring_visits',
-  office: 'taleemhub_office_visits',
-  other: 'taleemhub_other_activities',
-};
-
-const loadFromStorage = <T,>(key: string): T[] => {
-  try {
-    const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveToStorage = <T,>(key: string, data: T[]) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (error) {
-    console.error('Failed to save to localStorage:', error);
-  }
-};
-
 export function ActivitiesProvider({ children }: { children: ReactNode }) {
-  const [monitoringVisits, setMonitoringVisits] = useState<MonitoringVisitData[]>(() => loadFromStorage(STORAGE_KEYS.monitoring));
-  const [mentoringVisits, setMentoringVisits] = useState<MentoringVisitData[]>(() => loadFromStorage(STORAGE_KEYS.mentoring));
-  const [officeVisits, setOfficeVisits] = useState<OfficeVisitData[]>(() => loadFromStorage(STORAGE_KEYS.office));
-  const [otherActivities, setOtherActivities] = useState<OtherActivityData[]>(() => loadFromStorage(STORAGE_KEYS.other));
+  const [monitoringVisits, setMonitoringVisits] = useState<MonitoringVisitData[]>([]);
+  const [mentoringVisits, setMentoringVisits] = useState<MentoringVisitData[]>([]);
+  const [officeVisits, setOfficeVisits] = useState<OfficeVisitData[]>([]);
+  const [otherActivities, setOtherActivities] = useState<OtherActivityData[]>([]);
 
-  const addMonitoringVisit = useCallback((visit: MonitoringVisitData) => {
-    setMonitoringVisits((prev) => {
-      const updated = [...prev, visit];
-      saveToStorage(STORAGE_KEYS.monitoring, updated);
-      return updated;
-    });
+  // Load activities from the API on mount
+  useEffect(() => {
+    const loadActivities = async () => {
+      try {
+        const [monitoringRes, mentoringRes, officeRes, otherRes] = await Promise.all([
+          fetch('/api/activities/monitoring'),
+          fetch('/api/activities/mentoring'),
+          fetch('/api/activities/office'),
+          fetch('/api/activities/other'),
+        ]);
+
+        if (monitoringRes.ok) {
+          const data = await monitoringRes.json();
+          setMonitoringVisits(data);
+        }
+        if (mentoringRes.ok) {
+          const data = await mentoringRes.json();
+          setMentoringVisits(data);
+        }
+        if (officeRes.ok) {
+          const data = await officeRes.json();
+          setOfficeVisits(data);
+        }
+        if (otherRes.ok) {
+          const data = await otherRes.json();
+          setOtherActivities(data);
+        }
+      } catch (error) {
+        console.error('Failed to load activities:', error);
+      }
+    };
+
+    loadActivities();
   }, []);
 
-  const addMentoringVisit = useCallback((visit: MentoringVisitData) => {
-    setMentoringVisits((prev) => {
-      const updated = [...prev, visit];
-      saveToStorage(STORAGE_KEYS.mentoring, updated);
-      return updated;
-    });
+  const addMonitoringVisit = useCallback(async (visit: MonitoringVisitData) => {
+    try {
+      const response = await fetch('/api/activities/monitoring', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(visit),
+      });
+      if (response.ok) {
+        const savedVisit = await response.json();
+        setMonitoringVisits((prev) => [...prev, savedVisit]);
+      } else {
+        console.error('Failed to save monitoring visit');
+        // Still add to local state for UI update
+        setMonitoringVisits((prev) => [...prev, visit]);
+      }
+    } catch (error) {
+      console.error('Error saving monitoring visit:', error);
+      setMonitoringVisits((prev) => [...prev, visit]);
+    }
   }, []);
 
-  const addOfficeVisit = useCallback((visit: OfficeVisitData) => {
-    setOfficeVisits((prev) => {
-      const updated = [...prev, visit];
-      saveToStorage(STORAGE_KEYS.office, updated);
-      return updated;
-    });
+  const addMentoringVisit = useCallback(async (visit: MentoringVisitData) => {
+    try {
+      const response = await fetch('/api/activities/mentoring', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(visit),
+      });
+      if (response.ok) {
+        const savedVisit = await response.json();
+        setMentoringVisits((prev) => [...prev, savedVisit]);
+      } else {
+        console.error('Failed to save mentoring visit');
+        setMentoringVisits((prev) => [...prev, visit]);
+      }
+    } catch (error) {
+      console.error('Error saving mentoring visit:', error);
+      setMentoringVisits((prev) => [...prev, visit]);
+    }
   }, []);
 
-  const addOtherActivity = useCallback((activity: OtherActivityData) => {
-    setOtherActivities((prev) => {
-      const updated = [...prev, activity];
-      saveToStorage(STORAGE_KEYS.other, updated);
-      return updated;
-    });
+  const addOfficeVisit = useCallback(async (visit: OfficeVisitData) => {
+    try {
+      const response = await fetch('/api/activities/office', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(visit),
+      });
+      if (response.ok) {
+        const savedVisit = await response.json();
+        setOfficeVisits((prev) => [...prev, savedVisit]);
+      } else {
+        console.error('Failed to save office visit');
+        setOfficeVisits((prev) => [...prev, visit]);
+      }
+    } catch (error) {
+      console.error('Error saving office visit:', error);
+      setOfficeVisits((prev) => [...prev, visit]);
+    }
+  }, []);
+
+  const addOtherActivity = useCallback(async (activity: OtherActivityData) => {
+    try {
+      const response = await fetch('/api/activities/other', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(activity),
+      });
+      if (response.ok) {
+        const savedActivity = await response.json();
+        setOtherActivities((prev) => [...prev, savedActivity]);
+      } else {
+        console.error('Failed to save other activity');
+        setOtherActivities((prev) => [...prev, activity]);
+      }
+    } catch (error) {
+      console.error('Error saving other activity:', error);
+      setOtherActivities((prev) => [...prev, activity]);
+    }
   }, []);
 
   const getAllActivities = useCallback(() => {
