@@ -260,6 +260,13 @@ export default function Login() {
                 Don't have an account? Create Account
               </button>
             </div>
+
+            {/* Powered by Taleemabad */}
+            <div className="mt-6 text-center">
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                Powered by <span className="font-semibold text-purple-600 dark:text-purple-400">Taleemabad</span>
+              </p>
+            </div>
           </div>
         </Card>
 
