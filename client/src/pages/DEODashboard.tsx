@@ -77,8 +77,15 @@ export default function DEODashboard() {
   const [showMenuSidebar, setShowMenuSidebar] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Handle redirect in useEffect to avoid updating state during render
+  useEffect(() => {
+    if (!user || user.role !== 'DEO') {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
+  // Return null while redirecting
   if (!user || user.role !== 'DEO') {
-    navigate('/');
     return null;
   }
 

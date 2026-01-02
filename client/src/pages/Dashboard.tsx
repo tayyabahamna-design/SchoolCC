@@ -29,6 +29,22 @@ export default function Dashboard() {
   const [teacherDialogOpen, setTeacherDialogOpen] = useState(false);
   const [teacherDialogType, setTeacherDialogType] = useState<'total' | 'present' | 'onLeave' | 'absent'>('total');
 
+  // Handle redirects in useEffect to avoid updating state during render
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+      return;
+    }
+    if (user.role === 'CEO') {
+      navigate('/');
+      return;
+    }
+    if (user.role === 'DEO') {
+      navigate('/deo-dashboard');
+      return;
+    }
+  }, [user, navigate]);
+
   useEffect(() => {
     if (user) {
       getRequestsForUser(user.id, user.role).then((requests) => {
@@ -41,19 +57,8 @@ export default function Dashboard() {
     }
   }, [user, getRequestsForUser]);
 
-  if (!user) {
-    navigate('/');
-    return null;
-  }
-
-  // Redirect CEO and DEO to their specific dashboards
-  if (user.role === 'CEO') {
-    navigate('/');
-    return null;
-  }
-
-  if (user.role === 'DEO') {
-    navigate('/deo-dashboard');
+  // Return null while redirecting
+  if (!user || user.role === 'CEO' || user.role === 'DEO') {
     return null;
   }
   
