@@ -707,7 +707,7 @@ export class DBStorage implements IStorage {
 
   // Monitoring Visit operations
   async createMonitoringVisit(visit: InsertMonitoringVisit): Promise<MonitoringVisit> {
-    const result = await db.insert(monitoringVisits).values(visit).returning();
+    const result = await db.insert(monitoringVisits).values(visit as any).returning();
     return result[0];
   }
 
@@ -726,7 +726,7 @@ export class DBStorage implements IStorage {
 
   // Mentoring Visit operations
   async createMentoringVisit(visit: InsertMentoringVisit): Promise<MentoringVisit> {
-    const result = await db.insert(mentoringVisits).values(visit).returning();
+    const result = await db.insert(mentoringVisits).values(visit as any).returning();
     return result[0];
   }
 
@@ -745,7 +745,7 @@ export class DBStorage implements IStorage {
 
   // Office Visit operations
   async createOfficeVisit(visit: InsertOfficeVisit): Promise<OfficeVisit> {
-    const result = await db.insert(officeVisits).values(visit).returning();
+    const result = await db.insert(officeVisits).values(visit as any).returning();
     return result[0];
   }
 
@@ -764,7 +764,7 @@ export class DBStorage implements IStorage {
 
   // Other Activity operations
   async createOtherActivity(activity: InsertOtherActivity): Promise<OtherActivity> {
-    const result = await db.insert(otherActivities).values(activity).returning();
+    const result = await db.insert(otherActivities).values(activity as any).returning();
     return result[0];
   }
 

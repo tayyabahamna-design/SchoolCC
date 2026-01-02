@@ -1128,5 +1128,125 @@ export async function registerRoutes(
     }
   });
 
+  // Monitoring Visit endpoints
+  app.post("/api/activities/monitoring", async (req, res) => {
+    try {
+      const visitData = {
+        ...req.body,
+        submittedAt: req.body.submittedAt ? new Date(req.body.submittedAt) : undefined,
+      };
+      const visit = await storage.createMonitoringVisit(visitData);
+      res.json(visit);
+    } catch (error: any) {
+      console.error("Monitoring visit creation error:", error?.message || error);
+      res.status(400).json({ error: "Failed to create monitoring visit", details: error?.message || String(error) });
+    }
+  });
+
+  app.get("/api/activities/monitoring", async (req, res) => {
+    try {
+      const { aeoId } = req.query;
+      let visits;
+      if (aeoId) {
+        visits = await storage.getMonitoringVisitsByAeo(aeoId as string);
+      } else {
+        visits = await storage.getAllMonitoringVisits();
+      }
+      res.json(visits);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch monitoring visits" });
+    }
+  });
+
+  // Mentoring Visit endpoints
+  app.post("/api/activities/mentoring", async (req, res) => {
+    try {
+      const visitData = {
+        ...req.body,
+        submittedAt: req.body.submittedAt ? new Date(req.body.submittedAt) : undefined,
+      };
+      const visit = await storage.createMentoringVisit(visitData);
+      res.json(visit);
+    } catch (error: any) {
+      console.error("Mentoring visit creation error:", error?.message || error);
+      res.status(400).json({ error: "Failed to create mentoring visit", details: error?.message || String(error) });
+    }
+  });
+
+  app.get("/api/activities/mentoring", async (req, res) => {
+    try {
+      const { aeoId } = req.query;
+      let visits;
+      if (aeoId) {
+        visits = await storage.getMentoringVisitsByAeo(aeoId as string);
+      } else {
+        visits = await storage.getAllMentoringVisits();
+      }
+      res.json(visits);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch mentoring visits" });
+    }
+  });
+
+  // Office Visit endpoints
+  app.post("/api/activities/office", async (req, res) => {
+    try {
+      const visitData = {
+        ...req.body,
+        submittedAt: req.body.submittedAt ? new Date(req.body.submittedAt) : undefined,
+      };
+      const visit = await storage.createOfficeVisit(visitData);
+      res.json(visit);
+    } catch (error: any) {
+      console.error("Office visit creation error:", error?.message || error);
+      res.status(400).json({ error: "Failed to create office visit", details: error?.message || String(error) });
+    }
+  });
+
+  app.get("/api/activities/office", async (req, res) => {
+    try {
+      const { aeoId } = req.query;
+      let visits;
+      if (aeoId) {
+        visits = await storage.getOfficeVisitsByAeo(aeoId as string);
+      } else {
+        visits = await storage.getAllOfficeVisits();
+      }
+      res.json(visits);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch office visits" });
+    }
+  });
+
+  // Other Activity endpoints
+  app.post("/api/activities/other", async (req, res) => {
+    try {
+      const activityData = {
+        ...req.body,
+        submittedAt: req.body.submittedAt ? new Date(req.body.submittedAt) : undefined,
+      };
+      const activity = await storage.createOtherActivity(activityData);
+      res.json(activity);
+    } catch (error: any) {
+      console.error("Other activity creation error:", error?.message || error);
+      res.status(400).json({ error: "Failed to create other activity", details: error?.message || String(error) });
+    }
+  });
+
+  app.get("/api/activities/other", async (req, res) => {
+    try {
+      const { aeoId } = req.query;
+      let activities;
+      if (aeoId) {
+        activities = await storage.getOtherActivitiesByAeo(aeoId as string);
+      } else {
+        activities = await storage.getAllOtherActivities();
+      }
+      res.json(activities);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch other activities" });
+    }
+  });
+
   return httpServer;
 }
