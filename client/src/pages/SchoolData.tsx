@@ -544,154 +544,154 @@ export default function SchoolData() {
                 </div>
               )}
 
-              {/* Visit History & Albums Combined */}
+              {/* Visit History */}
               <div>
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
-                  Visit History & Photo Albums
+                  Visit History
                 </h3>
-                {(loadingHistory || loadingAlbums) ? (
+                {loadingHistory ? (
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="w-6 h-6 animate-spin text-primary" />
                   </div>
-                ) : (visitHistory.length === 0 && schoolAlbums.length === 0) ? (
-                  <p className="text-sm text-muted-foreground py-4">No visits or albums recorded yet.</p>
+                ) : visitHistory.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-4">No visits recorded yet.</p>
                 ) : (
                   <div className="space-y-4">
-                    {/* Visit History */}
-                    {visitHistory.length > 0 && (
-                      <>
-                        <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Recent Visits</h4>
-                        {visitHistory.slice(0, 5).map((visit, index) => (
-                          <div key={visit.id || index} className="border border-border rounded-lg p-4 bg-muted/20">
-                            <div className="flex items-start justify-between mb-3">
-                              <div>
-                                <p className="font-medium text-foreground">{visit.aeoName || 'AEO Visit'}</p>
-                                <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                  <span className="flex items-center gap-1">
-                                    <Calendar className="w-3 h-3" />
-                                    {new Date(visit.visitStartTime).toLocaleDateString()}
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <Clock className="w-3 h-3" />
-                                    {new Date(visit.visitStartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                  </span>
-                                </div>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => generateSummary(visit)}
-                                disabled={generatingSummary}
-                              >
-                                {generatingSummary ? (
-                                  <>
-                                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                                    Generating...
-                                  </>
-                                ) : (
-                                  'AI Summary'
-                                )}
-                              </Button>
+                    {visitHistory.slice(0, 5).map((visit, index) => (
+                      <div key={visit.id || index} className="border border-border rounded-lg p-4 bg-muted/20">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <p className="font-medium text-foreground">{visit.aeoName || 'AEO Visit'}</p>
+                            <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(visit.visitStartTime).toLocaleDateString()}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {new Date(visit.visitStartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
                             </div>
-
-                            {visit.observations && (
-                              <div className="mb-2">
-                                <p className="text-xs font-medium text-muted-foreground mb-1">Observations:</p>
-                                <p className="text-sm text-foreground">{visit.observations}</p>
-                              </div>
-                            )}
-
-                            {visit.voiceNoteUrl && (
-                              <div className="mt-3">
-                                <p className="text-xs font-medium text-muted-foreground mb-2">Voice Note:</p>
-                                <VoiceNotePlayer audioUrl={visit.voiceNoteUrl} size="sm" />
-                              </div>
-                            )}
-
-                            {generatedSummary && (
-                              <div className="mt-3 p-3 bg-primary/10 border border-primary/20 rounded">
-                                <p className="text-xs font-medium text-primary mb-2">AI-Generated Summary:</p>
-                                <p className="text-sm text-foreground whitespace-pre-wrap">{generatedSummary}</p>
-                              </div>
-                            )}
                           </div>
-                        ))}
-
-                        {visitHistory.length > 5 && (
-                          <p className="text-sm text-muted-foreground text-center">
-                            Showing 5 most recent visits out of {visitHistory.length} total
-                          </p>
-                        )}
-                      </>
-                    )}
-
-                    {/* Photo Albums */}
-                    {schoolAlbums.length > 0 && (
-                      <>
-                        <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mt-6 flex items-center gap-2">
-                          <Camera className="w-4 h-4" />
-                          Photo Albums ({schoolAlbums.length})
-                        </h4>
-                        <div className="space-y-4">
-                          {schoolAlbums.map((album) => {
-                            const photos = albumPhotos[album.id] || [];
-                            return (
-                              <div
-                                key={album.id}
-                                className="border border-border rounded-lg p-4 bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer"
-                                onClick={() => {
-                                  setSelectedSchool(null);
-                                  navigate(`/album/${selectedSchool?.id}?albumId=${album.id}`);
-                                }}
-                                data-testid={`album-card-${album.id}`}
-                              >
-                                <div className="flex items-start justify-between mb-2">
-                                  <div>
-                                    <p className="font-medium text-foreground flex items-center gap-2">
-                                      <ImageIcon className="w-4 h-4 text-primary" />
-                                      {album.title}
-                                    </p>
-                                    <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                                      <span className="flex items-center gap-1">
-                                        <Calendar className="w-3 h-3" />
-                                        {new Date(album.createdAt).toLocaleDateString()}
-                                      </span>
-                                      <span className="text-xs">
-                                        by {album.createdByName} ({album.createdByRole})
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                                    {photos.length} photo{photos.length !== 1 ? 's' : ''}
-                                  </span>
-                                </div>
-                                {album.description && (
-                                  <p className="text-sm text-muted-foreground mt-2">{album.description}</p>
-                                )}
-                                {photos.length > 0 && (
-                                  <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
-                                    {photos.slice(0, 4).map((photo) => (
-                                      <img
-                                        key={photo.id}
-                                        src={photo.photoUrl}
-                                        alt={photo.caption || 'Album photo'}
-                                        className="w-16 h-16 object-cover rounded-md flex-shrink-0 border border-border"
-                                      />
-                                    ))}
-                                    {photos.length > 4 && (
-                                      <div className="w-16 h-16 bg-muted/50 rounded-md flex items-center justify-center flex-shrink-0 border border-border">
-                                        <span className="text-xs text-muted-foreground">+{photos.length - 4}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => generateSummary(visit)}
+                            disabled={generatingSummary}
+                          >
+                            {generatingSummary ? (
+                              <>
+                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                Generating...
+                              </>
+                            ) : (
+                              'AI Summary'
+                            )}
+                          </Button>
                         </div>
-                      </>
+
+                        {visit.observations && (
+                          <div className="mb-2">
+                            <p className="text-xs font-medium text-muted-foreground mb-1">Observations:</p>
+                            <p className="text-sm text-foreground">{visit.observations}</p>
+                          </div>
+                        )}
+
+                        {visit.voiceNoteUrl && (
+                          <div className="mt-3">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">Voice Note:</p>
+                            <VoiceNotePlayer audioUrl={visit.voiceNoteUrl} size="sm" />
+                          </div>
+                        )}
+
+                        {generatedSummary && (
+                          <div className="mt-3 p-3 bg-primary/10 border border-primary/20 rounded">
+                            <p className="text-xs font-medium text-primary mb-2">AI-Generated Summary:</p>
+                            <p className="text-sm text-foreground whitespace-pre-wrap">{generatedSummary}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {visitHistory.length > 5 && (
+                      <p className="text-sm text-muted-foreground text-center">
+                        Showing 5 most recent visits out of {visitHistory.length} total
+                      </p>
                     )}
+                  </div>
+                )}
+              </div>
+
+              {/* Photo Albums */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <Camera className="w-5 h-5" />
+                  Photo Albums
+                </h3>
+                {loadingAlbums ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  </div>
+                ) : schoolAlbums.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-4">No albums yet.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {schoolAlbums.map((album) => {
+                      const photos = albumPhotos[album.id] || [];
+                      return (
+                        <div
+                          key={album.id}
+                          className="border border-border rounded-lg p-4 bg-muted/10 hover:bg-muted/20 transition-colors cursor-pointer"
+                          onClick={() => {
+                            setSelectedSchool(null);
+                            navigate(`/album/${selectedSchool?.id}?albumId=${album.id}`);
+                          }}
+                          data-testid={`album-card-${album.id}`}
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <p className="font-medium text-foreground flex items-center gap-2">
+                                <ImageIcon className="w-4 h-4 text-primary" />
+                                {album.title}
+                              </p>
+                              <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {new Date(album.createdAt).toLocaleDateString()}
+                                </span>
+                                <span className="text-xs">
+                                  by {album.createdByName} ({album.createdByRole})
+                                </span>
+                              </div>
+                            </div>
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                              {photos.length} photo{photos.length !== 1 ? 's' : ''}
+                            </span>
+                          </div>
+                          {album.description && (
+                            <p className="text-sm text-muted-foreground mt-2">{album.description}</p>
+                          )}
+                          {photos.length > 0 && (
+                            <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+                              {photos.slice(0, 4).map((photo) => (
+                                <img
+                                  key={photo.id}
+                                  src={photo.photoUrl}
+                                  alt={photo.caption || 'Album photo'}
+                                  className="w-16 h-16 object-cover rounded-md flex-shrink-0 border border-border"
+                                />
+                              ))}
+                              {photos.length > 4 && (
+                                <div className="w-16 h-16 bg-muted/50 rounded-md flex items-center justify-center flex-shrink-0 border border-border">
+                                  <span className="text-xs text-muted-foreground">+{photos.length - 4}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

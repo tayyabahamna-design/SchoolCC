@@ -779,6 +779,15 @@ export async function registerRoutes(
   });
 
   // Album Photos endpoints
+  app.get("/api/albums/:albumId/photos", async (req, res) => {
+    try {
+      const photos = await storage.getAlbumPhotos(req.params.albumId);
+      res.json(photos);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch album photos" });
+    }
+  });
+
   app.post("/api/albums/:albumId/photos", async (req, res) => {
     try {
       const photo = await storage.addPhotoToAlbum({
