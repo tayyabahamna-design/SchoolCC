@@ -6,7 +6,7 @@ import { useMockTeacherData } from '@/hooks/useMockTeacherData';
 import { useMockVisits } from '@/hooks/useMockVisits';
 import { useMockAEOActivities } from '@/hooks/useMockAEOActivities';
 import { useLocation } from 'wouter';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LogOut, Plus, FileText, TrendingUp, Users, Calendar, Building2, MapPin, ClipboardList, CheckSquare, Award, ChevronRight, User, MessageSquare, Edit, School } from 'lucide-react';
 import MonitoringVisitForm from '@/pages/MonitoringVisitForm';
 import MentoringVisitForm from '@/pages/MentoringVisitForm';
@@ -25,6 +25,19 @@ export default function Dashboard() {
   const { getAllActivities } = useMockAEOActivities();
 
   const [activeActivityForm, setActiveActivityForm] = useState<string | null>(null);
+  const [userRequests, setUserRequests] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      getRequestsForUser(user.id, user.role).then((requests) => {
+        if (Array.isArray(requests)) {
+          setUserRequests(requests);
+        }
+      }).catch(() => {
+        setUserRequests([]);
+      });
+    }
+  }, [user, getRequestsForUser]);
 
   if (!user) {
     navigate('/');
@@ -44,12 +57,11 @@ export default function Dashboard() {
   
   const activities = user.role === 'AEO' ? getAllActivities() : null;
 
-  const userRequests = getRequestsForUser(user.id, user.role);
   const pendingCount = userRequests.filter((r) =>
-    r.assignees.some((a) => a.userId === user.id && a.status === 'pending')
+    r.assignees?.some((a: any) => a.userId === user.id && a.status === 'pending')
   ).length;
   const completedCount = userRequests.filter((r) =>
-    r.assignees.some((a) => a.userId === user.id && a.status === 'completed')
+    r.assignees?.some((a: any) => a.userId === user.id && a.status === 'completed')
   ).length;
   const { totalTeachers, presentToday, onLeaveToday, absentToday } = getTeacherStats();
   const staffStats = getStaffStats();
@@ -81,9 +93,14 @@ export default function Dashboard() {
       { label: 'Completed', value: completedCount, icon: TrendingUp, color: 'bg-emerald-50' },
       { label: 'Colleagues Present', value: presentToday, icon: Users, color: 'bg-blue-50' },
     ],
+    COACH: [
+      { label: 'Total Teachers', value: totalTeachers, icon: Users, color: 'bg-blue-50' },
+      { label: 'Present Today', value: presentToday, icon: TrendingUp, color: 'bg-emerald-50' },
+      { label: 'On Leave Today', value: onLeaveToday, icon: Calendar, color: 'bg-amber-50' },
+    ],
   };
 
-  const stats = dashboardStats[user.role];
+  const stats = dashboardStats[user.role as keyof typeof dashboardStats];
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -173,7 +190,7 @@ export default function Dashboard() {
                 </button>
               </>
             )}
-            {(user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DEO' || user.role === 'DDEO') && (
+            {(user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DDEO') && (
               <button
                 onClick={() => navigate('/create-request')}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-violet-100/80 dark:hover:bg-violet-900/30 transition-all duration-300 group press-effect"
@@ -220,7 +237,7 @@ export default function Dashboard() {
               </div>
               <span className="font-medium text-foreground">School Inventory</span>
             </button>
-            {(user.role === 'AEO' || user.role === 'DEO' || user.role === 'DDEO') && (
+            {(user.role === 'AEO' || user.role === 'DDEO') && (
               <button
                 onClick={() => navigate('/school-visits')}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-rose-100/80 dark:hover:bg-rose-900/30 transition-all duration-300 group press-effect"
@@ -358,7 +375,7 @@ export default function Dashboard() {
         {/* Main Content */}
         <div className="px-4 lg:px-8 py-6 lg:py-8">
           {/* DEO Staff Overview */}
-          {user.role === 'DEO' && (
+          {false && (
             <div className="mb-8">
               <h2 className="text-2xl font-bold gradient-text mb-6">Staff Overview</h2>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 stagger-children">
