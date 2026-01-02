@@ -317,11 +317,8 @@ export default function MonitoringVisitForm({ onClose }: Props) {
             data-testid="select-head-teacher"
           >
             <option value="">Select status...</option>
-            <option value="yes">Present</option>
-            <option value="no">Absent</option>
             <option value="on_duty">On Duty</option>
             <option value="leave">On Leave</option>
-            <option value="other">Other</option>
           </select>
         </div>
 
