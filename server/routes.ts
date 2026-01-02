@@ -2,15 +2,23 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { 
+import {
   insertDataRequestSchema, insertRequestAssigneeSchema,
   insertDistrictSchema, insertClusterSchema, insertSchoolSchema, insertUserSchema
 } from "@shared/schema";
+import multer from "multer";
+import { transcribeAudio, generateVisitSummary } from "./lib/claude";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Configure multer for audio file uploads
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  });
+
   // Data Requests endpoints
   app.post("/api/requests", async (req, res) => {
     try {
@@ -1245,6 +1253,75 @@ export async function registerRoutes(
       res.json(activities);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch other activities" });
+    }
+  });
+
+  // AI Voice Note & Summary endpoints
+  app.post("/api/transcribe", upload.single('audio'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No audio file provided" });
+      }
+
+      // Note: Claude cannot directly transcribe audio
+      // This endpoint is a placeholder for Whisper API integration
+      try {
+        const transcription = await transcribeAudio(req.file.buffer);
+        res.json({ transcription });
+      } catch (error: any) {
+        // Return a helpful message about Whisper API integration
+        res.status(501).json({
+          error: "Audio transcription not yet implemented",
+          message: "Please integrate OpenAI Whisper API, AssemblyAI, or Deepgram for audio transcription",
+          details: error.message
+        });
+      }
+    } catch (error: any) {
+      console.error("Transcription error:", error);
+      res.status(500).json({
+        error: "Failed to transcribe audio",
+        details: error.message || String(error)
+      });
+    }
+  });
+
+  app.post("/api/generate-summary", async (req, res) => {
+    try {
+      const {
+        schoolName,
+        visitDate,
+        visitType,
+        attendanceData,
+        facilities,
+        observations,
+        transcribedNotes,
+        recommendations
+      } = req.body;
+
+      if (!schoolName || !visitDate || !visitType) {
+        return res.status(400).json({
+          error: "Missing required fields: schoolName, visitDate, visitType"
+        });
+      }
+
+      const summary = await generateVisitSummary({
+        schoolName,
+        visitDate,
+        visitType,
+        attendanceData,
+        facilities,
+        observations,
+        transcribedNotes,
+        recommendations
+      });
+
+      res.json({ summary });
+    } catch (error: any) {
+      console.error("Summary generation error:", error);
+      res.status(500).json({
+        error: "Failed to generate visit summary",
+        details: error.message || String(error)
+      });
     }
   });
 

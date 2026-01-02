@@ -1,18 +1,75 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useMockTeacherData, SchoolData as SchoolDataType } from '@/hooks/useMockTeacherData';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Download, Users, BookOpen, Droplet, Zap, BarChart3, ImageIcon, FileSpreadsheet, X } from 'lucide-react';
+import { ArrowLeft, Download, Users, BookOpen, Droplet, Zap, BarChart3, ImageIcon, FileSpreadsheet, X, Calendar, Clock, Loader2 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { VoiceNotePlayer } from '@/components/VoiceNotePlayer';
 
 export default function SchoolData() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const { getSchoolData, getSchoolById } = useMockTeacherData(user?.assignedSchools);
   const [selectedSchool, setSelectedSchool] = useState<SchoolDataType | null>(null);
+  const [visitHistory, setVisitHistory] = useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [generatingSummary, setGeneratingSummary] = useState(false);
+  const [generatedSummary, setGeneratedSummary] = useState<string>('');
+
+  // Fetch visit history when school is selected
+  useEffect(() => {
+    if (selectedSchool) {
+      fetchVisitHistory(selectedSchool.id);
+    }
+  }, [selectedSchool]);
+
+  const fetchVisitHistory = async (schoolId: string) => {
+    setLoadingHistory(true);
+    try {
+      const response = await fetch(`/api/visits/history/${schoolId}`);
+      if (response.ok) {
+        const history = await response.json();
+        setVisitHistory(history);
+      }
+    } catch (error) {
+      console.error('Failed to fetch visit history:', error);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const generateSummary = async (visit: any) => {
+    setGeneratingSummary(true);
+    setGeneratedSummary('');
+    try {
+      const response = await fetch('/api/generate-summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          schoolName: selectedSchool?.name,
+          visitDate: new Date(visit.visitStartTime).toISOString(),
+          visitType: 'Monitoring Visit',
+          attendanceData: visit.attendanceData,
+          facilities: visit.facilities,
+          observations: visit.observations,
+          transcribedNotes: visit.voiceNotes,
+          recommendations: visit.recommendations,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setGeneratedSummary(data.summary);
+      }
+    } catch (error) {
+      console.error('Failed to generate summary:', error);
+    } finally {
+      setGeneratingSummary(false);
+    }
+  };
 
   if (!user) return null;
 
@@ -433,6 +490,85 @@ export default function SchoolData() {
                   </div>
                 </div>
               )}
+
+              {/* Visit History */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <Calendar className="w-5 h-5" />
+                  Visit History
+                </h3>
+                {loadingHistory ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                  </div>
+                ) : visitHistory.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-4">No visits recorded yet.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {visitHistory.slice(0, 5).map((visit, index) => (
+                      <div key={visit.id || index} className="border border-border rounded-lg p-4 bg-muted/20">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <p className="font-medium text-foreground">{visit.aeoName || 'AEO Visit'}</p>
+                            <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(visit.visitStartTime).toLocaleDateString()}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {new Date(visit.visitStartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => generateSummary(visit)}
+                            disabled={generatingSummary}
+                          >
+                            {generatingSummary ? (
+                              <>
+                                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                Generating...
+                              </>
+                            ) : (
+                              'AI Summary'
+                            )}
+                          </Button>
+                        </div>
+
+                        {visit.observations && (
+                          <div className="mb-2">
+                            <p className="text-xs font-medium text-muted-foreground mb-1">Observations:</p>
+                            <p className="text-sm text-foreground">{visit.observations}</p>
+                          </div>
+                        )}
+
+                        {visit.voiceNoteUrl && (
+                          <div className="mt-3">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">Voice Note:</p>
+                            <VoiceNotePlayer audioUrl={visit.voiceNoteUrl} size="sm" />
+                          </div>
+                        )}
+
+                        {generatedSummary && (
+                          <div className="mt-3 p-3 bg-primary/10 border border-primary/20 rounded">
+                            <p className="text-xs font-medium text-primary mb-2">AI-Generated Summary:</p>
+                            <p className="text-sm text-foreground whitespace-pre-wrap">{generatedSummary}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+
+                    {visitHistory.length > 5 && (
+                      <p className="text-sm text-muted-foreground text-center">
+                        Showing 5 most recent visits out of {visitHistory.length} total
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Actions */}
               <div className="flex gap-3 pt-4 border-t border-border">

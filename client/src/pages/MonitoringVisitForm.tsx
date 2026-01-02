@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, Check, Upload, X } from 'lucide-re
 import { useActivities, MonitoringVisitData } from '@/contexts/activities';
 import { toast } from 'sonner';
 import { realSchools } from '@/data/realData';
+import { VoiceRecorder } from '@/components/VoiceRecorder';
 
 const SCHOOLS = realSchools.map(school => `${school.name} (${school.emisNumber})`);
 
@@ -15,7 +16,8 @@ const STEPS = [
   { id: 1, label: 'Attendance' },
   { id: 2, label: 'Facilities' },
   { id: 3, label: 'Learning' },
-  { id: 4, label: 'Evidence' },
+  { id: 4, label: 'Voice Notes' },
+  { id: 5, label: 'Evidence' },
 ];
 
 interface UploadedFile {
@@ -44,6 +46,8 @@ export default function MonitoringVisitForm({ onClose }: Props) {
 
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [voiceNoteTranscription, setVoiceNoteTranscription] = useState<string>('');
+  const [voiceNoteBlob, setVoiceNoteBlob] = useState<Blob | null>(null);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -577,10 +581,34 @@ export default function MonitoringVisitForm({ onClose }: Props) {
     </Card>
   );
 
+  const handleVoiceNoteComplete = (transcription: string, audioBlob: Blob) => {
+    setVoiceNoteTranscription(transcription);
+    setVoiceNoteBlob(audioBlob);
+    handleInputChange('voiceNotes', transcription);
+  };
+
+  const renderVoiceNotes = () => (
+    <Card className="p-6">
+      <h2 className="text-lg font-semibold text-foreground mb-4">Voice Notes (Optional)</h2>
+      <p className="text-sm text-muted-foreground mb-6">
+        Record your observations and comments during the visit. Voice notes will be transcribed automatically using AI.
+      </p>
+
+      <VoiceRecorder onTranscriptionComplete={handleVoiceNoteComplete} />
+
+      {voiceNoteTranscription && (
+        <div className="mt-6 p-4 bg-muted rounded-lg border">
+          <h3 className="text-sm font-medium text-foreground mb-2">Transcribed Voice Note</h3>
+          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{voiceNoteTranscription}</p>
+        </div>
+      )}
+    </Card>
+  );
+
   const renderEvidence = () => (
     <Card className="p-6">
       <h2 className="text-lg font-semibold text-foreground mb-4">Evidence (Optional)</h2>
-      
+
       <div className="space-y-4">
         <div className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-6 text-center">
           <Upload className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
@@ -661,6 +689,8 @@ export default function MonitoringVisitForm({ onClose }: Props) {
       case 3:
         return renderLearning();
       case 4:
+        return renderVoiceNotes();
+      case 5:
         return renderEvidence();
       default:
         return null;
