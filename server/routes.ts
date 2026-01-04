@@ -13,6 +13,15 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Helper function to find user by ID or phone number (for session compatibility)
+  async function findUserByIdOrPhone(idOrPhone: string) {
+    let user = await storage.getUser(idOrPhone);
+    if (!user) {
+      user = await storage.getUserByUsername(idOrPhone);
+    }
+    return user;
+  }
+
   // Configure multer for audio file uploads
   const upload = multer({
     storage: multer.memoryStorage(),
@@ -422,8 +431,8 @@ export async function registerRoutes(
     try {
       const { userId } = req.query;
 
-      // Verify DEO permission
-      const user = await storage.getUser(userId as string);
+      // Verify DEO permission (supports both ID and phone number lookup)
+      const user = await findUserByIdOrPhone(userId as string);
       if (!user || user.role !== 'DEO') {
         return res.status(403).json({ error: "Access denied. DEO role required." });
       }
@@ -439,8 +448,8 @@ export async function registerRoutes(
     try {
       const { approverId } = req.body;
 
-      // Verify DEO permission
-      const approver = await storage.getUser(approverId);
+      // Verify DEO permission (supports both ID and phone number lookup)
+      const approver = await findUserByIdOrPhone(approverId);
       if (!approver || approver.role !== 'DEO') {
         return res.status(403).json({ error: "Access denied. DEO role required." });
       }
@@ -456,8 +465,8 @@ export async function registerRoutes(
     try {
       const { approverId } = req.body;
 
-      // Verify DEO permission
-      const approver = await storage.getUser(approverId);
+      // Verify DEO permission (supports both ID and phone number lookup)
+      const approver = await findUserByIdOrPhone(approverId);
       if (!approver || approver.role !== 'DEO') {
         return res.status(403).json({ error: "Access denied. DEO role required." });
       }
@@ -473,8 +482,8 @@ export async function registerRoutes(
     try {
       const { adminId } = req.body;
 
-      // Verify DEO permission
-      const admin = await storage.getUser(adminId);
+      // Verify DEO permission (supports both ID and phone number lookup)
+      const admin = await findUserByIdOrPhone(adminId);
       if (!admin || admin.role !== 'DEO') {
         return res.status(403).json({ error: "Access denied. DEO role required." });
       }
@@ -490,8 +499,8 @@ export async function registerRoutes(
     try {
       const { adminId } = req.body;
 
-      // Verify DEO permission
-      const admin = await storage.getUser(adminId);
+      // Verify DEO permission (supports both ID and phone number lookup)
+      const admin = await findUserByIdOrPhone(adminId);
       if (!admin || admin.role !== 'DEO') {
         return res.status(403).json({ error: "Access denied. DEO role required." });
       }
@@ -506,14 +515,7 @@ export async function registerRoutes(
   // User Profile endpoints
   app.get("/api/users/:id", async (req, res) => {
     try {
-      // Try to find user by ID first
-      let user = await storage.getUser(req.params.id);
-      
-      // If not found by ID, try finding by phone number (for compatibility with different session formats)
-      if (!user) {
-        user = await storage.getUserByUsername(req.params.id);
-      }
-      
+      const user = await findUserByIdOrPhone(req.params.id);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -539,12 +541,8 @@ export async function registerRoutes(
         phoneNumber,
       } = req.body;
 
-      // Find user by ID first, then by phone number (for compatibility)
-      let existingUser = await storage.getUser(req.params.id);
-      if (!existingUser) {
-        existingUser = await storage.getUserByUsername(req.params.id);
-      }
-      
+      // Find user by ID or phone number (for session compatibility)
+      const existingUser = await findUserByIdOrPhone(req.params.id);
       if (!existingUser) {
         return res.status(404).json({ error: "User not found" });
       }
