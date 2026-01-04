@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 import type { UserRole } from '@/contexts/auth';
+import { analytics } from '@/lib/analytics';
 
 // All 16 schools in the district (uppercase)
 const ALL_SCHOOLS = [
@@ -114,11 +115,13 @@ export default function Signup() {
         throw new Error(errorMsg || 'Signup failed');
       }
 
+      analytics.auth.signedUp(formData.role as UserRole, 'phone');
       setSuccess(true);
       setTimeout(() => navigate('/'), 3000);
     } catch (err: any) {
       console.error('Signup error:', err);
       setError(err.message || 'Failed to create account');
+      analytics.error.formValidationError('signup', ['submission']);
     } finally {
       setLoading(false);
     }

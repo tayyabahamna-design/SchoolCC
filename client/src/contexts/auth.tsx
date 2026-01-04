@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { analytics } from '@/lib/analytics';
 
 export type UserRole = 'CEO' | 'DEO' | 'DDEO' | 'AEO' | 'HEAD_TEACHER' | 'TEACHER' | 'COACH';
 
@@ -78,6 +79,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const userData = await response.json();
       setUser(userData);
+      analytics.identify(userData.id, {
+        userId: userData.id,
+        role: userData.role,
+        schoolId: userData.schoolId,
+        clusterId: userData.clusterId,
+        districtId: userData.districtId,
+      });
+      analytics.auth.loggedIn(userData.role, 'admin');
+      analytics.auth.sessionStarted(userData.role);
     } catch (error) {
       console.error('Login failed, using mock authentication:', error);
 
@@ -119,6 +129,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
           console.log('✓ Mock EMIS authentication successful for Head Teacher:', user.name);
           setUser(user);
+          analytics.identify(user.id, {
+            userId: user.id,
+            role: user.role,
+            schoolId: user.schoolId,
+            clusterId: user.clusterId,
+            districtId: user.districtId,
+          });
+          analytics.auth.loggedIn(user.role, 'school');
+          analytics.auth.sessionStarted(user.role);
           return;
         }
 
@@ -137,6 +156,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
           console.log('✓ Mock EMIS authentication successful for Teacher:', user.name);
           setUser(user);
+          analytics.identify(user.id, {
+            userId: user.id,
+            role: user.role,
+            schoolId: user.schoolId,
+            clusterId: user.clusterId,
+            districtId: user.districtId,
+          });
+          analytics.auth.loggedIn(user.role, 'school');
+          analytics.auth.sessionStarted(user.role);
           return;
         }
 
@@ -164,6 +192,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             };
             console.log('✓ Mock authentication successful for AEO:', user.name, 'with schools:', assignedSchoolIds);
             setUser(user);
+            analytics.identify(user.id, {
+              userId: user.id,
+              role: user.role,
+              clusterId: user.clusterId,
+              districtId: user.districtId,
+            });
+            analytics.auth.loggedIn(user.role, 'admin');
+            analytics.auth.sessionStarted(user.role);
             return;
           }
         }
@@ -204,6 +240,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (mockUser && password === 'admin123') {
           console.log('✓ Mock authentication successful for:', mockUser.role);
           setUser(mockUser);
+          analytics.identify(mockUser.id, {
+            userId: mockUser.id,
+            role: mockUser.role,
+            districtId: mockUser.districtId,
+          });
+          analytics.auth.loggedIn(mockUser.role, 'admin');
+          analytics.auth.sessionStarted(mockUser.role);
         } else {
           throw new Error('Invalid credentials - use phone numbers from seed script with password: admin123');
         }
@@ -212,6 +255,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    analytics.auth.loggedOut();
+    analytics.reset();
     setUser(null);
   };
 

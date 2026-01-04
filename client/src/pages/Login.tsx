@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { AlertCircle, School, Check, Crown, Building2, Users, GraduationCap, UserCheck, BookOpen, Shield, TrendingUp, Eye } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { analytics } from '@/lib/analytics';
 
 const roles: { value: UserRole; label: string; description: string; icon: any }[] = [
   { value: 'CEO', label: 'CEO', description: 'System oversight, all data', icon: Crown },
@@ -42,11 +43,11 @@ export default function Login() {
       }
       navigate('/dashboard');
     } catch (err) {
-      if (loginMode === 'school') {
-        setError('Invalid EMIS number or phone number. Please try again.');
-      } else {
-        setError('Invalid phone number or password. Please try again.');
-      }
+      const errorMessage = loginMode === 'school' 
+        ? 'Invalid EMIS number or phone number. Please try again.'
+        : 'Invalid phone number or password. Please try again.';
+      setError(errorMessage);
+      analytics.auth.loginFailed(errorMessage, loginMode === 'school' ? 'school' : 'admin');
     } finally {
       setLoading(false);
     }
