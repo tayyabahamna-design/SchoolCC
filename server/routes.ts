@@ -528,6 +528,7 @@ export async function registerRoutes(
         dateOfJoining,
         qualification,
         profilePicture,
+        phoneNumber,
       } = req.body;
 
       const updateData: any = {
@@ -544,6 +545,7 @@ export async function registerRoutes(
       if (dateOfJoining !== undefined) updateData.dateOfJoining = dateOfJoining;
       if (qualification !== undefined) updateData.qualification = qualification;
       if (profilePicture !== undefined) updateData.profilePicture = profilePicture;
+      if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
 
       const user = await storage.updateUser(req.params.id, updateData);
       res.json({ ...user, password: undefined });
