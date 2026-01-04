@@ -232,7 +232,7 @@ export default function EditSchoolData() {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate(-1)}>
+            <Button variant="ghost" onClick={() => navigate('/dashboard')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
             </Button>
@@ -345,7 +345,7 @@ export default function EditSchoolData() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/dashboard')}
             >
               Cancel
             </Button>

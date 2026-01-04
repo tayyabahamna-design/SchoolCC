@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { useMockActivities } from '@/hooks/useMockActivities';
 import { useLocation, useParams } from 'wouter';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { analytics } from '@/lib/analytics';
 
 const SCHOOLS = [
   { id: 'school-1', name: 'GOVERNMENT PRIMARY SCHOOL, ZONE A' },
@@ -63,6 +64,7 @@ export default function CreateActivity() {
           user.name,
           user.role
         );
+        analytics.album.activityCreated(newActivity.id, selectedSchool, photos.length);
         navigate(`/album/${newActivity.schoolId}`);
       }
     }, 500);

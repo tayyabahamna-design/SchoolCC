@@ -8,6 +8,7 @@ import { useActivities, MonitoringVisitData } from '@/contexts/activities';
 import { toast } from 'sonner';
 import { realSchools } from '@/data/realData';
 import { VoiceRecorder } from '@/components/VoiceRecorder';
+import { analytics } from '@/lib/analytics';
 
 const SCHOOLS = realSchools.map(school => `${school.name.toUpperCase()} (${school.emisNumber})`);
 
@@ -127,14 +128,16 @@ export default function MonitoringVisitForm({ onClose }: Props) {
         url: f.previewUrl || f.name,
       }));
 
+      const visitId = `mon-${Date.now()}`;
       const visit: MonitoringVisitData = {
-        id: `mon-${Date.now()}`,
         ...(dataWithoutId as MonitoringVisitData),
+        id: visitId,
         evidence,
         status: 'submitted',
         submittedAt: new Date(),
       };
       addMonitoringVisit(visit);
+      analytics.visit.submitted(visit.id, 'monitoring', visit.schoolName || '');
       toast.success('Monitoring visit submitted successfully!');
       onClose?.();
     }, 1000);

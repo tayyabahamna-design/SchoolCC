@@ -145,6 +145,9 @@ export const analytics = {
     gpsLocationCaptured: (visitId: string, lat: number, lng: number) => {
       posthog.capture('gps_location_captured', { visit_id: visitId, latitude: lat, longitude: lng });
     },
+    submitted: (visitId: string, visitType: 'monitoring' | 'mentoring' | 'office', schoolName: string) => {
+      posthog.capture('visit_submitted', { visit_id: visitId, visit_type: visitType, school_name: schoolName });
+    },
   },
 
   dataRequest: {
@@ -213,6 +216,9 @@ export const analytics = {
     },
     shared: (albumId: string, shareMethod: string) => {
       posthog.capture('activity_shared', { album_id: albumId, share_method: shareMethod });
+    },
+    activityCreated: (activityId: string, schoolId: string, photoCount: number) => {
+      posthog.capture('activity_created', { activity_id: activityId, school_id: schoolId, photo_count: photoCount });
     },
   },
 

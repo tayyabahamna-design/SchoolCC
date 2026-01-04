@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Check, CheckCircle2, Upload, X } from 'lucide-react';
 import { useActivities, OfficeVisitData } from '@/contexts/activities';
 import { toast } from 'sonner';
+import { analytics } from '@/lib/analytics';
 
 const STEPS = ['Visit Details', 'Activities Completed', 'Comments', 'Evidence (Optional)'];
 
@@ -132,6 +133,7 @@ export default function OfficeVisitForm({ onClose }: Props) {
         submittedAt: new Date(),
       };
       addOfficeVisit(visit);
+      analytics.visit.submitted(visit.id, 'office', 'District Office');
       toast.success('Office visit submitted successfully!');
       onClose?.();
     }, 1000);

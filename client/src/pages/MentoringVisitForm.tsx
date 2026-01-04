@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Check, Upload, Trash2, CheckCircle2, Mic, Square
 import { useActivities, MentoringVisitData, MENTORING_AREAS } from '@/contexts/activities';
 import { toast } from 'sonner';
 import { realSchools } from '@/data/realData';
+import { analytics } from '@/lib/analytics';
 
 const SCHOOLS = realSchools.map(school => `${school.name.toUpperCase()} (${school.emisNumber})`);
 
@@ -169,6 +170,7 @@ export default function MentoringVisitForm({ onClose }: Props) {
         submittedAt: new Date(),
       };
       addMentoringVisit(visit);
+      analytics.visit.submitted(visit.id, 'mentoring', visit.schoolName || '');
       toast.success('Mentoring visit submitted successfully!');
       onClose?.();
     }, 1000);
