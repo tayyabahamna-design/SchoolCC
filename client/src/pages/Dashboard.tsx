@@ -5,16 +5,17 @@ import { Card } from '@/components/ui/card';
 import { useMockDataRequests } from '@/hooks/useMockDataRequests';
 import { useMockTeacherData } from '@/hooks/useMockTeacherData';
 import { useMockVisits } from '@/hooks/useMockVisits';
+import { useDashboardWidgets } from '@/hooks/useDashboardWidgets';
 import { useLocation } from 'wouter';
 import { useState, useEffect } from 'react';
-import { LogOut, Plus, FileText, TrendingUp, Users, Calendar, Building2, MapPin, ClipboardList, CheckSquare, Award, ChevronRight, User, MessageSquare, Edit, School } from 'lucide-react';
+import { LogOut, Plus, FileText, TrendingUp, Users, Calendar, Building2, MapPin, ClipboardList, CheckSquare, Award, ChevronRight, User, MessageSquare, Edit, School, Settings2 } from 'lucide-react';
 import MonitoringVisitForm from '@/pages/MonitoringVisitForm';
 import MentoringVisitForm from '@/pages/MentoringVisitForm';
 import OfficeVisitForm from '@/pages/OfficeVisitForm';
 import OtherActivityForm from '@/pages/OtherActivityForm';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { MetricCard, TeacherDetailsDialog } from '@/components/dashboard';
+import { MetricCard, TeacherDetailsDialog, CustomizeDashboardModal } from '@/components/dashboard';
 import { analytics } from '@/lib/analytics';
 
 export default function Dashboard() {
@@ -29,6 +30,19 @@ export default function Dashboard() {
   const [userRequests, setUserRequests] = useState<any[]>([]);
   const [teacherDialogOpen, setTeacherDialogOpen] = useState(false);
   const [teacherDialogType, setTeacherDialogType] = useState<'total' | 'present' | 'onLeave' | 'absent'>('total');
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false);
+
+  const {
+    widgets,
+    visibleWidgets,
+    draggedWidget,
+    toggleWidget,
+    moveWidget,
+    resetToDefault,
+    handleDragStart,
+    handleDragEnd,
+    handleDragOver,
+  } = useDashboardWidgets(user?.id || 'guest', user?.role || 'TEACHER');
 
   // Handle redirects in useEffect to avoid updating state during render
   useEffect(() => {
@@ -65,6 +79,231 @@ export default function Dashboard() {
   }
   
   const activities = user.role === 'AEO' ? getAllActivities() : null;
+
+  const renderWidget = (widgetId: string) => {
+    switch (widgetId) {
+      case 'stats':
+        if (!stats) return null;
+        return (
+          <div key="stats" className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 stagger-children" data-testid="widget-stats">
+            {stats.map((stat, idx) => {
+              const gradients = [
+                'from-blue-500 to-blue-600',
+                'from-emerald-500 to-emerald-600',
+                'from-amber-500 to-amber-600',
+              ];
+              const getClickHandler = () => {
+                if ('taskType' in stat) return () => navigate('/data-requests');
+                if ('teacherType' in stat) return () => openTeacherDialog(stat.teacherType);
+                return undefined;
+              };
+              return (
+                <MetricCard
+                  key={idx}
+                  value={stat.value}
+                  label={stat.label}
+                  icon={stat.icon}
+                  iconGradient={gradients[idx % 3]}
+                  size="xl"
+                  onClick={getClickHandler()}
+                  className="hover-lift card-shine"
+                />
+              );
+            })}
+          </div>
+        );
+      
+      case 'activities':
+        if (user.role !== 'AEO' || !activities) return null;
+        return (
+          <div key="activities" data-testid="widget-activities">
+            <h2 className="text-2xl font-bold gradient-text mb-6">Your Activities</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children">
+              <MetricCard
+                value={activities.monitoring.length}
+                label="Monitoring"
+                icon={FileText}
+                iconGradient="from-blue-400 to-blue-600"
+                size="xl"
+                onClick={() => setActiveActivityForm('monitoring')}
+                className="hover-lift card-shine border-blue-200/50 dark:border-blue-800/50"
+                data-testid="card-monitoring-activity"
+              />
+              <MetricCard
+                value={activities.mentoring.length}
+                label="Mentoring"
+                icon={Award}
+                iconGradient="from-purple-400 to-purple-600"
+                size="xl"
+                onClick={() => setActiveActivityForm('mentoring')}
+                className="hover-lift card-shine border-purple-200/50 dark:border-purple-800/50"
+                data-testid="card-mentoring-activity"
+              />
+              <MetricCard
+                value={activities.office.length}
+                label="Office"
+                icon={Building2}
+                iconGradient="from-emerald-400 to-emerald-600"
+                size="xl"
+                onClick={() => setActiveActivityForm('office')}
+                className="hover-lift card-shine border-emerald-200/50 dark:border-emerald-800/50"
+                data-testid="card-office-activity"
+              />
+              <MetricCard
+                value={activities.other.length}
+                label="Other"
+                icon={CheckSquare}
+                iconGradient="from-slate-400 to-slate-600"
+                size="xl"
+                onClick={() => setActiveActivityForm('other-activity')}
+                className="hover-lift card-shine border-slate-200/50 dark:border-slate-700/50"
+                data-testid="card-other-activity"
+              />
+            </div>
+          </div>
+        );
+      
+      case 'requests':
+        return (
+          <div key="requests" data-testid="widget-requests">
+            <h2 className="text-2xl font-bold gradient-text mb-6">Recent Activity</h2>
+            {userRequests.length === 0 ? (
+              <Card className="p-12 text-center bg-card border border-border">
+                <p className="text-lg text-muted-foreground">No requests yet</p>
+              </Card>
+            ) : (
+              <Card className="p-0 overflow-hidden bg-card border border-border">
+                <ul className="divide-y divide-border">
+                  {userRequests.slice(0, 5).map((req, idx) => (
+                    <li
+                      key={req.id}
+                      className="flex items-center justify-between p-6 hover:bg-amber-50/50 dark:hover:bg-amber-900/20 transition-all duration-300 cursor-pointer group"
+                      onClick={() => navigate(`/request/${req.id}`)}
+                      style={{animationDelay: `${idx * 0.1}s`}}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                          <FileText className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-lg text-foreground group-hover:text-amber-700 transition-colors">{req.title}</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Due: {req.dueDate.toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:text-amber-700 dark:hover:text-amber-400 hover:border-amber-300 dark:hover:border-amber-700"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/request/${req.id}`);
+                        }}
+                        data-testid={`button-view-request-${req.id}`}
+                      >
+                        View
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            )}
+          </div>
+        );
+      
+      case 'staff':
+        return (
+          <div key="staff" data-testid="widget-staff">
+            <h2 className="text-2xl font-bold gradient-text mb-6">Staff Overview</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 stagger-children">
+              <MetricCard
+                value={staffStats.aeos.total}
+                label="AEOs"
+                icon={Award}
+                iconGradient="from-purple-500 to-purple-600"
+                size="lg"
+                breakdown={[
+                  { label: 'Present', value: staffStats.aeos.present, valueColor: 'text-emerald-600', showAsBadge: false },
+                  { label: 'On Leave', value: staffStats.aeos.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
+                ]}
+                className="hover-lift card-shine"
+              />
+              <MetricCard
+                value={staffStats.headTeachers.total}
+                label="Head Teachers"
+                icon={Building2}
+                iconGradient="from-teal-500 to-teal-600"
+                size="lg"
+                breakdown={[
+                  { label: 'Present', value: staffStats.headTeachers.present, valueColor: 'text-emerald-600', showAsBadge: false },
+                  { label: 'On Leave', value: staffStats.headTeachers.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
+                ]}
+                className="hover-lift card-shine"
+              />
+              <MetricCard
+                value={staffStats.teachers.total}
+                label="Teachers"
+                icon={Users}
+                iconGradient="from-blue-500 to-blue-600"
+                size="lg"
+                breakdown={[
+                  { label: 'Present', value: staffStats.teachers.present, valueColor: 'text-emerald-600', showAsBadge: false },
+                  { label: 'On Leave', value: staffStats.teachers.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
+                ]}
+                className="hover-lift card-shine"
+              />
+            </div>
+          </div>
+        );
+      
+      case 'visits':
+        return (
+          <div key="visits" data-testid="widget-visits">
+            <h2 className="text-2xl font-bold gradient-text mb-6">Recent Visits</h2>
+            <Card className="p-6 bg-card border border-border">
+              <div className="text-center py-8">
+                <MapPin className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">View your school visits</p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => navigate('/school-visits')}
+                  data-testid="button-view-all-visits"
+                >
+                  View All Visits
+                </Button>
+              </div>
+            </Card>
+          </div>
+        );
+      
+      case 'calendar':
+        return (
+          <div key="calendar" data-testid="widget-calendar">
+            <h2 className="text-2xl font-bold gradient-text mb-6">Leave Calendar</h2>
+            <Card className="p-6 bg-card border border-border">
+              <div className="text-center py-8">
+                <Calendar className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">Manage leaves and attendance</p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => navigate('/calendar')}
+                  data-testid="button-view-calendar"
+                >
+                  Open Calendar
+                </Button>
+              </div>
+            </Card>
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
 
   const pendingCount = userRequests.filter((r) =>
     r.assignees?.some((a: any) => a.userId === user.id && a.status === 'pending')
@@ -380,6 +619,16 @@ export default function Dashboard() {
               <p className="text-base text-muted-foreground mt-1">Here's your dashboard overview</p>
             </div>
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCustomizeModal(true)}
+                className="gap-2"
+                data-testid="button-customize-dashboard"
+              >
+                <Settings2 className="w-4 h-4" />
+                Customize
+              </Button>
               <ThemeToggle />
               <NotificationBell />
             </div>
@@ -388,82 +637,10 @@ export default function Dashboard() {
 
         {/* Main Content */}
         <div className="px-4 lg:px-8 py-6 lg:py-8">
-          {/* DEO Staff Overview */}
-          {false && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold gradient-text mb-6">Staff Overview</h2>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 stagger-children">
-                <MetricCard
-                  value={staffStats.aeos.total}
-                  label="AEOs"
-                  icon={Award}
-                  iconGradient="from-purple-500 to-purple-600"
-                  size="lg"
-                  breakdown={[
-                    { label: 'Present', value: staffStats.aeos.present, valueColor: 'text-emerald-600', showAsBadge: false },
-                    { label: 'On Leave', value: staffStats.aeos.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
-                  ]}
-                  className="hover-lift card-shine"
-                />
-
-                <MetricCard
-                  value={staffStats.headTeachers.total}
-                  label="Head Teachers"
-                  icon={Building2}
-                  iconGradient="from-teal-500 to-teal-600"
-                  size="lg"
-                  breakdown={[
-                    { label: 'Present', value: staffStats.headTeachers.present, valueColor: 'text-emerald-600', showAsBadge: false },
-                    { label: 'On Leave', value: staffStats.headTeachers.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
-                  ]}
-                  className="hover-lift card-shine"
-                />
-
-                <MetricCard
-                  value={staffStats.teachers.total}
-                  label="Teachers"
-                  icon={Users}
-                  iconGradient="from-blue-500 to-blue-600"
-                  size="lg"
-                  breakdown={[
-                    { label: 'Present', value: staffStats.teachers.present, valueColor: 'text-emerald-600', showAsBadge: false },
-                    { label: 'On Leave', value: staffStats.teachers.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
-                  ]}
-                  className="hover-lift card-shine"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Stats Grid - For non-DEO roles */}
-          {stats && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 mb-8 stagger-children">
-              {stats.map((stat, idx) => {
-                const gradients = [
-                  'from-blue-500 to-blue-600',
-                  'from-emerald-500 to-emerald-600',
-                  'from-amber-500 to-amber-600',
-                ];
-                const getClickHandler = () => {
-                  if ('taskType' in stat) return () => navigate('/data-requests');
-                  if ('teacherType' in stat) return () => openTeacherDialog(stat.teacherType);
-                  return undefined;
-                };
-                return (
-                  <MetricCard
-                    key={idx}
-                    value={stat.value}
-                    label={stat.label}
-                    icon={stat.icon}
-                    iconGradient={gradients[idx % 3]}
-                    size="xl"
-                    onClick={getClickHandler()}
-                    className="hover-lift card-shine"
-                  />
-                );
-              })}
-            </div>
-          )}
+          {/* Customizable Widgets Container - renders in user-defined order */}
+          <div className="space-y-8">
+            {visibleWidgets.map(widget => renderWidget(widget.id))}
+          </div>
 
           <TeacherDetailsDialog
             open={teacherDialogOpen}
@@ -472,103 +649,6 @@ export default function Dashboard() {
             teachers={teachers}
             leaves={leaves}
           />
-
-          {/* AEO Activity Summary */}
-        {user.role === 'AEO' && activities && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold gradient-text mb-6">Your Activities</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children">
-              <MetricCard
-                value={activities.monitoring.length}
-                label="Monitoring"
-                icon={FileText}
-                iconGradient="from-blue-400 to-blue-600"
-                size="xl"
-                onClick={() => setActiveActivityForm('monitoring')}
-                className="hover-lift card-shine border-blue-200/50 dark:border-blue-800/50"
-                data-testid="card-monitoring-activity"
-              />
-              <MetricCard
-                value={activities.mentoring.length}
-                label="Mentoring"
-                icon={Award}
-                iconGradient="from-purple-400 to-purple-600"
-                size="xl"
-                onClick={() => setActiveActivityForm('mentoring')}
-                className="hover-lift card-shine border-purple-200/50 dark:border-purple-800/50"
-                data-testid="card-mentoring-activity"
-              />
-              <MetricCard
-                value={activities.office.length}
-                label="Office"
-                icon={Building2}
-                iconGradient="from-emerald-400 to-emerald-600"
-                size="xl"
-                onClick={() => setActiveActivityForm('office')}
-                className="hover-lift card-shine border-emerald-200/50 dark:border-emerald-800/50"
-                data-testid="card-office-activity"
-              />
-              <MetricCard
-                value={activities.other.length}
-                label="Other"
-                icon={CheckSquare}
-                iconGradient="from-slate-400 to-slate-600"
-                size="xl"
-                onClick={() => setActiveActivityForm('other-activity')}
-                className="hover-lift card-shine border-slate-200/50 dark:border-slate-700/50"
-                data-testid="card-other-activity"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Recent Requests */}
-        <div>
-          <h2 className="text-2xl font-bold gradient-text mb-6">Recent Activity</h2>
-          {userRequests.length === 0 ? (
-            <Card className="p-12 text-center bg-card border border-border">
-              <p className="text-lg text-muted-foreground">No requests yet</p>
-            </Card>
-          ) : (
-            <Card className="p-0 overflow-hidden bg-card border border-border">
-              <ul className="divide-y divide-border">
-                {userRequests.slice(0, 5).map((req, idx) => (
-                  <li
-                    key={req.id}
-                    className="flex items-center justify-between p-6 hover:bg-amber-50/50 dark:hover:bg-amber-900/20 transition-all duration-300 cursor-pointer group"
-                    onClick={() => navigate(`/request/${req.id}`)}
-                    style={{animationDelay: `${idx * 0.1}s`}}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                        <FileText className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-lg text-foreground group-hover:text-amber-700 transition-colors">{req.title}</p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Due: {req.dueDate.toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-amber-50 dark:hover:bg-amber-900/30 hover:text-amber-700 dark:hover:text-amber-400 hover:border-amber-300 dark:hover:border-amber-700"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/request/${req.id}`);
-                      }}
-                      data-testid={`button-view-request-${req.id}`}
-                    >
-                      View
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
-        </div>
         </div>
       </div>
 
@@ -700,6 +780,16 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Customize Dashboard Modal */}
+      <CustomizeDashboardModal
+        open={showCustomizeModal}
+        onClose={() => setShowCustomizeModal(false)}
+        widgets={widgets}
+        onToggleWidget={toggleWidget}
+        onMoveWidget={moveWidget}
+        onResetToDefault={resetToDefault}
+      />
     </div>
   );
 }
