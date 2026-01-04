@@ -34,6 +34,7 @@ router.get("/:id", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   try {
     const userId = req.params.id;
+    console.log("PATCH /api/users/:id - Request body:", JSON.stringify(req.body));
     const {
       name,
       fatherName,
