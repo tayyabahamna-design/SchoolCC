@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { realSchools } from '@/data/realData';
 import { analytics } from '@/lib/analytics';
 
-const SCHOOLS = realSchools.map(school => `${school.name.toUpperCase()} (${school.emisNumber})`);
+const getAllSchools = () => realSchools.map(school => `${school.name.toUpperCase()} (${school.emisNumber})`);
 
 const SUBJECTS = ['English', 'Urdu', 'Mathematics', 'Science', 'Social Studies', 'General'];
 
@@ -36,6 +36,24 @@ export default function MentoringVisitForm({ onClose }: Props) {
   const { user } = useAuth();
   const { addMentoringVisit } = useActivities();
   const mentoringAreas = MENTORING_AREAS;
+
+  // Get schools - filter by assigned schools for AEO users
+  const getSchools = () => {
+    const allSchools = getAllSchools();
+    if (user?.role === 'AEO' && user?.assignedSchools && user.assignedSchools.length > 0) {
+      // assignedSchools contains names like "GBPS DHOKE ZIARAT"
+      // allSchools contains display strings like "GBPS DHOKE ZIARAT (37330XXX)"
+      // Match by checking if display string starts with the assigned school name (trimmed and normalized)
+      return allSchools.filter(schoolDisplay => 
+        user.assignedSchools!.some(assignedName => 
+          schoolDisplay.toUpperCase().trim().startsWith(assignedName.toUpperCase().trim())
+        )
+      );
+    }
+    return allSchools;
+  };
+  
+  const SCHOOLS = getSchools();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<MentoringVisitData>>({

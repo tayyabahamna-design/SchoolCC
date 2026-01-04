@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,7 +10,7 @@ import { realSchools } from '@/data/realData';
 import { VoiceRecorder } from '@/components/VoiceRecorder';
 import { analytics } from '@/lib/analytics';
 
-const SCHOOLS = realSchools.map(school => `${school.name.toUpperCase()} (${school.emisNumber})`);
+const getAllSchools = () => realSchools.map(school => `${school.name.toUpperCase()} (${school.emisNumber})`);
 
 const STEPS = [
   { id: 0, label: 'Basic Info' },
@@ -37,13 +37,43 @@ export default function MonitoringVisitForm({ onClose }: Props) {
   const { user } = useAuth();
   const { addMonitoringVisit } = useActivities();
 
+  // Get schools - filter by assigned schools for AEO users
+  const getSchools = () => {
+    const allSchools = getAllSchools();
+    if (user?.role === 'AEO' && user?.assignedSchools && user.assignedSchools.length > 0) {
+      // assignedSchools contains names like "GBPS DHOKE ZIARAT"
+      // allSchools contains display strings like "GBPS DHOKE ZIARAT (37330XXX)"
+      // Match by checking if display string starts with the assigned school name (trimmed and normalized)
+      return allSchools.filter(schoolDisplay => 
+        user.assignedSchools!.some(assignedName => 
+          schoolDisplay.toUpperCase().trim().startsWith(assignedName.toUpperCase().trim())
+        )
+      );
+    }
+    return allSchools;
+  };
+  
+  const SCHOOLS = getSchools();
+
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Partial<MonitoringVisitData>>({
+  const [formData, setFormData] = useState<Partial<MonitoringVisitData>>(() => ({
     aeoName: user?.name || '',
+    markaz: user?.markaz || '',
     visitDate: new Date().toISOString().split('T')[0],
     status: 'draft',
     evidence: [],
-  });
+  }));
+
+  // Sync formData with user data when user loads asynchronously
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        aeoName: user.name || prev.aeoName,
+        markaz: user.markaz || prev.markaz,
+      }));
+    }
+  }, [user]);
 
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -132,6 +162,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
       const visit: MonitoringVisitData = {
         ...(dataWithoutId as MonitoringVisitData),
         id: visitId,
+        markaz: user?.markaz || formData.markaz || '',
         evidence,
         status: 'submitted',
         submittedAt: new Date(),
@@ -216,12 +247,18 @@ export default function MonitoringVisitForm({ onClose }: Props) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-muted-foreground mb-2">Markaz</label>
-          <Input
-            placeholder="Enter markaz name"
-            value={formData.markaz || ''}
-            onChange={(e) => handleInputChange('markaz', e.target.value)}
-            data-testid="input-markaz"
-          />
+          {user?.markaz ? (
+            <div className="px-3 py-2 border border-input rounded-md bg-muted text-foreground" data-testid="display-markaz">
+              {user.markaz}
+            </div>
+          ) : (
+            <Input
+              placeholder="Enter markaz name"
+              value={formData.markaz || ''}
+              onChange={(e) => handleInputChange('markaz', e.target.value)}
+              data-testid="input-markaz"
+            />
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-muted-foreground mb-2">
