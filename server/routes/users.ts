@@ -45,6 +45,7 @@ router.patch("/:id", async (req, res) => {
       dateOfJoining,
       qualification,
       profilePicture,
+      phoneNumber,
     } = req.body;
 
     // Build update object with only provided fields
@@ -63,6 +64,7 @@ router.patch("/:id", async (req, res) => {
     if (dateOfJoining !== undefined) updateData.dateOfJoining = dateOfJoining;
     if (qualification !== undefined) updateData.qualification = qualification;
     if (profilePicture !== undefined) updateData.profilePicture = profilePicture;
+    if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
 
     const updatedUser = await db
       .update(users)

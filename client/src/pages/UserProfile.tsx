@@ -303,7 +303,17 @@ export default function UserProfile() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Phone Number</Label>
-                <p className="mt-1 text-sm">{profile.phoneNumber}</p>
+                {editMode && profile.role === 'DEO' ? (
+                  <Input
+                    type="tel"
+                    data-testid="input-phone-number"
+                    value={editedProfile.phoneNumber || ""}
+                    onChange={(e) => handleChange("phoneNumber", e.target.value)}
+                    placeholder="Enter phone number"
+                  />
+                ) : (
+                  <p className="mt-1 text-sm" data-testid="text-phone-number">{profile.phoneNumber}</p>
+                )}
               </div>
 
               <div>
