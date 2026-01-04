@@ -12,6 +12,7 @@ import { useLocation } from 'wouter';
 import { Plus, X, ArrowLeft, Mic, Square, Play } from 'lucide-react';
 import { realAEOs, realSchools, realHeadmasters } from '@/data/realData';
 import { analytics } from '@/lib/analytics';
+import { useToast } from '@/hooks/use-toast';
 
 const FIELD_TYPES = ['text', 'number', 'file', 'photo', 'voice_note'];
 
@@ -34,6 +35,7 @@ export default function CreateRequest() {
   const { createForm } = useMockCollaborativeForms();
   const { getSchoolById } = useMockTeacherData();
   const { startRecording, stopRecording, playRecording, deleteRecording, hasRecording } = useVoiceRecorder();
+  const { toast } = useToast();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -226,6 +228,11 @@ export default function CreateRequest() {
       navigate('/data-requests');
     } catch (error) {
       console.error('Error creating request:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create request. Please try again.',
+        variant: 'destructive',
+      });
     }
   };
 

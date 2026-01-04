@@ -119,7 +119,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    setTimeout(() => {
+    try {
       const { id: _, ...dataWithoutId } = formData;
       const evidence = uploadedFiles.map((f) => ({
         id: f.id,
@@ -136,11 +136,16 @@ export default function MonitoringVisitForm({ onClose }: Props) {
         status: 'submitted',
         submittedAt: new Date(),
       };
-      addMonitoringVisit(visit);
+      await addMonitoringVisit(visit);
       analytics.visit.submitted(visit.id, 'monitoring', visit.schoolName || '');
       toast.success('Monitoring visit submitted successfully!');
       onClose?.();
-    }, 1000);
+    } catch (error) {
+      console.error('Error submitting monitoring visit:', error);
+      toast.error('Failed to submit visit. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isStepComplete = (stepIndex: number): boolean => {

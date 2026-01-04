@@ -142,7 +142,7 @@ export default function MentoringVisitForm({ onClose }: Props) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    setTimeout(() => {
+    try {
       const evidence = uploadedFiles.map((f) => ({
         id: f.id,
         name: f.name,
@@ -169,11 +169,16 @@ export default function MentoringVisitForm({ onClose }: Props) {
         status: 'submitted',
         submittedAt: new Date(),
       };
-      addMentoringVisit(visit);
+      await addMentoringVisit(visit);
       analytics.visit.submitted(visit.id, 'mentoring', visit.schoolName || '');
       toast.success('Mentoring visit submitted successfully!');
       onClose?.();
-    }, 1000);
+    } catch (error) {
+      console.error('Error submitting mentoring visit:', error);
+      toast.error('Failed to submit visit. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getRatingColor = (rating: string | null) => {

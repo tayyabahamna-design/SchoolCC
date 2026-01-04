@@ -116,7 +116,7 @@ export default function OfficeVisitForm({ onClose }: Props) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    setTimeout(() => {
+    try {
       const { id: _, ...dataWithoutId } = formData;
       const evidence = uploadedFiles.map((f) => ({
         id: f.id,
@@ -132,11 +132,16 @@ export default function OfficeVisitForm({ onClose }: Props) {
         status: 'submitted',
         submittedAt: new Date(),
       };
-      addOfficeVisit(visit);
+      await addOfficeVisit(visit);
       analytics.visit.submitted(visit.id, 'office', 'District Office');
       toast.success('Office visit submitted successfully!');
       onClose?.();
-    }, 1000);
+    } catch (error) {
+      console.error('Error submitting office visit:', error);
+      toast.error('Failed to submit visit. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isStepComplete = (stepIndex: number): boolean => {

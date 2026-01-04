@@ -7,6 +7,7 @@ import { useMockActivities } from '@/hooks/useMockActivities';
 import { useLocation, useParams } from 'wouter';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { analytics } from '@/lib/analytics';
+import { toast } from 'sonner';
 
 const SCHOOLS = [
   { id: 'school-1', name: 'GOVERNMENT PRIMARY SCHOOL, ZONE A' },
@@ -46,12 +47,12 @@ export default function CreateActivity() {
     setPhotos(photos.filter((p) => p.id !== id));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSchool || !title.trim() || photos.length === 0) return;
 
     setLoading(true);
-    setTimeout(() => {
+    try {
       const school = SCHOOLS.find((s) => s.id === selectedSchool);
       if (school) {
         const newActivity = createActivity(
@@ -65,9 +66,15 @@ export default function CreateActivity() {
           user.role
         );
         analytics.album.activityCreated(newActivity.id, selectedSchool, photos.length);
+        toast.success('Activity created successfully!');
         navigate(`/album/${newActivity.schoolId}`);
       }
-    }, 500);
+    } catch (error) {
+      console.error('Error creating activity:', error);
+      toast.error('Failed to create activity. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
