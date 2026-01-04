@@ -77,18 +77,70 @@ export default function UserProfile() {
     try {
       setLoading(true);
       const response = await fetch(`/api/users/${user.id}`);
-      if (!response.ok) throw new Error("Failed to fetch profile");
+      if (!response.ok) {
+        // If API fails, use user data from auth context as fallback
+        if (user) {
+          const contextProfile: UserProfile = {
+            id: user.id,
+            name: user.name,
+            phoneNumber: user.phoneNumber,
+            role: user.role,
+            schoolId: user.schoolId,
+            schoolName: user.schoolName,
+            clusterId: user.clusterId,
+            districtId: user.districtId,
+            fatherName: user.fatherName,
+            email: user.email,
+            residentialAddress: user.residentialAddress,
+            cnic: user.cnic,
+            dateOfBirth: user.dateOfBirth,
+            dateOfJoining: user.dateOfJoining,
+            qualification: user.qualification,
+            profilePicture: user.profilePicture,
+            assignedSchools: user.assignedSchools,
+          };
+          setProfile(contextProfile);
+          setEditedProfile(contextProfile);
+          return;
+        }
+        throw new Error("Failed to fetch profile");
+      }
 
       const data = await response.json();
       setProfile(data);
       setEditedProfile(data);
     } catch (error) {
       console.error("Error fetching profile:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load profile",
-        variant: "destructive",
-      });
+      // Final fallback to context user
+      if (user) {
+        const contextProfile: UserProfile = {
+          id: user.id,
+          name: user.name,
+          phoneNumber: user.phoneNumber,
+          role: user.role,
+          schoolId: user.schoolId,
+          schoolName: user.schoolName,
+          clusterId: user.clusterId,
+          districtId: user.districtId,
+          fatherName: user.fatherName,
+          email: user.email,
+          residentialAddress: user.residentialAddress,
+          cnic: user.cnic,
+          dateOfBirth: user.dateOfBirth,
+          dateOfJoining: user.dateOfJoining,
+          qualification: user.qualification,
+          profilePicture: user.profilePicture,
+          assignedSchools: user.assignedSchools,
+        };
+        setProfile(contextProfile);
+        setEditedProfile(contextProfile);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to load profile",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
