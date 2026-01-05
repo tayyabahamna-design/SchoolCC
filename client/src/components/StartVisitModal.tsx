@@ -12,11 +12,12 @@ const getAllSchools = () => realSchools.map(school => `${school.name.toUpperCase
 
 interface StartVisitModalProps {
   open: boolean;
-  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
   onVisitStarted?: () => void;
 }
 
-export function StartVisitModal({ open, onClose, onVisitStarted }: StartVisitModalProps) {
+export function StartVisitModal({ open, onOpenChange, onVisitStarted }: StartVisitModalProps) {
+  const onClose = () => onOpenChange(false);
   const { user } = useAuth();
   const { startVisit, isLoading, currentLocation, locationError, requestLocationPermission } = useVisitSession();
   
@@ -136,7 +137,7 @@ export function StartVisitModal({ open, onClose, onVisitStarted }: StartVisitMod
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
