@@ -44,7 +44,7 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
 export const VALID_ASSIGNEES: Record<UserRole, UserRole[]> = {
   'CEO': ['DEO', 'DDEO', 'AEO', 'HEAD_TEACHER', 'TEACHER'], // CEO is the king - can assign to anyone
   'DEO': ['DDEO', 'AEO', 'HEAD_TEACHER', 'TEACHER'], // DEO can assign from DDEO down to Teacher
-  'DDEO': [],
+  'DDEO': ['AEO', 'HEAD_TEACHER', 'TEACHER'], // DDEO can assign to AEOs and below
   'AEO': ['HEAD_TEACHER'],
   'HEAD_TEACHER': ['TEACHER'],
   'TEACHER': [],
