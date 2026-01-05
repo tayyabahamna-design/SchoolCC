@@ -1,12 +1,13 @@
 import { useParams } from 'wouter';
-import { useAuth } from '@/contexts/auth';
+import { useAuth, ROLE_HIERARCHY, UserRole } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useMockDataRequests, DataRequest, RequestAssignee } from '@/hooks/useMockDataRequests';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Mic, Play, Upload, Download, Lock, Square, Trash2, Edit } from 'lucide-react';
+import { ArrowLeft, Mic, Play, Upload, Download, Lock, Square, Trash2, Edit, UserPlus, X, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 export default function ViewRequest() {
   const { id } = useParams();
@@ -22,6 +23,10 @@ export default function ViewRequest() {
   const [requestPriority, setRequestPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [requestDueDate, setRequestDueDate] = useState('');
   const [request, setRequest] = useState<DataRequest | null>(null);
+  const [showDelegateModal, setShowDelegateModal] = useState(false);
+  const [subordinates, setSubordinates] = useState<any[]>([]);
+  const [selectedSubordinate, setSelectedSubordinate] = useState<any | null>(null);
+  const [delegating, setDelegating] = useState(false);
 
   useEffect(() => {
     const fetchRequest = async () => {
@@ -51,6 +56,90 @@ export default function ViewRequest() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [request?.id, user?.id]);
 
+  // Fetch subordinates when delegate modal opens
+  useEffect(() => {
+    const fetchSubordinates = async () => {
+      if (!showDelegateModal || !user) return;
+      
+      try {
+        const response = await fetch('/api/users');
+        if (response.ok) {
+          const allUsers = await response.json();
+          const userHierarchy = ROLE_HIERARCHY[user.role as UserRole] || 0;
+          
+          // Filter users that are lower in hierarchy
+          const lowerUsers = allUsers.filter((u: any) => {
+            const theirHierarchy = ROLE_HIERARCHY[u.role as UserRole] || 0;
+            // Must be lower in hierarchy (higher number = lower rank)
+            if (theirHierarchy <= userHierarchy) return false;
+            
+            // Filter by location - must be in same district/cluster/school
+            if (user.role === 'AEO') {
+              // AEO can assign to head teachers/teachers in their cluster
+              return u.clusterId === user.clusterId || 
+                     (user.assignedSchools && user.assignedSchools.includes(u.schoolName));
+            }
+            if (user.role === 'DDEO' || user.role === 'DEO') {
+              // DEO/DDEO can assign to AEOs/HTs/Teachers in their district
+              return u.districtId === user.districtId;
+            }
+            if (user.role === 'HEAD_TEACHER') {
+              // Head Teacher can assign to teachers in their school
+              return u.schoolId === user.schoolId;
+            }
+            return false;
+          });
+          
+          // Exclude already assigned users
+          const existingAssigneeIds = request?.assignees.map(a => a.userId) || [];
+          const availableUsers = lowerUsers.filter((u: any) => !existingAssigneeIds.includes(u.id));
+          
+          setSubordinates(availableUsers);
+        }
+      } catch (error) {
+        console.error('Failed to fetch subordinates:', error);
+      }
+    };
+    
+    fetchSubordinates();
+  }, [showDelegateModal, user, request?.assignees]);
+
+  const handleDelegateRequest = async () => {
+    if (!selectedSubordinate || !request) return;
+    
+    setDelegating(true);
+    try {
+      const response = await fetch(`/api/requests/${request.id}/assignees`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: selectedSubordinate.id,
+          userName: selectedSubordinate.name,
+          userRole: selectedSubordinate.role,
+          schoolId: selectedSubordinate.schoolId,
+          schoolName: selectedSubordinate.schoolName,
+          fieldResponses: request.fields.map(f => ({ ...f, value: null })),
+        }),
+      });
+      
+      if (response.ok) {
+        toast.success(`Request assigned to ${selectedSubordinate.name}`);
+        setShowDelegateModal(false);
+        setSelectedSubordinate(null);
+        // Refresh the request data
+        const refreshedRequest = await getRequest(request.id);
+        setRequest(refreshedRequest);
+      } else {
+        toast.error('Failed to assign request');
+      }
+    } catch (error) {
+      console.error('Failed to delegate:', error);
+      toast.error('Failed to assign request');
+    } finally {
+      setDelegating(false);
+    }
+  };
+
   if (!request || !user) {
     return null;
   }
@@ -66,6 +155,10 @@ export default function ViewRequest() {
 
   const canEdit = userAssignee && (user.role === 'TEACHER' || user.role === 'HEAD_TEACHER');
   const isCreator = request.createdBy === user.id;
+  
+  // Check if user can delegate to subordinates
+  const canDelegate = userAssignee && 
+    (user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DEO' || user.role === 'DDEO');
 
   const handleFieldChange = (fieldId: string, value: string | number | null) => {
     if (!editedAssignee) return;
@@ -150,6 +243,17 @@ export default function ViewRequest() {
                 data-testid={editing ? 'button-submit' : 'button-edit'}
               >
                 {editing ? 'Submit' : 'Edit Response'}
+              </Button>
+            )}
+            {canDelegate && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDelegateModal(true)}
+                data-testid="button-delegate"
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Assign to Subordinate
               </Button>
             )}
           </div>
@@ -433,6 +537,76 @@ export default function ViewRequest() {
           </Button>
         )}
       </div>
+
+      {/* Delegate Modal */}
+      {showDelegateModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowDelegateModal(false)}>
+          <div className="bg-background rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-foreground">Assign to Subordinate</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowDelegateModal(false)}>
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+            
+            <p className="text-sm text-muted-foreground mb-4">
+              Select a person lower in the hierarchy to assign this data request to. They will be able to fill out the response fields.
+            </p>
+            
+            {subordinates.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No subordinates available to assign</p>
+                <p className="text-xs text-muted-foreground mt-2">All eligible users may already be assigned to this request.</p>
+              </div>
+            ) : (
+              <div className="space-y-2 mb-4">
+                {subordinates.map((sub) => (
+                  <div
+                    key={sub.id}
+                    className={`p-3 border rounded-lg cursor-pointer transition-all ${
+                      selectedSubordinate?.id === sub.id
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                    onClick={() => setSelectedSubordinate(sub)}
+                    data-testid={`subordinate-${sub.id}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-foreground">{sub.name}</p>
+                        <p className="text-xs text-muted-foreground">{sub.role} • {sub.schoolName || sub.clusterId || 'N/A'}</p>
+                      </div>
+                      {selectedSubordinate?.id === sub.id && (
+                        <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <div className="flex gap-2 mt-4">
+              <Button
+                className="flex-1"
+                onClick={handleDelegateRequest}
+                disabled={!selectedSubordinate || delegating}
+                data-testid="button-confirm-delegate"
+              >
+                {delegating ? 'Assigning...' : 'Assign Request'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowDelegateModal(false)}
+                data-testid="button-cancel-delegate"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
