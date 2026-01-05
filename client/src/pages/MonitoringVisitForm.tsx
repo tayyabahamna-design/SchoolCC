@@ -414,7 +414,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
           <h3 className="font-semibold text-foreground mb-4">Furniture Availability</h3>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">Total Students</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Total Furniture</label>
               <Input
                 type="number"
                 value={formData.furnitureTotal || ''}
@@ -423,7 +423,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">With Furniture</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Functional</label>
               <Input
                 type="number"
                 value={formData.furnitureWith || ''}
@@ -432,7 +432,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">Without Furniture</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Non-Functional</label>
               <Input
                 type="number"
                 value={formData.furnitureWithout || ''}
@@ -447,15 +447,6 @@ export default function MonitoringVisitForm({ onClose }: Props) {
           <h3 className="font-semibold text-foreground mb-4">Toilet Sufficiency</h3>
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">Total Students</label>
-              <Input
-                type="number"
-                value={formData.toiletStudentTotal || ''}
-                onChange={(e) => handleInputChange('toiletStudentTotal', parseInt(e.target.value) || 0)}
-                data-testid="input-toilet-student-total"
-              />
-            </div>
-            <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">Total Toilets</label>
               <Input
                 type="number"
@@ -465,7 +456,16 @@ export default function MonitoringVisitForm({ onClose }: Props) {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-2">Required (SRT)</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Functional</label>
+              <Input
+                type="number"
+                value={formData.toiletStudentTotal || ''}
+                onChange={(e) => handleInputChange('toiletStudentTotal', parseInt(e.target.value) || 0)}
+                data-testid="input-toilet-functional"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Required</label>
               <Input
                 type="number"
                 value={formData.toiletRequired || ''}
