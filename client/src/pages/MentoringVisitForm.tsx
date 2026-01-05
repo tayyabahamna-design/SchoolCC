@@ -57,6 +57,7 @@ export default function MentoringVisitForm({ onClose }: Props) {
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<MentoringVisitData>>({
+    aeoId: user?.id || '',
     aeoName: user?.name || '',
     visitDate: new Date().toISOString().split('T')[0],
     status: 'draft',
@@ -170,7 +171,8 @@ export default function MentoringVisitForm({ onClose }: Props) {
 
       const visit: MentoringVisitData = {
         id: `ment-${Date.now()}`,
-        aeoName: formData.aeoName || '',
+        aeoId: formData.aeoId || user?.id || '',
+        aeoName: formData.aeoName || user?.name || '',
         schoolName: formData.schoolName || '',
         visitDate: formData.visitDate || '',
         arrivalTime: formData.arrivalTime || '',

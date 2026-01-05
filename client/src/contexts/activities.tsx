@@ -227,6 +227,7 @@ export interface MentoringVisitIndicator {
 
 export interface MentoringVisitData {
   id: string;
+  aeoId: string;
   aeoName: string;
   schoolName: string;
   visitDate: string;
