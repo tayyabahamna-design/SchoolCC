@@ -269,7 +269,15 @@ export default function MonitoringVisitForm({ onClose }: Props) {
           <select
             className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground"
             value={formData.schoolName || ''}
-            onChange={(e) => handleInputChange('schoolName', e.target.value)}
+            onChange={(e) => {
+              const selectedSchool = e.target.value;
+              handleInputChange('schoolName', selectedSchool);
+              // Extract EMIS number from school name format: "SCHOOL NAME (EMIS_NUMBER)"
+              const emisMatch = selectedSchool.match(/\((\d+)\)$/);
+              if (emisMatch) {
+                handleInputChange('schoolId', emisMatch[1]);
+              }
+            }}
             data-testid="select-school"
           >
             <option value="">Select school...</option>

@@ -172,6 +172,7 @@ export const MENTORING_AREAS = [
 export interface MonitoringVisitData {
   id: string;
   aeoId: string;
+  schoolId: string;
   tehsil: string;
   markaz: string;
   aeoName: string;
@@ -229,6 +230,7 @@ export interface MentoringVisitIndicator {
 export interface MentoringVisitData {
   id: string;
   aeoId: string;
+  schoolId: string;
   aeoName: string;
   schoolName: string;
   visitDate: string;
