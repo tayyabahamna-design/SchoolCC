@@ -415,9 +415,12 @@ export default function MonitoringVisitForm({ onClose }: Props) {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">Total Students</label>
-              <div className="px-3 py-2 border border-input rounded-md bg-muted text-muted-foreground" data-testid="text-furniture-total">
-                {formData.studentTotal || 0}
-              </div>
+              <Input
+                type="number"
+                value={formData.furnitureTotal || ''}
+                onChange={(e) => handleInputChange('furnitureTotal', parseInt(e.target.value) || 0)}
+                data-testid="input-furniture-total"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">With Furniture</label>
@@ -430,9 +433,12 @@ export default function MonitoringVisitForm({ onClose }: Props) {
             </div>
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">Without Furniture</label>
-              <div className="px-3 py-2 border border-input rounded-md bg-muted text-muted-foreground" data-testid="text-furniture-without">
-                {Math.max(0, (formData.studentTotal || 0) - (formData.furnitureWith || 0))}
-              </div>
+              <Input
+                type="number"
+                value={formData.furnitureWithout || ''}
+                onChange={(e) => handleInputChange('furnitureWithout', parseInt(e.target.value) || 0)}
+                data-testid="input-furniture-without"
+              />
             </div>
           </div>
         </div>
@@ -442,9 +448,12 @@ export default function MonitoringVisitForm({ onClose }: Props) {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">Total Students</label>
-              <div className="px-3 py-2 border border-input rounded-md bg-muted text-muted-foreground" data-testid="text-toilet-student-total">
-                {formData.studentTotal || 0}
-              </div>
+              <Input
+                type="number"
+                value={formData.toiletStudentTotal || ''}
+                onChange={(e) => handleInputChange('toiletStudentTotal', parseInt(e.target.value) || 0)}
+                data-testid="input-toilet-student-total"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">Total Toilets</label>
@@ -457,9 +466,12 @@ export default function MonitoringVisitForm({ onClose }: Props) {
             </div>
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">Required (SRT)</label>
-              <div className="px-3 py-2 border border-input rounded-md bg-muted text-muted-foreground" data-testid="text-toilet-required">
-                {Math.ceil((formData.studentTotal || 0) / 50)}
-              </div>
+              <Input
+                type="number"
+                value={formData.toiletRequired || ''}
+                onChange={(e) => handleInputChange('toiletRequired', parseInt(e.target.value) || 0)}
+                data-testid="input-toilet-required"
+              />
             </div>
           </div>
         </div>
