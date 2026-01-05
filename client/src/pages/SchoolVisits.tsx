@@ -4,9 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useActivities } from '@/contexts/activities';
+import { useVisitSession } from '@/contexts/visit-session';
 import { useLocation } from 'wouter';
-import { ArrowLeft, MapPin, CheckCircle, Clock, Eye, Search, X } from 'lucide-react';
+import { ArrowLeft, MapPin, CheckCircle, Clock, Eye, Search, X, Navigation, Plus } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { StartVisitModal } from '@/components/StartVisitModal';
+import { ActiveVisitBanner } from '@/components/ActiveVisitBanner';
+import MonitoringVisitForm from './MonitoringVisitForm';
+import MentoringVisitForm from './MentoringVisitForm';
 
 interface NormalizedVisit {
   id: string;
@@ -28,9 +33,20 @@ export default function SchoolVisits() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const { monitoringVisits, mentoringVisits, officeVisits } = useActivities();
+  const { activeSession, endSession } = useVisitSession();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showStartVisitModal, setShowStartVisitModal] = useState(false);
+  const [showFormType, setShowFormType] = useState<'monitoring' | 'mentoring' | null>(null);
 
   if (!user) return null;
+  
+  // Show embedded form if there's an active session and a form type was selected
+  if (activeSession && showFormType === 'monitoring') {
+    return <MonitoringVisitForm />;
+  }
+  if (activeSession && showFormType === 'mentoring') {
+    return <MentoringVisitForm />;
+  }
 
   // Combine and normalize all visits from the activities context
   const userVisits = useMemo(() => {
@@ -132,6 +148,13 @@ export default function SchoolVisits() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Active Visit Banner for AEOs */}
+      {user.role === 'AEO' && activeSession && (
+        <ActiveVisitBanner 
+          onOpenForm={(type) => setShowFormType(type)}
+        />
+      )}
+      
       {/* Header */}
       <div className="bg-background border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between">
@@ -150,6 +173,17 @@ export default function SchoolVisits() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Start Visit Button for AEOs without active session */}
+            {user.role === 'AEO' && !activeSession && (
+              <Button
+                onClick={() => setShowStartVisitModal(true)}
+                className="gap-2"
+                data-testid="button-start-visit"
+              >
+                <Navigation className="w-4 h-4" />
+                Start Visit
+              </Button>
+            )}
             <ThemeToggle />
           </div>
         </div>
@@ -289,6 +323,12 @@ export default function SchoolVisits() {
           </div>
         )}
       </div>
+      
+      {/* Start Visit Modal */}
+      <StartVisitModal
+        open={showStartVisitModal}
+        onOpenChange={setShowStartVisitModal}
+      />
     </div>
   );
 }

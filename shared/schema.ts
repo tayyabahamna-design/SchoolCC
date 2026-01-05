@@ -57,6 +57,9 @@ export const schools = pgTable("schools", {
   computersBroken: integer("computers_broken").default(0),
   // Last updated timestamp for tracking
   dataLastUpdated: timestamp("data_last_updated"),
+  // GPS location
+  latitude: text("latitude"),
+  longitude: text("longitude"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -385,6 +388,32 @@ export const otherActivities = pgTable("other_activities", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Visit Sessions table - GPS-tracked school visits
+export const visitSessions = pgTable("visit_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  aeoId: varchar("aeo_id").notNull(),
+  aeoName: text("aeo_name").notNull(),
+  schoolId: varchar("school_id"),
+  schoolName: text("school_name").notNull(),
+  // Start tracking
+  startTimestamp: timestamp("start_timestamp").notNull().defaultNow(),
+  startLatitude: text("start_latitude"),
+  startLongitude: text("start_longitude"),
+  startLocationSource: text("start_location_source").notNull().default("auto"), // auto, manual
+  // End tracking
+  endTimestamp: timestamp("end_timestamp"),
+  endLatitude: text("end_latitude"),
+  endLongitude: text("end_longitude"),
+  endLocationSource: text("end_location_source"), // auto, manual
+  // Status and metadata
+  status: text("status").notNull().default("in_progress"), // in_progress, completed, cancelled
+  notes: text("notes"),
+  // Linked forms
+  monitoringVisitId: varchar("monitoring_visit_id"),
+  mentoringVisitId: varchar("mentoring_visit_id"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Organization insert schemas
 export const insertDistrictSchema = createInsertSchema(districts).omit({
   id: true,
@@ -484,6 +513,11 @@ export const insertOtherActivitySchema = createInsertSchema(otherActivities).omi
   createdAt: true,
 });
 
+export const insertVisitSessionSchema = createInsertSchema(visitSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Organization types
 export type InsertDistrict = z.infer<typeof insertDistrictSchema>;
 export type District = typeof districts.$inferSelect;
@@ -525,3 +559,5 @@ export type InsertOfficeVisit = z.infer<typeof insertOfficeVisitSchema>;
 export type OfficeVisit = typeof officeVisits.$inferSelect;
 export type InsertOtherActivity = z.infer<typeof insertOtherActivitySchema>;
 export type OtherActivity = typeof otherActivities.$inferSelect;
+export type InsertVisitSession = z.infer<typeof insertVisitSessionSchema>;
+export type VisitSession = typeof visitSessions.$inferSelect;

@@ -1315,6 +1315,93 @@ export async function registerRoutes(
     }
   });
 
+  // Visit Session endpoints (GPS tracking)
+  app.post("/api/visit-sessions/start", async (req, res) => {
+    try {
+      const sessionData = {
+        ...req.body,
+        startTimestamp: new Date(),
+        status: 'in_progress'
+      };
+      const session = await storage.createVisitSession(sessionData);
+      res.json(session);
+    } catch (error: any) {
+      console.error("Visit session start error:", error?.message || error);
+      res.status(400).json({ error: "Failed to start visit session", details: error?.message || String(error) });
+    }
+  });
+
+  app.get("/api/visit-sessions", async (req, res) => {
+    try {
+      const { aeoId } = req.query;
+      let sessions;
+      if (aeoId) {
+        sessions = await storage.getVisitSessionsByAeo(aeoId as string);
+      } else {
+        sessions = await storage.getAllVisitSessions();
+      }
+      res.json(sessions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch visit sessions" });
+    }
+  });
+
+  app.get("/api/visit-sessions/active/:aeoId", async (req, res) => {
+    try {
+      const session = await storage.getActiveVisitSession(req.params.aeoId);
+      res.json(session || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch active visit session" });
+    }
+  });
+
+  app.get("/api/visit-sessions/:id", async (req, res) => {
+    try {
+      const session = await storage.getVisitSession(req.params.id);
+      if (!session) {
+        return res.status(404).json({ error: "Visit session not found" });
+      }
+      res.json(session);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch visit session" });
+    }
+  });
+
+  app.post("/api/visit-sessions/:id/end", async (req, res) => {
+    try {
+      const { endLatitude, endLongitude, endLocationSource } = req.body;
+      const session = await storage.completeVisitSession(req.params.id, {
+        endLatitude,
+        endLongitude,
+        endLocationSource
+      });
+      res.json(session);
+    } catch (error: any) {
+      console.error("Visit session end error:", error?.message || error);
+      res.status(400).json({ error: "Failed to end visit session", details: error?.message || String(error) });
+    }
+  });
+
+  app.post("/api/visit-sessions/:id/cancel", async (req, res) => {
+    try {
+      const session = await storage.cancelVisitSession(req.params.id);
+      res.json(session);
+    } catch (error: any) {
+      console.error("Visit session cancel error:", error?.message || error);
+      res.status(400).json({ error: "Failed to cancel visit session", details: error?.message || String(error) });
+    }
+  });
+
+  app.patch("/api/visit-sessions/:id", async (req, res) => {
+    try {
+      const session = await storage.updateVisitSession(req.params.id, req.body);
+      res.json(session);
+    } catch (error: any) {
+      console.error("Visit session update error:", error?.message || error);
+      res.status(400).json({ error: "Failed to update visit session", details: error?.message || String(error) });
+    }
+  });
+
   // AI Voice Note & Summary endpoints
   app.post("/api/transcribe", upload.single('audio'), async (req, res) => {
     try {

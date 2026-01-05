@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, dataRequests, requestAssignees, districts, clusters, schools, notifications, queries, queryResponses, visitLogs, schoolAlbums, albumPhotos, albumComments, albumReactions, announcements, monitoringVisits, mentoringVisits, officeVisits, otherActivities } from "@shared/schema";
+import { users, dataRequests, requestAssignees, districts, clusters, schools, notifications, queries, queryResponses, visitLogs, schoolAlbums, albumPhotos, albumComments, albumReactions, announcements, monitoringVisits, mentoringVisits, officeVisits, otherActivities, visitSessions } from "@shared/schema";
 import type {
   InsertUser, User, InsertDataRequest, DataRequest, InsertRequestAssignee, RequestAssignee,
   InsertDistrict, District, InsertCluster, Cluster, InsertSchool, School,
@@ -7,7 +7,8 @@ import type {
   InsertVisitLog, VisitLog, InsertSchoolAlbum, SchoolAlbum, InsertAlbumPhoto, AlbumPhoto,
   InsertAlbumComment, AlbumComment, InsertAlbumReaction, AlbumReaction, InsertAnnouncement, Announcement,
   InsertMonitoringVisit, MonitoringVisit, InsertMentoringVisit, MentoringVisit,
-  InsertOfficeVisit, OfficeVisit, InsertOtherActivity, OtherActivity
+  InsertOfficeVisit, OfficeVisit, InsertOtherActivity, OtherActivity,
+  InsertVisitSession, VisitSession
 } from "@shared/schema";
 import { eq, and, or, inArray, desc } from "drizzle-orm";
 
@@ -135,6 +136,16 @@ export interface IStorage {
   createOtherActivity(activity: InsertOtherActivity): Promise<OtherActivity>;
   getOtherActivitiesByAeo(aeoId: string): Promise<OtherActivity[]>;
   getAllOtherActivities(): Promise<OtherActivity[]>;
+
+  // Visit Session operations (GPS tracking)
+  createVisitSession(session: InsertVisitSession): Promise<VisitSession>;
+  getVisitSession(id: string): Promise<VisitSession | undefined>;
+  getActiveVisitSession(aeoId: string): Promise<VisitSession | undefined>;
+  getVisitSessionsByAeo(aeoId: string): Promise<VisitSession[]>;
+  getAllVisitSessions(): Promise<VisitSession[]>;
+  updateVisitSession(id: string, updates: Partial<VisitSession>): Promise<VisitSession>;
+  completeVisitSession(id: string, endData: { endLatitude?: string; endLongitude?: string; endLocationSource?: string }): Promise<VisitSession>;
+  cancelVisitSession(id: string): Promise<VisitSession>;
 }
 
 export class DBStorage implements IStorage {
@@ -779,6 +790,75 @@ export class DBStorage implements IStorage {
     return await db.select()
       .from(otherActivities)
       .orderBy(desc(otherActivities.createdAt));
+  }
+
+  // Visit Session operations (GPS tracking)
+  async createVisitSession(session: InsertVisitSession): Promise<VisitSession> {
+    const result = await db.insert(visitSessions).values(session as any).returning();
+    return result[0];
+  }
+
+  async getVisitSession(id: string): Promise<VisitSession | undefined> {
+    const result = await db.select()
+      .from(visitSessions)
+      .where(eq(visitSessions.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async getActiveVisitSession(aeoId: string): Promise<VisitSession | undefined> {
+    const result = await db.select()
+      .from(visitSessions)
+      .where(and(
+        eq(visitSessions.aeoId, aeoId),
+        eq(visitSessions.status, 'in_progress')
+      ))
+      .limit(1);
+    return result[0];
+  }
+
+  async getVisitSessionsByAeo(aeoId: string): Promise<VisitSession[]> {
+    return await db.select()
+      .from(visitSessions)
+      .where(eq(visitSessions.aeoId, aeoId))
+      .orderBy(desc(visitSessions.createdAt));
+  }
+
+  async getAllVisitSessions(): Promise<VisitSession[]> {
+    return await db.select()
+      .from(visitSessions)
+      .orderBy(desc(visitSessions.createdAt));
+  }
+
+  async updateVisitSession(id: string, updates: Partial<VisitSession>): Promise<VisitSession> {
+    const result = await db.update(visitSessions)
+      .set(updates)
+      .where(eq(visitSessions.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async completeVisitSession(id: string, endData: { endLatitude?: string; endLongitude?: string; endLocationSource?: string }): Promise<VisitSession> {
+    const result = await db.update(visitSessions)
+      .set({
+        ...endData,
+        endTimestamp: new Date(),
+        status: 'completed'
+      })
+      .where(eq(visitSessions.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async cancelVisitSession(id: string): Promise<VisitSession> {
+    const result = await db.update(visitSessions)
+      .set({
+        endTimestamp: new Date(),
+        status: 'cancelled'
+      })
+      .where(eq(visitSessions.id, id))
+      .returning();
+    return result[0];
   }
 }
 

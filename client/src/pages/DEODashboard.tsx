@@ -147,6 +147,9 @@ export default function DEODashboard() {
   // Fetch requests using React Query or state
   const [requests, setRequests] = useState<any[]>([]);
   
+  // Fetch real GPS-tracked visit sessions
+  const [liveVisitSessions, setLiveVisitSessions] = useState<any[]>([]);
+  
   useEffect(() => {
     const fetchRequests = async () => {
       try {
@@ -159,6 +162,24 @@ export default function DEODashboard() {
     };
     fetchRequests();
   }, [user.id, user.role, getRequestsForUser]);
+
+  useEffect(() => {
+    const fetchLiveVisits = async () => {
+      try {
+        const response = await fetch('/api/visit-sessions');
+        if (response.ok) {
+          const sessions = await response.json();
+          const activeSessions = sessions.filter((s: any) => s.status === 'in_progress');
+          setLiveVisitSessions(activeSessions);
+        }
+      } catch (error) {
+        console.error('Error fetching visit sessions:', error);
+      }
+    };
+    fetchLiveVisits();
+    const interval = setInterval(fetchLiveVisits, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Calculate aggregations
   const {
@@ -320,13 +341,13 @@ export default function DEODashboard() {
       items: [
         {
           id: 'active-visits',
-          label: 'Active Visits',
+          label: 'Live Field Visits',
           icon: MapPin,
           color: 'from-purple-500 to-purple-600',
           action: () => { setShowVisitsModal(true); setShowMenuSidebar(false); },
           description: 'Track live AEO field visits',
-          badge: activeVisits.length,
-          live: activeVisits.length > 0,
+          badge: liveVisitSessions.length,
+          live: liveVisitSessions.length > 0,
         },
         {
           id: 'school-visits',
@@ -687,15 +708,15 @@ export default function DEODashboard() {
                 case 'visits':
                   return (
                     <MetricCard
-                      value={activeVisits.length}
-                      label="Active AEO Visits"
+                      value={liveVisitSessions.length}
+                      label="Live Field Visits"
                       icon={MapPin}
                       iconGradient="from-purple-500 to-purple-600"
                       borderColor="border-l-purple-500"
                       showChevron
                       onClick={() => setShowVisitsModal(true)}
                       breakdown={[
-                        { label: 'Live Tracking', value: '', showAsBadge: false, valueColor: 'text-green-600 font-medium' },
+                        { label: 'GPS Tracking Active', value: liveVisitSessions.length > 0 ? 'Yes' : 'No', showAsBadge: false, valueColor: liveVisitSessions.length > 0 ? 'text-green-600 font-medium' : 'text-muted-foreground' },
                       ]}
                     />
                   );
@@ -1010,63 +1031,73 @@ export default function DEODashboard() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-4xl w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Active AEO Visits ({activeVisits.length})
+                Active AEO Visits ({liveVisitSessions.length})
               </h2>
               <Button variant="ghost" size="icon" onClick={() => setShowVisitsModal(false)}>
                 <X className="w-5 h-5" />
               </Button>
             </div>
-            <div className="space-y-4">
-              {activeVisits.map((visit) => (
-                <Card 
-                  key={visit.id} 
-                  className="p-6 cursor-pointer hover:shadow-lg transition-all duration-300 hover:border-purple-300"
-                  onClick={() => {
-                    setShowVisitsModal(false);
-                    navigate(`/visit/${visit.id}`);
-                  }}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-semibold">
-                          {visit.conductedByName?.charAt(0)}
+            {liveVisitSessions.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <MapPin className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No AEOs are currently on field visits.</p>
+                <p className="text-sm mt-2">Active visits will appear here in real-time with GPS tracking.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {liveVisitSessions.map((session) => (
+                  <Card 
+                    key={session.id} 
+                    className="p-6 hover:shadow-lg transition-all duration-300 hover:border-purple-300"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-semibold">
+                            {session.aeoName?.charAt(0)}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg">{session.aeoName}</h3>
+                            <p className="text-sm text-muted-foreground">{session.schoolName}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-lg">{visit.conductedByName}</h3>
-                          <p className="text-sm text-muted-foreground">{visit.schoolName}</p>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">Started:</span>
+                            <span className="ml-2 font-medium">
+                              {new Date(session.startTimestamp).toLocaleTimeString()}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Duration:</span>
+                            <span className="ml-2 font-medium">
+                              {Math.floor((new Date().getTime() - new Date(session.startTimestamp).getTime()) / (1000 * 60))} min
+                            </span>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="text-muted-foreground">GPS Location:</span>
+                            {session.startLatitude && session.startLongitude ? (
+                              <span className="ml-2 font-mono text-xs text-green-600">
+                                {parseFloat(session.startLatitude).toFixed(4)}, {parseFloat(session.startLongitude).toFixed(4)}
+                              </span>
+                            ) : (
+                              <span className="ml-2 text-xs text-amber-600">Manual entry</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Visit Type:</span>
-                          <Badge className="ml-2 bg-blue-500">{visit.visitType}</Badge>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                          <span className="text-sm font-medium text-green-600">In Progress</span>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">Duration:</span>
-                          <span className="ml-2 font-medium">
-                            {Math.floor((new Date().getTime() - new Date(visit.startTime || Date.now()).getTime()) / (1000 * 60))} min
-                          </span>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="text-muted-foreground">GPS Location:</span>
-                          <span className="ml-2 font-mono text-xs">
-                            {visit.gpsStartLocation?.lat?.toFixed(4)}, {visit.gpsStartLocation?.lng?.toFixed(4)}
-                          </span>
-                        </div>
+                        <span className="text-xs text-muted-foreground">Live GPS Tracking</span>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-                        <span className="text-sm font-medium text-green-600">In Progress</span>
-                      </div>
-                      <span className="text-xs text-muted-foreground">Click to view details</span>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
