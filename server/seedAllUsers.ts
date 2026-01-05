@@ -56,7 +56,7 @@ async function seedAllUsers() {
     // 2. Create DEO account
     console.log("\n=== Creating DEO Account ===");
     const deoData = {
-      name: "DEO - District Education Officer",
+      name: "Dr Hajira",
       phoneNumber: "03007194767",
       password: defaultPassword,
       role: "DEO",
