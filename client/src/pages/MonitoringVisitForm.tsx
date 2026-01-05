@@ -160,10 +160,19 @@ export default function MonitoringVisitForm({ onClose }: Props) {
         url: f.previewUrl || f.name,
       }));
 
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 5);
       const visitId = `mon-${Date.now()}`;
       const visit: MonitoringVisitData = {
         ...(dataWithoutId as MonitoringVisitData),
         id: visitId,
+        aeoId: formData.aeoId || user?.id || '',
+        schoolId: formData.schoolId || '',
+        aeoName: formData.aeoName || user?.name || '',
+        schoolName: formData.schoolName || '',
+        visitDate: formData.visitDate || now.toISOString().split('T')[0],
+        arrivalTime: formData.arrivalTime || currentTime,
+        departureTime: formData.departureTime || currentTime,
         markaz: user?.markaz || formData.markaz || '',
         evidence,
         status: 'submitted',

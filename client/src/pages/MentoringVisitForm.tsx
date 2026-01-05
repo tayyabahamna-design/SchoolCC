@@ -169,15 +169,17 @@ export default function MentoringVisitForm({ onClose }: Props) {
         url: f.previewUrl || f.name,
       }));
 
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 5);
       const visit: MentoringVisitData = {
         id: `ment-${Date.now()}`,
         aeoId: formData.aeoId || user?.id || '',
         schoolId: formData.schoolId || '',
         aeoName: formData.aeoName || user?.name || '',
         schoolName: formData.schoolName || '',
-        visitDate: formData.visitDate || '',
-        arrivalTime: formData.arrivalTime || '',
-        departureTime: formData.departureTime || '',
+        visitDate: formData.visitDate || now.toISOString().split('T')[0],
+        arrivalTime: formData.arrivalTime || currentTime,
+        departureTime: formData.departureTime || currentTime,
         classObserved: formData.classObserved || '',
         teacherName: formData.teacherName || '',
         subject: formData.subject || '',
