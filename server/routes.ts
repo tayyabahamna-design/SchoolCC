@@ -309,8 +309,20 @@ export async function registerRoutes(
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { phoneNumber, password } = req.body;
+      
+      if (!phoneNumber || !password) {
+        return res.status(400).json({ error: "Phone number and password are required" });
+      }
+      
       const user = await storage.getUserByUsername(phoneNumber);
-      if (!user || user.password !== password) {
+      
+      if (!user) {
+        console.log("Login failed - user not found for phone:", phoneNumber);
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      if (user.password !== password) {
+        console.log("Login failed - password mismatch for user:", user.name);
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
