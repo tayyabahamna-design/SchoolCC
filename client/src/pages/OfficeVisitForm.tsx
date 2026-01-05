@@ -126,9 +126,16 @@ export default function OfficeVisitForm({ onClose }: Props) {
         url: f.previewUrl || f.name,
       }));
 
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 5);
       const visit: OfficeVisitData = {
         ...(dataWithoutId as OfficeVisitData),
         id: `off-${Date.now()}`,
+        aeoId: formData.aeoId || user?.id || '',
+        aeoName: formData.aeoName || user?.name || '',
+        visitDate: formData.visitDate || now.toISOString().split('T')[0],
+        arrivalTime: formData.arrivalTime || currentTime,
+        departureTime: formData.departureTime || currentTime,
         evidence,
         status: 'submitted',
         submittedAt: new Date(),

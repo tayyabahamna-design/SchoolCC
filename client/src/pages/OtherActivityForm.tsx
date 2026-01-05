@@ -112,7 +112,7 @@ export default function OtherActivityForm({ onClose }: Props) {
 
   const handleSubmit = async () => {
     setLoading(true);
-    setTimeout(() => {
+    try {
       const { id: _, ...dataWithoutId } = formData;
       const evidence = uploadedFiles.map((f) => ({
         id: f.id,
@@ -121,17 +121,30 @@ export default function OtherActivityForm({ onClose }: Props) {
         url: f.previewUrl || f.name,
       }));
 
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 5);
       const activity: OtherActivityData = {
         ...(dataWithoutId as OtherActivityData),
         id: `other-${Date.now()}`,
+        aeoId: formData.aeoId || user?.id || '',
+        aeoName: formData.aeoName || user?.name || '',
+        activityType: formData.activityType || 'other',
+        activityDate: formData.activityDate || now.toISOString().split('T')[0],
+        startTime: formData.startTime || currentTime,
+        endTime: formData.endTime || currentTime,
         evidence,
         status: 'submitted',
         submittedAt: new Date(),
       };
-      addOtherActivity(activity);
+      await addOtherActivity(activity);
       toast.success('Activity logged successfully!');
       onClose?.();
-    }, 1000);
+    } catch (error) {
+      console.error('Error submitting activity:', error);
+      toast.error('Failed to submit activity');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isStepComplete = (stepIndex: number): boolean => {
