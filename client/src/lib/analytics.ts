@@ -4,15 +4,22 @@ type UserRole = 'CEO' | 'DEO' | 'DDEO' | 'AEO' | 'HEAD_TEACHER' | 'TEACHER' | 'C
 
 interface UserProperties {
   userId?: string;
+  phoneNumber?: string;
   role?: UserRole;
+  name?: string;
   schoolId?: string;
+  schoolName?: string;
   clusterId?: string;
   districtId?: string;
 }
 
 export const analytics = {
-  identify: (userId: string, properties?: UserProperties) => {
-    posthog.identify(userId, properties);
+  identify: (phoneNumber: string, properties?: UserProperties) => {
+    // Use phone number as the distinct_id for easier tracking
+    posthog.identify(phoneNumber, {
+      ...properties,
+      phone_number: phoneNumber,
+    });
   },
 
   reset: () => {

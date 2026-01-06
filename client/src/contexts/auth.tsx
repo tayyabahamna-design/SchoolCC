@@ -102,10 +102,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const userData = await response.json();
     setUser(userData);
-    analytics.identify(userData.id, {
+    // Use phone number as the distinct_id for PostHog tracking
+    analytics.identify(userData.phoneNumber, {
       userId: userData.id,
+      phoneNumber: userData.phoneNumber,
+      name: userData.name,
       role: userData.role,
       schoolId: userData.schoolId,
+      schoolName: userData.schoolName,
       clusterId: userData.clusterId,
       districtId: userData.districtId,
     });
