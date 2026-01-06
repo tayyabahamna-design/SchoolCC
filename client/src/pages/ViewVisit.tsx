@@ -6,6 +6,7 @@ import { useActivities, MonitoringVisitData, MentoringVisitData, OfficeVisitData
 import { useLocation } from 'wouter';
 import { ArrowLeft, MapPin, Calendar, User, CheckCircle, Mic, Camera, Clock, FileText } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
+import { analytics } from '@/lib/analytics';
 
 type VisitType = 'monitoring' | 'mentoring' | 'office';
 
@@ -98,6 +99,13 @@ export default function ViewVisit() {
     const timer = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(timer);
   }, [monitoringVisits, mentoringVisits, officeVisits]);
+
+  // Track visit viewed
+  useEffect(() => {
+    if (visit && id) {
+      analytics.navigation.pageViewed(`view_visit_${visit.type}`, user?.role);
+    }
+  }, [visit?.id, visit?.type, user?.role]);
 
   if (loading) {
     return (

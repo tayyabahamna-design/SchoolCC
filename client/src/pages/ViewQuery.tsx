@@ -4,9 +4,10 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useLocation, useParams } from 'wouter';
 import { ArrowLeft, Send, Clock, CheckCircle, AlertCircle, User, Paperclip } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQueries, Query } from '@/hooks/useQueries';
 import { useToast } from '@/hooks/use-toast';
+import { analytics } from '@/lib/analytics';
 
 const statusColors: Record<Query['status'], string> = {
   open: 'bg-blue-100 text-blue-700',
@@ -53,6 +54,13 @@ export default function ViewQuery() {
   const canReply = user.id === query.recipientId || 
     (user.role === 'DEO' || user.role === 'CEO' || user.role === 'DDEO');
 
+  // Track query viewed
+  useEffect(() => {
+    if (query) {
+      analytics.query.viewed(query.id);
+    }
+  }, [query?.id]);
+
   const handleSubmitReply = () => {
     if (!replyMessage.trim()) return;
     
@@ -67,6 +75,7 @@ export default function ViewQuery() {
         message: replyMessage,
       });
 
+      analytics.query.responded(query.id);
       toast({
         title: "Reply Sent",
         description: "Your response has been added.",
@@ -79,6 +88,7 @@ export default function ViewQuery() {
 
   const handleResolve = () => {
     updateQueryStatus(query.id, 'resolved');
+    analytics.navigation.pageViewed('query_resolved', user.role);
     toast({
       title: "Query Resolved",
       description: "This query has been marked as resolved.",
@@ -87,6 +97,7 @@ export default function ViewQuery() {
 
   const handleClose = () => {
     updateQueryStatus(query.id, 'closed');
+    analytics.navigation.pageViewed('query_closed', user.role);
     toast({
       title: "Query Closed",
       description: "This query has been closed.",

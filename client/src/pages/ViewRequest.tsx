@@ -8,6 +8,7 @@ import { useLocation } from 'wouter';
 import { ArrowLeft, Mic, Play, Upload, Download, Lock, Square, Trash2, Edit, UserPlus, X, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { analytics } from '@/lib/analytics';
 
 export default function ViewRequest() {
   const { id } = useParams();
@@ -33,6 +34,10 @@ export default function ViewRequest() {
       if (id) {
         const fetchedRequest = await getRequest(id);
         setRequest(fetchedRequest);
+        // Track request viewed
+        if (fetchedRequest) {
+          analytics.dataRequest.viewed(id);
+        }
       }
     };
     fetchRequest();

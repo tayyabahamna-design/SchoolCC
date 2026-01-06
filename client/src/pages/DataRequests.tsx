@@ -6,6 +6,7 @@ import { useLocation } from 'wouter';
 import { Plus, Download, ChevronRight, Clock, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useState, useEffect } from 'react';
+import { analytics } from '@/lib/analytics';
 
 export default function DataRequests() {
   const { user } = useAuth();
@@ -38,6 +39,13 @@ export default function DataRequests() {
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
+
+  // Track page view
+  useEffect(() => {
+    if (user) {
+      analytics.navigation.pageViewed('data_requests', user.role);
+    }
+  }, [user?.role]);
 
   if (!user) return null;
 

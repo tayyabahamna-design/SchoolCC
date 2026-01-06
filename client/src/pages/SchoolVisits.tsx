@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { StartVisitModal } from '@/components/StartVisitModal';
 import { ActiveVisitBanner } from '@/components/ActiveVisitBanner';
 import MonitoringVisitForm from './MonitoringVisitForm';
 import MentoringVisitForm from './MentoringVisitForm';
+import { analytics } from '@/lib/analytics';
 
 interface NormalizedVisit {
   id: string;
@@ -37,6 +38,13 @@ export default function SchoolVisits() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showStartVisitModal, setShowStartVisitModal] = useState(false);
   const [showFormType, setShowFormType] = useState<'monitoring' | 'mentoring' | null>(null);
+
+  // Track page view
+  useEffect(() => {
+    if (user) {
+      analytics.navigation.pageViewed('school_visits', user.role);
+    }
+  }, [user?.role]);
 
   if (!user) return null;
   

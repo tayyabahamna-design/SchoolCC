@@ -7,9 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLocation } from 'wouter';
 import { ArrowLeft, Send, Upload, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { realAEOs, realHeadmasters } from '@/data/realData';
 import { useToast } from '@/hooks/use-toast';
+import { analytics } from '@/lib/analytics';
 
 const categories = [
   { value: 'general', label: 'General Query' },
@@ -42,6 +43,13 @@ export default function CreateQuery() {
   });
   const [attachment, setAttachment] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Track page view
+  useEffect(() => {
+    if (user) {
+      analytics.navigation.pageViewed('create_query', user.role);
+    }
+  }, [user?.role]);
 
   if (!user) return null;
 
@@ -142,6 +150,7 @@ export default function CreateQuery() {
         throw new Error('Failed to submit query');
       }
 
+      analytics.query.created(`query-${Date.now()}`, selectedRecipient.role as any);
       toast({
         title: "Query Submitted",
         description: "Your query has been sent successfully.",

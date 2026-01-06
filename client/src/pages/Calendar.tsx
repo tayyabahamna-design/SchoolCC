@@ -9,8 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useLeaveRecords, LeaveRecord } from '@/hooks/useLeaveRecords';
 import { useLocation } from 'wouter';
 import { ArrowLeft, ArrowRight, Plus, Calendar as CalendarIcon, Eye, Edit2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { analytics } from '@/lib/analytics';
 
 const leaveTypeColors: Record<string, string> = {
   sick: 'bg-red-100 text-red-700 border-red-200',
@@ -42,6 +43,13 @@ export default function Calendar() {
     reason: '',
     numberOfDays: 1,
   });
+
+  // Track page view
+  useEffect(() => {
+    if (user) {
+      analytics.navigation.pageViewed('calendar', user.role);
+    }
+  }, [user?.role]);
 
   if (!user) return null;
 

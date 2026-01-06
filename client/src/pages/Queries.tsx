@@ -4,8 +4,9 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useLocation } from 'wouter';
 import { ArrowLeft, Plus, Search, MessageSquare, Clock, CheckCircle, AlertCircle, Filter } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQueries, Query } from '@/hooks/useQueries';
+import { analytics } from '@/lib/analytics';
 
 const statusColors: Record<Query['status'], string> = {
   open: 'bg-blue-100 text-blue-700',
@@ -33,6 +34,13 @@ export default function Queries() {
   const { getAllQueries, getQueriesBySender, getQueriesByRecipient } = useQueries();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+
+  // Track page view
+  useEffect(() => {
+    if (user) {
+      analytics.navigation.pageViewed('queries', user.role);
+    }
+  }, [user?.role]);
 
   if (!user) return null;
 

@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Edit, Save, X, User, ArrowLeft, School } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { analytics } from '@/lib/analytics';
 
 interface UserProfile {
   id: string;
@@ -53,6 +54,7 @@ export default function UserProfile() {
       return;
     }
     fetchProfile();
+    analytics.navigation.profileViewed();
 
     // Fetch available schools for AEO
     if (user?.role === 'AEO' && user?.clusterId) {
