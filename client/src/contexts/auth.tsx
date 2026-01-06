@@ -76,6 +76,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return null;
   });
 
+  // Re-identify user with PostHog when session is restored or user changes
+  useEffect(() => {
+    if (user && user.phoneNumber) {
+      analytics.identify(user.phoneNumber, {
+        userId: user.id,
+        phoneNumber: user.phoneNumber,
+        name: user.name,
+        role: user.role,
+        schoolId: user.schoolId,
+        schoolName: user.schoolName,
+        clusterId: user.clusterId,
+        districtId: user.districtId,
+      });
+    }
+  }, [user]);
+
   // Sync user state to localStorage
   useEffect(() => {
     if (user) {

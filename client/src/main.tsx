@@ -10,6 +10,8 @@ if (posthogKey) {
     autocapture: true,
     capture_pageview: true,
     capture_pageleave: true,
+    person_profiles: 'identified_only',
+    persistence: 'localStorage+cookie',
   });
 }
 
