@@ -16,8 +16,10 @@ interface UserProperties {
 export const analytics = {
   identify: (phoneNumber: string, properties?: UserProperties) => {
     // Use phone number as the distinct_id for easier tracking
+    // $name is a special PostHog property that shows the user's name prominently
     posthog.identify(phoneNumber, {
       ...properties,
+      $name: properties?.name,
       phone_number: phoneNumber,
     });
   },
@@ -27,8 +29,27 @@ export const analytics = {
   },
 
   auth: {
-    signedUp: (role: UserRole, method: 'phone' | 'emis' = 'phone') => {
-      posthog.capture('user_signed_up', { role, method });
+    signedUp: (role: UserRole, method: 'phone' | 'emis' = 'phone', userData?: { name?: string; phoneNumber?: string; email?: string; districtId?: string }) => {
+      // Identify the new user with their phone number
+      if (userData?.phoneNumber) {
+        posthog.identify(userData.phoneNumber, {
+          $name: userData.name,
+          phone_number: userData.phoneNumber,
+          email: userData.email,
+          role: role,
+          district_id: userData.districtId,
+          signup_method: method,
+          signup_date: new Date().toISOString(),
+        });
+      }
+      posthog.capture('user_signed_up', { 
+        role, 
+        method,
+        name: userData?.name,
+        phone_number: userData?.phoneNumber,
+        email: userData?.email,
+        district_id: userData?.districtId,
+      });
     },
     loggedIn: (role: UserRole, loginMode: 'school' | 'admin' = 'admin') => {
       posthog.capture('user_logged_in', { role, login_mode: loginMode });

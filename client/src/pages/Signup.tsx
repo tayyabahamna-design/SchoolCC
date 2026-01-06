@@ -114,7 +114,12 @@ export default function Signup() {
         throw new Error(errorMsg || 'Signup failed');
       }
 
-      analytics.auth.signedUp(formData.role as UserRole, 'phone');
+      analytics.auth.signedUp(formData.role as UserRole, 'phone', {
+        name: formData.name,
+        phoneNumber: formData.phoneNumber,
+        email: formData.email,
+        districtId: formData.districtId,
+      });
       setSuccess(true);
       setTimeout(() => navigate('/'), 3000);
     } catch (err: any) {
