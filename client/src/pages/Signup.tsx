@@ -179,6 +179,7 @@ export default function Signup() {
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="DEO">District Education Officer</SelectItem>
                     <SelectItem value="DDEO">Deputy DEO</SelectItem>
                     <SelectItem value="AEO">Area Education Officer</SelectItem>
                     <SelectItem value="HEAD_TEACHER">Head Teacher</SelectItem>
@@ -213,7 +214,7 @@ export default function Signup() {
                 </div>
               )}
 
-              {formData.role === 'DDEO' && (
+              {(formData.role === 'DEO' || formData.role === 'DDEO') && (
                 <div>
                   <Label>District *</Label>
                   <Input
