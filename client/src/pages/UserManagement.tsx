@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Users, UserCheck, UserX, CheckCircle, XCircle, Trash2, ArrowLeft, Plus, Edit, School } from 'lucide-react';
+import { Users, UserCheck, UserX, CheckCircle, XCircle, Trash2, ArrowLeft, Plus, Edit, School, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { analytics } from '@/lib/analytics';
 
@@ -81,12 +81,28 @@ export default function UserManagement() {
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserRole, setNewUserRole] = useState<UserRole>('TEACHER');
   const [newUserSchool, setNewUserSchool] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Permission check
-  if (!user || user.role !== 'DEO') {
+  // Permission check - allow both DEO and DDEO
+  if (!user || (user.role !== 'DEO' && user.role !== 'DDEO')) {
     navigate('/');
     return null;
   }
+
+  // Helper function to filter and sort users alphabetically
+  const filterAndSortUsers = (users: UserAccount[]) => {
+    return users
+      .filter(u => 
+        u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.phoneNumber.includes(searchQuery)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
+  };
+
+  const filteredAllUsers = filterAndSortUsers(allUsers);
+  const filteredPendingUsers = filterAndSortUsers(pendingUsers);
+  const filteredActiveUsers = filterAndSortUsers(activeUsers);
+  const filteredRestrictedUsers = filterAndSortUsers(restrictedUsers);
 
   useEffect(() => {
     fetchUsers();
@@ -477,19 +493,30 @@ export default function UserManagement() {
       <div className="max-w-7xl mx-auto p-6">
         <Button
           variant="ghost"
-          onClick={() => navigate('/deo-dashboard')}
+          onClick={() => navigate(user.role === 'DEO' ? '/deo-dashboard' : '/dashboard')}
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Dashboard
         </Button>
 
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">User Management</h1>
             <p className="text-muted-foreground">Manage account requests and user access</p>
           </div>
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-64"
+                data-testid="input-search-users"
+              />
+            </div>
+            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
               <Button data-testid="button-add-user">
                 <Plus className="w-4 h-4 mr-2" />
@@ -574,6 +601,7 @@ export default function UserManagement() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Edit Role Dialog */}
@@ -680,12 +708,12 @@ export default function UserManagement() {
           <TabsContent value="all" className="space-y-4">
             {loading ? (
               <p>Loading...</p>
-            ) : allUsers.length === 0 ? (
+            ) : filteredAllUsers.length === 0 ? (
               <Card className="p-8 text-center text-muted-foreground">
-                No users found
+                {searchQuery ? 'No users match your search' : 'No users found'}
               </Card>
             ) : (
-              allUsers.map((userAccount) => (
+              filteredAllUsers.map((userAccount) => (
                 <UserCard
                   key={userAccount.id}
                   user={userAccount}
@@ -770,12 +798,12 @@ export default function UserManagement() {
           <TabsContent value="pending" className="space-y-4">
             {loading ? (
               <p>Loading...</p>
-            ) : pendingUsers.length === 0 ? (
+            ) : filteredPendingUsers.length === 0 ? (
               <Card className="p-8 text-center text-muted-foreground">
-                No pending account requests
+                {searchQuery ? 'No pending users match your search' : 'No pending account requests'}
               </Card>
             ) : (
-              pendingUsers.map((userAccount) => (
+              filteredPendingUsers.map((userAccount) => (
                 <UserCard
                   key={userAccount.id}
                   user={userAccount}
@@ -807,12 +835,12 @@ export default function UserManagement() {
           <TabsContent value="active" className="space-y-4">
             {loading ? (
               <p>Loading...</p>
-            ) : activeUsers.length === 0 ? (
+            ) : filteredActiveUsers.length === 0 ? (
               <Card className="p-8 text-center text-muted-foreground">
-                No active users
+                {searchQuery ? 'No active users match your search' : 'No active users'}
               </Card>
             ) : (
-              activeUsers.map((userAccount) => (
+              filteredActiveUsers.map((userAccount) => (
                 <UserCard
                   key={userAccount.id}
                   user={userAccount}
@@ -856,12 +884,12 @@ export default function UserManagement() {
           <TabsContent value="restricted" className="space-y-4">
             {loading ? (
               <p>Loading...</p>
-            ) : restrictedUsers.length === 0 ? (
+            ) : filteredRestrictedUsers.length === 0 ? (
               <Card className="p-8 text-center text-muted-foreground">
-                No restricted users
+                {searchQuery ? 'No restricted users match your search' : 'No restricted users'}
               </Card>
             ) : (
-              restrictedUsers.map((userAccount) => (
+              filteredRestrictedUsers.map((userAccount) => (
                 <UserCard
                   key={userAccount.id}
                   user={userAccount}

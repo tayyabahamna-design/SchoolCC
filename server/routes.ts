@@ -454,10 +454,10 @@ export async function registerRoutes(
     try {
       const { userId } = req.query;
 
-      // Verify DEO permission (supports both ID and phone number lookup)
+      // Verify DEO or DDEO permission (supports both ID and phone number lookup)
       const user = await findUserByIdOrPhone(userId as string);
-      if (!user || user.role !== 'DEO') {
-        return res.status(403).json({ error: "Access denied. DEO role required." });
+      if (!user || (user.role !== 'DEO' && user.role !== 'DDEO')) {
+        return res.status(403).json({ error: "Access denied. DEO or DDEO role required." });
       }
 
       const pendingUsers = await storage.getUsersByStatus('pending');
@@ -471,10 +471,10 @@ export async function registerRoutes(
     try {
       const { approverId } = req.body;
 
-      // Verify DEO permission (supports both ID and phone number lookup)
+      // Verify DEO or DDEO permission (supports both ID and phone number lookup)
       const approver = await findUserByIdOrPhone(approverId);
-      if (!approver || approver.role !== 'DEO') {
-        return res.status(403).json({ error: "Access denied. DEO role required." });
+      if (!approver || (approver.role !== 'DEO' && approver.role !== 'DDEO')) {
+        return res.status(403).json({ error: "Access denied. DEO or DDEO role required." });
       }
 
       const user = await storage.updateUser(req.params.id, { status: 'active' });
@@ -488,10 +488,10 @@ export async function registerRoutes(
     try {
       const { approverId } = req.body;
 
-      // Verify DEO permission (supports both ID and phone number lookup)
+      // Verify DEO or DDEO permission (supports both ID and phone number lookup)
       const approver = await findUserByIdOrPhone(approverId);
-      if (!approver || approver.role !== 'DEO') {
-        return res.status(403).json({ error: "Access denied. DEO role required." });
+      if (!approver || (approver.role !== 'DEO' && approver.role !== 'DDEO')) {
+        return res.status(403).json({ error: "Access denied. DEO or DDEO role required." });
       }
 
       await storage.deleteUser(req.params.id);
@@ -505,10 +505,10 @@ export async function registerRoutes(
     try {
       const { adminId } = req.body;
 
-      // Verify DEO permission (supports both ID and phone number lookup)
+      // Verify DEO or DDEO permission (supports both ID and phone number lookup)
       const admin = await findUserByIdOrPhone(adminId);
-      if (!admin || admin.role !== 'DEO') {
-        return res.status(403).json({ error: "Access denied. DEO role required." });
+      if (!admin || (admin.role !== 'DEO' && admin.role !== 'DDEO')) {
+        return res.status(403).json({ error: "Access denied. DEO or DDEO role required." });
       }
 
       const user = await storage.updateUser(req.params.id, { status: 'restricted' });
@@ -522,10 +522,10 @@ export async function registerRoutes(
     try {
       const { adminId } = req.body;
 
-      // Verify DEO permission (supports both ID and phone number lookup)
+      // Verify DEO or DDEO permission (supports both ID and phone number lookup)
       const admin = await findUserByIdOrPhone(adminId);
-      if (!admin || admin.role !== 'DEO') {
-        return res.status(403).json({ error: "Access denied. DEO role required." });
+      if (!admin || (admin.role !== 'DEO' && admin.role !== 'DDEO')) {
+        return res.status(403).json({ error: "Access denied. DEO or DDEO role required." });
       }
 
       const user = await storage.updateUser(req.params.id, { status: 'active' });
