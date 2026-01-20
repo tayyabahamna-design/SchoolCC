@@ -326,6 +326,14 @@ export async function registerRoutes(
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
+      // Block teachers and headmasters from using admin login - they must use school staff login with EMIS
+      if (user.role === 'TEACHER' || user.role === 'HEAD_TEACHER') {
+        console.log("Login blocked - Teachers/Headmasters must use School Staff Login:", user.name);
+        return res.status(403).json({ 
+          error: "Teachers and Head Teachers must use the School Staff Login with EMIS number and phone number." 
+        });
+      }
+      
       if (user.password !== password) {
         console.log("Login failed - password mismatch for user:", user.name);
         return res.status(401).json({ error: "Invalid credentials" });
@@ -346,6 +354,63 @@ export async function registerRoutes(
 
       res.json({ ...user, password: undefined });
     } catch (error) {
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  // School Staff Login endpoint (EMIS + Phone for Teachers and Headmasters)
+  app.post("/api/auth/login-school", async (req, res) => {
+    try {
+      const { phoneNumber, emisNumber } = req.body;
+      
+      if (!phoneNumber || !emisNumber) {
+        return res.status(400).json({ error: "Phone number and EMIS number are required" });
+      }
+      
+      // Find the school by EMIS number
+      const school = await storage.getSchoolByEmis(emisNumber);
+      if (!school) {
+        console.log("School login failed - school not found for EMIS:", emisNumber);
+        return res.status(401).json({ error: "Invalid EMIS number" });
+      }
+      
+      // Find the user by phone number
+      const user = await storage.getUserByUsername(phoneNumber);
+      if (!user) {
+        console.log("School login failed - user not found for phone:", phoneNumber);
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      // Verify user is a teacher or headmaster
+      if (user.role !== 'TEACHER' && user.role !== 'HEAD_TEACHER') {
+        console.log("School login failed - user is not a teacher/headmaster:", user.role);
+        return res.status(403).json({ 
+          error: "This login is only for Teachers and Head Teachers. Please use Admin Login." 
+        });
+      }
+      
+      // Verify user belongs to this school
+      if (user.schoolId !== school.id) {
+        console.log("School login failed - user not assigned to this school:", user.name, school.name);
+        return res.status(401).json({ error: "You are not registered at this school" });
+      }
+
+      // Check user status
+      if (user.status === 'pending') {
+        return res.status(403).json({
+          error: "Account pending approval. Please wait for DEO to approve your request."
+        });
+      }
+
+      if (user.status === 'restricted') {
+        return res.status(403).json({
+          error: "Account restricted. Please contact DEO."
+        });
+      }
+
+      res.json({ ...user, password: undefined });
+    } catch (error) {
+      console.error("School login error:", error);
       res.status(500).json({ error: "Login failed" });
     }
   });

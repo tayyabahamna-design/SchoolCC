@@ -56,6 +56,7 @@ export const VALID_ASSIGNEES: Record<UserRole, UserRole[]> = {
 interface AuthContextType {
   user: User | null;
   login: (phoneNumber: string, role: UserRole, password: string) => Promise<void>;
+  loginSchool: (phoneNumber: string, emisNumber: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -133,6 +134,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     analytics.auth.sessionStarted(userData.role);
   };
 
+  const loginSchool = async (phoneNumber: string, emisNumber: string) => {
+    const response = await fetch('/api/auth/login-school', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ phoneNumber, emisNumber }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Login failed' }));
+      throw new Error(errorData.error || 'Invalid credentials');
+    }
+
+    const userData = await response.json();
+    setUser(userData);
+    analytics.identify(userData.phoneNumber, {
+      userId: userData.id,
+      phoneNumber: userData.phoneNumber,
+      name: userData.name,
+      role: userData.role,
+      schoolId: userData.schoolId,
+      schoolName: userData.schoolName,
+      clusterId: userData.clusterId,
+      districtId: userData.districtId,
+    });
+    analytics.auth.loggedIn(userData.role, 'school');
+    analytics.auth.sessionStarted(userData.role);
+  };
+
   const logout = () => {
     analytics.auth.loggedOut();
     analytics.reset();
@@ -141,7 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, loginSchool, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

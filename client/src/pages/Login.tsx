@@ -19,7 +19,7 @@ const roles: { value: UserRole; label: string; description: string; icon: any }[
 ];
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, loginSchool } = useAuth();
   const [, navigate] = useLocation();
   const [loginMode, setLoginMode] = useState<'standard' | 'school'>('standard');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -36,16 +36,17 @@ export default function Login() {
     try {
       if (loginMode === 'school') {
         // For teachers and headmasters: use EMIS + Phone
-        await login(phoneNumber, '' as UserRole, emisNumber);
+        await loginSchool(phoneNumber, emisNumber);
       } else {
         // For admin roles: use Phone + Password
         await login(phoneNumber, '' as UserRole, password);
       }
       navigate('/dashboard');
-    } catch (err) {
-      const errorMessage = loginMode === 'school' 
+    } catch (err: any) {
+      const serverMessage = err?.message || err?.error;
+      const errorMessage = serverMessage || (loginMode === 'school' 
         ? 'Invalid EMIS number or phone number. Please try again.'
-        : 'Invalid phone number or password. Please try again.';
+        : 'Invalid phone number or password. Please try again.');
       setError(errorMessage);
       analytics.auth.loginFailed(errorMessage, loginMode === 'school' ? 'school' : 'admin');
     } finally {
