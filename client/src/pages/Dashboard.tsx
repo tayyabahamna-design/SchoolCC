@@ -346,7 +346,7 @@ export default function Dashboard() {
       { label: 'Completed', value: completedCount, icon: TrendingUp, color: 'bg-emerald-50', taskType: 'completed' as const },
       { label: 'Colleagues Present', value: presentToday, icon: Users, color: 'bg-blue-50', teacherType: 'present' as const },
     ],
-    COACH: [
+    TRAINING_MANAGER: [
       { label: 'Total Teachers', value: totalTeachers, icon: Users, color: 'bg-blue-50', teacherType: 'total' as const },
       { label: 'Present Today', value: presentToday, icon: TrendingUp, color: 'bg-emerald-50', teacherType: 'present' as const },
       { label: 'On Leave Today', value: onLeaveToday, icon: Calendar, color: 'bg-amber-50', teacherType: 'onLeave' as const },

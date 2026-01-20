@@ -330,7 +330,7 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
 
       try {
         // For AEO role, filter by their own ID; for leadership roles, get all
-        const isLeadership = ['CEO', 'DEO', 'DDEO', 'COACH'].includes(user.role);
+        const isLeadership = ['CEO', 'DEO', 'DDEO', 'TRAINING_MANAGER'].includes(user.role);
         const aeoParam = !isLeadership && user.role === 'AEO' ? `?aeoId=${user.id}` : '';
         
         const [monitoringRes, mentoringRes, officeRes, otherRes] = await Promise.all([
@@ -442,7 +442,7 @@ export function ActivitiesProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     
     try {
-      const isLeadership = ['CEO', 'DEO', 'DDEO', 'COACH'].includes(user.role);
+      const isLeadership = ['CEO', 'DEO', 'DDEO', 'TRAINING_MANAGER'].includes(user.role);
       const aeoParam = !isLeadership && user.role === 'AEO' ? `?aeoId=${user.id}` : '';
       
       const [monitoringRes, mentoringRes, officeRes, otherRes] = await Promise.all([

@@ -9,8 +9,8 @@ export interface PermissionSet {
 }
 
 export function getPermissions(role: UserRole): PermissionSet {
-  // Coach has read-only access
-  if (role === 'COACH') {
+  // Training Manager has read-only access
+  if (role === 'TRAINING_MANAGER') {
     return {
       canCreate: false,
       canEdit: false,
@@ -31,8 +31,8 @@ export function getPermissions(role: UserRole): PermissionSet {
 }
 
 export function canAccessRoute(role: UserRole, route: string): boolean {
-  // Coach cannot access creation/editing routes
-  if (role === 'COACH') {
+  // Training Manager cannot access creation/editing routes
+  if (role === 'TRAINING_MANAGER') {
     const restrictedRoutes = [
       '/create-request',
       '/create-visit',

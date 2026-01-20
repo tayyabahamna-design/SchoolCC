@@ -54,7 +54,7 @@ const AVAILABLE_ROLES: { value: UserRole; label: string }[] = [
   { value: 'AEO', label: 'Assistant Education Officer' },
   { value: 'HEAD_TEACHER', label: 'Head Teacher' },
   { value: 'TEACHER', label: 'Teacher' },
-  { value: 'COACH', label: 'Coach' },
+  { value: 'TRAINING_MANAGER', label: 'Training Manager' },
 ];
 
 export default function UserManagement() {
