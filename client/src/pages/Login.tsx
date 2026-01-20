@@ -65,7 +65,7 @@ export default function Login() {
         <div className="hidden lg:flex flex-col justify-center space-y-8 p-12">
           <div className="space-y-6">
             <div className="inline-flex items-center justify-center w-32 h-32">
-              <img src="/taleemhub-logo.svg" alt="TaleemHub Logo" className="w-full h-full" />
+              <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-full h-full" />
             </div>
             <div>
               <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
@@ -114,7 +114,7 @@ export default function Login() {
         <Card className="p-8 lg:p-10 shadow-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-0">
           {/* Mobile Logo - Only shown on small screens */}
           <div className="lg:hidden flex flex-col items-center mb-6">
-            <img src="/taleemhub-logo.svg" alt="TaleemHub Logo" className="w-20 h-20 mb-3" />
+            <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-20 h-20 mb-3" />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">TaleemHub</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Education Command Center</p>
           </div>
