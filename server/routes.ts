@@ -342,19 +342,6 @@ export async function registerRoutes(
         }
       }
 
-      // Check user status
-      if (user.status === 'pending') {
-        return res.status(403).json({
-          error: "Account pending approval. Please wait for DEO to approve your request."
-        });
-      }
-
-      if (user.status === 'restricted') {
-        return res.status(403).json({
-          error: "Account restricted. Please contact DEO."
-        });
-      }
-
       console.log(`Login successful for ${user.role}: ${user.name}`);
       res.json({ ...user, password: undefined });
     } catch (error) {
@@ -436,13 +423,13 @@ export async function registerRoutes(
         schoolDistrictId = school.districtId;
       }
 
-      // Create pending user
+      // Create active user
       const newUser = await storage.createUser({
         name,
         phoneNumber,
         password: finalPassword,
         role,
-        status: 'pending',
+        status: 'active',
         fatherName,
         email,
         residentialAddress,
@@ -460,7 +447,7 @@ export async function registerRoutes(
 
       res.json({
         success: true,
-        message: "Account request submitted. You'll be notified when DEO approves."
+        message: "Account created successfully! You can now log in."
       });
     } catch (error: any) {
       console.error('Signup error:', error);
