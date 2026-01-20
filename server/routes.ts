@@ -314,21 +314,32 @@ export async function registerRoutes(
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { phoneNumber, password } = req.body;
-      
-      if (!phoneNumber || !password) {
-        return res.status(400).json({ error: "Phone number and password are required" });
+
+      if (!phoneNumber) {
+        return res.status(400).json({ error: "Phone number is required" });
       }
-      
+
       const user = await storage.getUserByUsername(phoneNumber);
-      
+
       if (!user) {
         console.log("Login failed - user not found for phone:", phoneNumber);
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      
-      if (user.password !== password) {
-        console.log("Login failed - password mismatch for user:", user.name);
-        return res.status(401).json({ error: "Invalid credentials" });
+
+      // For teachers and headmasters: phone number only (no password required)
+      // For other roles: phone number + password required
+      const isStaffRole = user.role === 'TEACHER' || user.role === 'HEAD_TEACHER';
+
+      if (!isStaffRole) {
+        // Admin roles require password
+        if (!password) {
+          return res.status(400).json({ error: "Password is required for admin accounts" });
+        }
+
+        if (user.password !== password) {
+          console.log("Login failed - password mismatch for user:", user.name);
+          return res.status(401).json({ error: "Invalid credentials" });
+        }
       }
 
       // Check user status
@@ -344,6 +355,7 @@ export async function registerRoutes(
         });
       }
 
+      console.log(`Login successful for ${user.role}: ${user.name}`);
       res.json({ ...user, password: undefined });
     } catch (error) {
       res.status(500).json({ error: "Login failed" });
@@ -373,9 +385,19 @@ export async function registerRoutes(
       } = req.body;
 
       // Validation
-      if (!name || !phoneNumber || !password || !role) {
+      const isStaffRole = role === 'TEACHER' || role === 'HEAD_TEACHER';
+
+      if (!name || !phoneNumber || !role) {
         return res.status(400).json({ error: "Missing required fields" });
       }
+
+      // Password required for non-staff roles
+      if (!isStaffRole && !password) {
+        return res.status(400).json({ error: "Password required for admin accounts" });
+      }
+
+      // Auto-generate password for staff if not provided (won't be used for login)
+      const finalPassword = password || `STAFF_${Math.random().toString(36).substring(2, 15)}`;
 
       // Check if phone number already exists
       const existingUser = await storage.getUserByUsername(phoneNumber);
@@ -418,7 +440,7 @@ export async function registerRoutes(
       const newUser = await storage.createUser({
         name,
         phoneNumber,
-        password,
+        password: finalPassword,
         role,
         status: 'pending',
         fatherName,

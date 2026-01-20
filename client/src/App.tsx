@@ -34,6 +34,7 @@ import Signup from "@/pages/Signup";
 import UserManagement from "@/pages/UserManagement";
 import NotFound from "@/pages/not-found";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 function DashboardRoute() {
   const { isAuthenticated, user } = useAuth();
@@ -90,6 +91,7 @@ function App() {
             <VisitSessionProvider>
               <ActivitiesProvider>
                 <Toaster />
+                <PWAInstallPrompt />
                 <Router />
               </ActivitiesProvider>
             </VisitSessionProvider>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TaleemHub</string>
+    <string name="title_activity_main">TaleemHub</string>
+    <string name="package_name">com.taleemabad.taleemhub</string>
+    <string name="custom_url_scheme">com.taleemabad.taleemhub</string>
+</resources>

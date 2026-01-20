@@ -5,3 +5,16 @@ server/public
 vite.config.ts.*
 *.tar.gz
 .env
+
+# Android build files
+android/app/build/
+android/app/release/
+android/.gradle/
+android/build/
+android/gradle.properties
+*.keystore
+*.jks
+
+# Capacitor
+capacitor.config.json
+.capacitor/

@@ -67,23 +67,40 @@ export default function Signup() {
     setError('');
     setLoading(true);
 
+    // For teachers and headmasters, password is optional (auto-generated)
+    const isStaffRole = formData.role === 'TEACHER' || formData.role === 'HEAD_TEACHER';
+
     // Validation
-    if (!formData.name || !formData.phoneNumber || !formData.password || !formData.role) {
+    if (!formData.name || !formData.phoneNumber || !formData.role) {
       setError('Please fill all required fields');
       setLoading(false);
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
+    // Password validation only for non-staff roles
+    if (!isStaffRole) {
+      if (!formData.password) {
+        setError('Password is required for admin accounts');
+        setLoading(false);
+        return;
+      }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setLoading(false);
-      return;
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match');
+        setLoading(false);
+        return;
+      }
+
+      if (formData.password.length < 6) {
+        setError('Password must be at least 6 characters');
+        setLoading(false);
+        return;
+      }
+    } else {
+      // Auto-generate a dummy password for staff (won't be used for login)
+      if (!formData.password) {
+        formData.password = `STAFF_${Math.random().toString(36).substring(2, 15)}`;
+      }
     }
 
     // AEO-specific validation
@@ -190,28 +207,40 @@ export default function Signup() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Password *</Label>
-                  <Input
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="Min 6 characters"
-                    required
-                  />
+              {/* Password fields - only for non-staff roles */}
+              {formData.role && formData.role !== 'TEACHER' && formData.role !== 'HEAD_TEACHER' && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Password *</Label>
+                    <Input
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="Min 6 characters"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Confirm Password *</Label>
+                    <Input
+                      type="password"
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      placeholder="Confirm password"
+                      required
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label>Confirm Password *</Label>
-                  <Input
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    placeholder="Confirm password"
-                    required
-                  />
+              )}
+
+              {/* Info for staff roles */}
+              {(formData.role === 'TEACHER' || formData.role === 'HEAD_TEACHER') && (
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    <strong>Teachers and Head Teachers:</strong> You can log in using only your phone number. No password is required.
+                  </p>
                 </div>
-              </div>
+              )}
 
               <div>
                 <Label>Role *</Label>

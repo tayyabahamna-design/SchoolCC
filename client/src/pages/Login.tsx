@@ -35,16 +35,16 @@ export default function Login() {
 
     try {
       if (loginMode === 'school') {
-        // For teachers and headmasters: use EMIS + Phone
-        await login(phoneNumber, '' as UserRole, emisNumber);
+        // For teachers and headmasters: use Phone only (no password, no EMIS)
+        await login(phoneNumber, '' as UserRole, '');
       } else {
         // For admin roles: use Phone + Password
         await login(phoneNumber, '' as UserRole, password);
       }
       navigate('/dashboard');
     } catch (err) {
-      const errorMessage = loginMode === 'school' 
-        ? 'Invalid EMIS number or phone number. Please try again.'
+      const errorMessage = loginMode === 'school'
+        ? 'Invalid phone number. Please try again or contact your administrator.'
         : 'Invalid phone number or password. Please try again.';
       setError(errorMessage);
       analytics.auth.loginFailed(errorMessage, loginMode === 'school' ? 'school' : 'admin');
@@ -189,25 +189,7 @@ export default function Login() {
               </>
             ) : (
               <>
-                {/* EMIS Number */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    School EMIS Number
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Enter EMIS number (e.g., 37330227)"
-                    value={emisNumber}
-                    onChange={(e) => setEmisNumber(e.target.value)}
-                    data-testid="input-emis"
-                    className="w-full h-12 text-base rounded-lg"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Your school's unique EMIS identifier
-                  </p>
-                </div>
-
-                {/* Phone Number */}
+                {/* Phone Number Only for Staff */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Phone Number
@@ -241,7 +223,7 @@ export default function Login() {
               disabled={
                 loading ||
                 !phoneNumber ||
-                (loginMode === 'standard' ? !password : !emisNumber)
+                (loginMode === 'standard' && !password)
               }
               data-testid="button-login"
               className="w-full h-12 text-base font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -255,7 +237,7 @@ export default function Login() {
             <p className="text-xs text-center text-gray-500 dark:text-gray-400">
               {loginMode === 'standard'
                 ? 'Default password for admin accounts: admin123'
-                : 'Use your school EMIS number and registered phone number'
+                : 'Simply enter your registered phone number to log in'
               }
             </p>
 
