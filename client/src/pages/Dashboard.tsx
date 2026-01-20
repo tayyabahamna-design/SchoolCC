@@ -668,16 +668,6 @@ export default function Dashboard() {
               <p className="text-base text-muted-foreground mt-1">Here's your dashboard overview</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowCustomizeModal(true)}
-                className="gap-2"
-                data-testid="button-customize-dashboard"
-              >
-                <Settings2 className="w-4 h-4" />
-                Customize
-              </Button>
               <ThemeToggle />
               <NotificationBell />
             </div>
