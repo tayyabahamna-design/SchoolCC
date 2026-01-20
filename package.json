@@ -14,7 +14,8 @@
     "seed:all": "tsx server/seedAllUsers.ts",
     "cap:sync": "npm run build && npx cap sync",
     "cap:open:android": "npx cap open android",
-    "cap:run:android": "npm run cap:sync && npx cap run android"
+    "cap:run:android": "npm run cap:sync && npx cap run android",
+    "generate:icons": "node scripts/generate-all-logos.mjs && npx capacitor-assets generate --android"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
