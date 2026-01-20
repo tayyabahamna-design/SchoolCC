@@ -277,7 +277,7 @@ export function OnboardingTour({ steps, isOpen, onComplete, onSkip, storageKey }
       />
 
       <div
-        className={`absolute bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-5 w-80 transition-all duration-300 ${
+        className={`absolute bg-white dark:bg-slate-800 rounded-md shadow-2xl p-5 w-80 transition-all duration-300 ${
           isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
         }`}
         style={{
