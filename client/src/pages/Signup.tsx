@@ -150,14 +150,14 @@ export default function Signup() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <Card className="p-8 max-w-md w-full text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Account Request Submitted!</h2>
+          <h2 className="text-2xl font-bold mb-2 text-foreground">Account Created Successfully!</h2>
           <p className="text-muted-foreground mb-6">
-            Your account request has been sent to the DEO for approval. You'll be notified when your account is activated.
+            Your account has been created. You can now log in using your phone number.
           </p>
-          <Button onClick={() => navigate('/')}>Return to Login</Button>
+          <Button onClick={() => navigate('/')} className="w-full">Go to Login</Button>
         </Card>
       </div>
     );
