@@ -101,10 +101,10 @@ export function OnboardingTour({ steps, isOpen, onComplete, onSkip, storageKey }
   const getTooltipPosition = () => {
     const preferredPlacement = step.placement || 'bottom';
     const padding = 20;
-    const arrowOffset = 16;
+    const arrowOffset = 24; // Increased offset to avoid overlapping
     
     const tooltipWidth = 320;
-    const tooltipHeight = 200;
+    const tooltipHeight = 220;
     
     const calculatePosition = (placement: string) => {
       let top = 0;
@@ -256,7 +256,7 @@ export function OnboardingTour({ steps, isOpen, onComplete, onSkip, storageKey }
           zIndex: 10001,
         }}
         onClick={() => {
-          const targetElement = document.querySelector(`[data-testid="${step.targetId}"]`) as HTMLElement;
+          const targetElement = document.querySelector(step.target) as HTMLElement;
           if (targetElement) {
             targetElement.click();
           }
