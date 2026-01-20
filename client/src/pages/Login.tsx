@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth, UserRole } from '@/contexts/auth';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { AlertCircle, School, Check, Crown, Building2, Users, GraduationCap, UserCheck, BookOpen, Shield, TrendingUp, Eye } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { analytics } from '@/lib/analytics';
+import { OnboardingTour, TourStep, useTourStatus } from '@/components/OnboardingTour';
 
 const roles: { value: UserRole; label: string; description: string; icon: any }[] = [
   { value: 'CEO', label: 'CEO', description: 'System oversight, all data', icon: Crown },
@@ -18,6 +19,17 @@ const roles: { value: UserRole; label: string; description: string; icon: any }[
   { value: 'TRAINING_MANAGER', label: 'Training Manager', description: 'Read-only monitoring', icon: Eye },
 ];
 
+const LOGIN_TOUR_KEY = 'taleemhub_login_tour';
+
+const loginTourSteps: TourStep[] = [
+  {
+    target: '[data-testid="button-create-account"]',
+    title: 'Welcome to TaleemHub!',
+    content: 'New here? Click "Create Account" to register as a Teacher or Head Teacher. You\'ll need your school\'s EMIS number.',
+    placement: 'top',
+  },
+];
+
 export default function Login() {
   const { login } = useAuth();
   const [, navigate] = useLocation();
@@ -27,6 +39,16 @@ export default function Login() {
   const [emisNumber, setEmisNumber] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  const { hasSeenTour } = useTourStatus(LOGIN_TOUR_KEY);
+  const [showTour, setShowTour] = useState(false);
+
+  useEffect(() => {
+    if (!hasSeenTour) {
+      const timer = setTimeout(() => setShowTour(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [hasSeenTour]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -247,6 +269,7 @@ export default function Login() {
                 type="button"
                 onClick={() => navigate('/signup')}
                 className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                data-testid="button-create-account"
               >
                 Don't have an account? Create Account
               </button>
@@ -262,6 +285,15 @@ export default function Login() {
         </Card>
 
       </div>
+
+      {/* Onboarding Tour */}
+      <OnboardingTour
+        steps={loginTourSteps}
+        isOpen={showTour}
+        onComplete={() => setShowTour(false)}
+        onSkip={() => setShowTour(false)}
+        storageKey={LOGIN_TOUR_KEY}
+      />
     </div>
   );
 }
