@@ -168,7 +168,9 @@ export default function Dashboard() {
       case 'requests':
         return (
           <div key="requests" data-testid="widget-requests">
-            <h2 className="text-2xl font-bold gradient-text mb-6">Recent Activity</h2>
+            <h2 className="text-2xl font-bold gradient-text mb-6">
+              {user.role === 'TEACHER' ? 'My Tasks' : 'Recent Activity'}
+            </h2>
             {userRequests.length === 0 ? (
               <Card className="p-12 text-center bg-card border border-border">
                 <p className="text-lg text-muted-foreground">No requests yet</p>
@@ -216,6 +218,7 @@ export default function Dashboard() {
         );
       
       case 'staff':
+        if (user.role === 'TEACHER') return null;
         return (
           <div key="staff" data-testid="widget-staff">
             <h2 className="text-2xl font-bold gradient-text mb-6">Staff Overview</h2>
@@ -261,6 +264,7 @@ export default function Dashboard() {
         );
       
       case 'visits':
+        if (user.role === 'TEACHER' || user.role === 'HEAD_TEACHER') return null;
         return (
           <div key="visits" data-testid="widget-visits">
             <h2 className="text-2xl font-bold gradient-text mb-6">Recent Visits</h2>

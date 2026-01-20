@@ -21,9 +21,33 @@ const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: 'calendar', title: 'Leave Calendar', visible: true, order: 5 },
 ];
 
+const TEACHER_WIDGETS: WidgetConfig[] = [
+  { id: 'stats', title: 'Quick Stats', visible: true, order: 0 },
+  { id: 'requests', title: 'My Tasks', visible: true, order: 1 },
+  { id: 'calendar', title: 'Leave Calendar', visible: true, order: 2 },
+];
+
+const HEAD_TEACHER_WIDGETS: WidgetConfig[] = [
+  { id: 'stats', title: 'Quick Stats', visible: true, order: 0 },
+  { id: 'requests', title: 'Data Requests', visible: true, order: 1 },
+  { id: 'staff', title: 'Staff Overview', visible: true, order: 2 },
+  { id: 'calendar', title: 'Leave Calendar', visible: true, order: 3 },
+];
+
+function getDefaultWidgetsForRole(role: string): WidgetConfig[] {
+  switch (role) {
+    case 'TEACHER':
+      return TEACHER_WIDGETS;
+    case 'HEAD_TEACHER':
+      return HEAD_TEACHER_WIDGETS;
+    default:
+      return DEFAULT_WIDGETS;
+  }
+}
+
 const STORAGE_KEY = 'dashboard_layout';
 
-function loadWidgetsFromStorage(storageKey: string): WidgetConfig[] {
+function loadWidgetsFromStorage(storageKey: string, role: string): WidgetConfig[] {
   try {
     const saved = localStorage.getItem(storageKey);
     if (saved) {
@@ -33,23 +57,23 @@ function loadWidgetsFromStorage(storageKey: string): WidgetConfig[] {
   } catch (e) {
     console.error('Error loading dashboard layout:', e);
   }
-  return [...DEFAULT_WIDGETS];
+  return [...getDefaultWidgetsForRole(role)];
 }
 
 export function useDashboardWidgets(userId: string, userRole: string) {
   const storageKey = `${STORAGE_KEY}_${userId}_${userRole}`;
   const prevStorageKey = useRef(storageKey);
   
-  const [widgets, setWidgets] = useState<WidgetConfig[]>(() => loadWidgetsFromStorage(storageKey));
+  const [widgets, setWidgets] = useState<WidgetConfig[]>(() => loadWidgetsFromStorage(storageKey, userRole));
 
   const [draggedWidget, setDraggedWidget] = useState<string | null>(null);
 
   useEffect(() => {
     if (prevStorageKey.current !== storageKey) {
-      setWidgets(loadWidgetsFromStorage(storageKey));
+      setWidgets(loadWidgetsFromStorage(storageKey, userRole));
       prevStorageKey.current = storageKey;
     }
-  }, [storageKey]);
+  }, [storageKey, userRole]);
 
   useEffect(() => {
     if (userId !== 'guest') {
@@ -97,8 +121,8 @@ export function useDashboardWidgets(userId: string, userRole: string) {
   }, []);
 
   const resetToDefault = useCallback(() => {
-    setWidgets([...DEFAULT_WIDGETS]);
-  }, []);
+    setWidgets([...getDefaultWidgetsForRole(userRole)]);
+  }, [userRole]);
 
   const getVisibleWidgets = useCallback(() => {
     return widgets.filter(w => w.visible).sort((a, b) => a.order - b.order);
