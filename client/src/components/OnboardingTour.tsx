@@ -245,6 +245,25 @@ export function OnboardingTour({ steps, isOpen, onComplete, onSkip, storageKey }
         />
       </svg>
 
+      {/* Clickable area over the highlighted element - allows users to tap the button */}
+      <div
+        className="absolute cursor-pointer"
+        style={{
+          top: targetRect.top - 8,
+          left: targetRect.left - 8,
+          width: targetRect.width + 16,
+          height: targetRect.height + 16,
+          zIndex: 10001,
+        }}
+        onClick={() => {
+          const targetElement = document.querySelector(`[data-testid="${step.targetId}"]`) as HTMLElement;
+          if (targetElement) {
+            targetElement.click();
+          }
+        }}
+      />
+      
+      {/* Visual highlight ring around the target */}
       <div
         className="absolute rounded-2xl ring-4 ring-amber-400 ring-offset-2 pointer-events-none transition-all duration-300"
         style={{
