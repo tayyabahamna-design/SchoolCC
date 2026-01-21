@@ -514,7 +514,7 @@ export default function DEODashboard() {
                   className="text-sm text-muted-foreground mt-1 cursor-pointer hover:text-foreground transition-colors"
                   onClick={() => navigate('/profile')}
                 >
-                  {user.name} • {user.role === 'DDEO' ? 'Deputy District Education Officer' : 'District Education Officer'}
+                  {user.name}
                 </p>
               </div>
             </div>
