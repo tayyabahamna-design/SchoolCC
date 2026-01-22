@@ -325,17 +325,23 @@ export function HelpGuide() {
     setLanguage(language === 'en' ? 'ur' : 'en');
   };
 
+  // Hide on login and signup pages (they have their own help systems)
+  const hideOnPages = ['/', '/signup'];
+  const shouldHideButton = hideOnPages.includes(location);
+
   return (
     <>
-      {/* Floating Help Button */}
-      <button
-        onClick={handleOpen}
-        className="fixed bottom-20 right-4 z-[60] w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95"
-        aria-label="Open Help Guide"
-        data-testid="button-help-guide"
-      >
-        <HelpCircle className="w-6 h-6" />
-      </button>
+      {/* Floating Help Button - hidden on login/signup */}
+      {!shouldHideButton && (
+        <button
+          onClick={handleOpen}
+          className="fixed bottom-20 right-4 z-[60] w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95"
+          aria-label="Open Help Guide"
+          data-testid="button-help-guide"
+        >
+          <HelpCircle className="w-6 h-6" />
+        </button>
+      )}
 
       {/* Guide Panel */}
       {isOpen && (
