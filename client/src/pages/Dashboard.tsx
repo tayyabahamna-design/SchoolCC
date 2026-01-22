@@ -565,16 +565,6 @@ export default function Dashboard() {
                     <span className="font-medium text-foreground">Staff Leave Calendar</span>
                   </button>
                   <button
-                    onClick={() => { navigate('/collaborative-forms'); setShowMobileSidebar(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group"
-                    data-testid="mobile-button-collab-forms"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md">
-                      <Plus className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="font-medium text-foreground">Collaborative Forms</span>
-                  </button>
-                  <button
                     onClick={() => { navigate('/headteacher-user-management'); setShowMobileSidebar(false); }}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-indigo-100/80 dark:hover:bg-indigo-900/30 transition-all duration-300 group"
                     data-testid="mobile-button-manage-teachers"
@@ -815,16 +805,6 @@ export default function Dashboard() {
                     <Edit className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-medium text-foreground">Update School Data</span>
-                </button>
-                <button
-                  onClick={() => navigate('/collaborative-forms')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
-                  data-testid="button-collaborative-forms"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                    <Plus className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="font-medium text-foreground">Collaborative Forms</span>
                 </button>
                 <button
                   onClick={() => navigate('/headteacher-user-management')}
