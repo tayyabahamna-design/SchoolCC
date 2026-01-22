@@ -195,8 +195,12 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'Data Requests', ur: 'ڈیٹا کی درخواستیں' },
         description: {
-          en: 'Use "DATA REQUESTS" to:\n\n• View requests from AEO, DEO, or CEO\n• Create new data requests for your teachers\n• Track responses and submissions\n• Export data to Excel for reporting',
-          ur: '"ڈیٹا کی درخواستیں" استعمال کریں:\n\n• AEO، DEO یا CEO کی درخواستیں دیکھیں\n• اپنے اساتذہ کے لیے نئی ڈیٹا کی درخواستیں بنائیں\n• جوابات اور جمع کرائیں ٹریک کریں\n• رپورٹنگ کے لیے ڈیٹا Excel میں ایکسپورٹ کریں'
+          en: 'Use "DATA REQUESTS" to:\n\n• View requests from AEO, DEO, or CEO\n• Create new data requests for your teachers\n• Use VOICE NOTES to record instructions in English or Urdu - speech is automatically converted to text!\n• Track responses and submissions\n• Export data to Excel for reporting\n\n🎤 Voice Recording: Tap the microphone icon to record voice notes. Your speech will be transcribed automatically!',
+          ur: '"ڈیٹا کی درخواستیں" استعمال کریں:\n\n• AEO، DEO یا CEO کی درخواستیں دیکھیں\n• اپنے اساتذہ کے لیے نئی ڈیٹا کی درخواستیں بنائیں\n• انگریزی یا اردو میں ہدایات ریکارڈ کرنے کے لیے وائس نوٹس استعمال کریں - تقریر خودکار طور پر ٹیکسٹ میں تبدیل ہو جاتی ہے!\n• جوابات اور جمع کرائیں ٹریک کریں\n• رپورٹنگ کے لیے ڈیٹا Excel میں ایکسپورٹ کریں\n\n🎤 وائس ریکارڈنگ: وائس نوٹس ریکارڈ کرنے کے لیے مائیکروفون آئیکن ٹیپ کریں۔ آپ کی تقریر خودکار طور پر لکھی جائے گی!'
+        },
+        tip: {
+          en: 'Use voice notes in English or Urdu - they get converted to text automatically!',
+          ur: 'انگریزی یا اردو میں وائس نوٹس استعمال کریں - یہ خودکار طور پر ٹیکسٹ میں تبدیل ہو جاتے ہیں!'
         },
         target: '[data-testid="button-data-requests"]',
         position: 'bottom'
@@ -314,8 +318,8 @@ const guides: Record<string, ScreenGuide> = {
   '/data-requests': {
     screenName: { en: 'Data Requests', ur: 'ڈیٹا کی درخواستیں' },
     introduction: {
-      en: 'View and respond to data collection requests from your supervisors.',
-      ur: 'اپنے سپروائزرز کی طرف سے ڈیٹا جمع کرنے کی درخواستیں دیکھیں اور ان کا جواب دیں۔'
+      en: 'View and respond to data collection requests from your supervisors. You can use voice notes to record responses in English or Urdu!',
+      ur: 'اپنے سپروائزرز کی طرف سے ڈیٹا جمع کرنے کی درخواستیں دیکھیں اور ان کا جواب دیں۔ آپ انگریزی یا اردو میں جوابات ریکارڈ کرنے کے لیے وائس نوٹس استعمال کر سکتے ہیں!'
     },
     steps: [
       {
@@ -341,10 +345,23 @@ const guides: Record<string, ScreenGuide> = {
         position: 'bottom'
       },
       {
+        title: { en: 'Voice Notes Feature', ur: 'وائس نوٹس کی خصوصیت' },
+        description: {
+          en: 'Use VOICE NOTES to record your instructions or responses:\n\n• Tap the 🎤 microphone icon to start recording\n• Speak in English or Urdu\n• Your speech is automatically converted to text!\n• The transcribed text appears in the text field\n• You can edit the text after recording',
+          ur: 'اپنی ہدایات یا جوابات ریکارڈ کرنے کے لیے وائس نوٹس استعمال کریں:\n\n• ریکارڈنگ شروع کرنے کے لیے 🎤 مائیکروفون آئیکن ٹیپ کریں\n• انگریزی یا اردو میں بولیں\n• آپ کی تقریر خودکار طور پر ٹیکسٹ میں تبدیل ہو جاتی ہے!\n• لکھا ہوا ٹیکسٹ ٹیکسٹ فیلڈ میں ظاہر ہوتا ہے\n• آپ ریکارڈنگ کے بعد ٹیکسٹ ایڈٹ کر سکتے ہیں'
+        },
+        tip: {
+          en: 'Speak clearly - your voice is converted to text automatically!',
+          ur: 'واضح بولیں - آپ کی آواز خودکار طور پر ٹیکسٹ میں تبدیل ہو جاتی ہے!'
+        },
+        target: '[data-testid*="voice-recorder"], [data-testid*="mic"]',
+        position: 'bottom'
+      },
+      {
         title: { en: 'Submitting a Response', ur: 'جواب جمع کرانا' },
         description: {
-          en: 'After tapping a request, fill in all required fields carefully. Upload any needed files or photos. Tap "Submit" when done - you cannot change it after!',
-          ur: 'درخواست پر ٹیپ کرنے کے بعد تمام مطلوبہ خانے احتیاط سے پُر کریں۔ کوئی بھی ضروری فائلیں یا تصاویر اپ لوڈ کریں۔ مکمل ہونے پر "جمع کریں" پر ٹیپ کریں - بعد میں تبدیل نہیں ہو سکتا!'
+          en: 'After tapping a request, fill in all required fields carefully. You can type or use voice notes. Upload any needed files or photos. Tap "Submit" when done - you cannot change it after!',
+          ur: 'درخواست پر ٹیپ کرنے کے بعد تمام مطلوبہ خانے احتیاط سے پُر کریں۔ آپ ٹائپ کر سکتے ہیں یا وائس نوٹس استعمال کر سکتے ہیں۔ کوئی بھی ضروری فائلیں یا تصاویر اپ لوڈ کریں۔ مکمل ہونے پر "جمع کریں" پر ٹیپ کریں - بعد میں تبدیل نہیں ہو سکتا!'
         },
         position: 'center'
       },
