@@ -224,10 +224,7 @@ export default function Signup() {
 
         <Card className="p-8">
           <div data-guide="welcome">
-            <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-            <p className="text-muted-foreground mb-6">
-              Submit your request for DEO approval
-            </p>
+            <h1 className="text-3xl font-bold mb-6">Create Account | اکاؤنٹ بنائیں</h1>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
