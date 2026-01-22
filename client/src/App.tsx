@@ -80,6 +80,7 @@ function Router() {
         <Route path="/album/:schoolId" component={SchoolAlbum} />
         <Route path="/community-album" component={CommunityAlbum} />
         <Route path="/create-activity/:schoolId" component={CreateActivity} />
+        <Route path="/create-activity" component={CreateActivity} />
         <Route path="/collaborative-forms" component={CollaborativeForms} />
         <Route path="/create-collaborative-form" component={CreateCollaborativeForm} />
         <Route path="/collaborative-form/:formId" component={ViewCollaborativeForm} />
