@@ -372,19 +372,16 @@ export async function registerRoutes(
       } = req.body;
 
       // Validation
-      const isStaffRole = role === 'TEACHER' || role === 'HEAD_TEACHER';
-
       if (!name || !phoneNumber || !role) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      // Password required for non-staff roles
-      if (!isStaffRole && !password) {
-        return res.status(400).json({ error: "Password required for admin accounts" });
+      // Password required for all roles
+      if (!password) {
+        return res.status(400).json({ error: "Password is required" });
       }
 
-      // Auto-generate password for staff if not provided (won't be used for login)
-      const finalPassword = password || `STAFF_${Math.random().toString(36).substring(2, 15)}`;
+      const finalPassword = password;
 
       // Check if phone number already exists
       const existingUser = await storage.getUserByUsername(phoneNumber);

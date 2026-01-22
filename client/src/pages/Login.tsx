@@ -33,16 +33,15 @@ const loginHelpSteps: HelpStep[] = [
     action: 'Look for "Create Account" link | "Create Account" لنک تلاش کریں',
   },
   {
-    title: 'Login Methods',
-    content: 'Admin roles (CEO, DEO, DDEO, AEO) use phone + password. School staff (Teachers, Head Teachers) use phone number only.\n\nایڈمن رولز (CEO, DEO, DDEO, AEO) فون + پاس ورڈ استعمال کرتے ہیں۔ سکول سٹاف (اساتذہ، ہیڈ ٹیچرز) صرف فون نمبر استعمال کرتے ہیں۔',
-    action: 'Switch tabs: "Admin Login" or "School Staff Login" | ٹیبز سوئچ کریں',
+    title: 'Login with Phone & Password',
+    content: 'All users login with phone number and password for security.\n\nتمام صارفین فون نمبر اور پاس ورڈ سے لاگ ان کرتے ہیں۔',
+    action: 'Enter your phone number and password | اپنا فون نمبر اور پاس ورڈ درج کریں',
   },
 ];
 
 export default function Login() {
   const { login } = useAuth();
   const [, navigate] = useLocation();
-  const [loginMode, setLoginMode] = useState<'standard' | 'school'>('standard');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [emisNumber, setEmisNumber] = useState('');
@@ -83,20 +82,12 @@ export default function Login() {
     setLoading(true);
 
     try {
-      if (loginMode === 'school') {
-        // For teachers and headmasters: use Phone only (no password, no EMIS)
-        await login(phoneNumber, '' as UserRole, '');
-      } else {
-        // For admin roles: use Phone + Password
-        await login(phoneNumber, '' as UserRole, password);
-      }
+      // All users now use Phone + Password
+      await login(phoneNumber, '' as UserRole, password);
       navigate('/dashboard');
     } catch (err) {
-      const errorMessage = loginMode === 'school'
-        ? 'Invalid phone number. Please try again or contact your administrator.'
-        : 'Invalid phone number or password. Please try again.';
-      setError(errorMessage);
-      analytics.auth.loginFailed(errorMessage, loginMode === 'school' ? 'school' : 'admin');
+      setError('Invalid phone number or password. Please try again.');
+      analytics.auth.loginFailed('Invalid credentials', 'admin');
     } finally {
       setLoading(false);
     }
@@ -204,89 +195,36 @@ export default function Login() {
             <p className="text-gray-600 dark:text-gray-400">Sign in to continue your monitoring journey</p>
           </div>
 
-          {/* Login Mode Switcher */}
-          <div className="flex gap-2 p-1 mb-6 bg-gray-100 dark:bg-gray-700 rounded-lg">
-            <button
-              type="button"
-              onClick={() => setLoginMode('standard')}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                loginMode === 'standard'
-                  ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
-            >
-              Admin Login
-            </button>
-            <button
-              type="button"
-              onClick={() => setLoginMode('school')}
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all ${
-                loginMode === 'school'
-                  ? 'bg-white dark:bg-gray-800 text-blue-600 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
-            >
-              School Staff Login
-            </button>
-          </div>
-
           <form onSubmit={handleLogin} className="space-y-6">
-            {loginMode === 'standard' ? (
-              <>
-                {/* Phone Number */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Phone Number
-                  </label>
-                  <Input
-                    type="tel"
-                    placeholder="Enter phone number (e.g., 03000000002)"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    data-testid="input-phone"
-                    className="w-full h-12 text-base rounded-lg"
-                  />
-                </div>
+            {/* Phone Number */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Phone Number | فون نمبر
+              </label>
+              <Input
+                type="tel"
+                placeholder="Enter phone number (e.g., 03001234567)"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                data-testid="input-phone"
+                className="w-full h-12 text-base rounded-lg"
+              />
+            </div>
 
-                {/* Password */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Password
-                  </label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    data-testid="input-password"
-                    className="w-full h-12 text-base rounded-lg"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    For CEO, DEO, DDEO, AEO roles
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Phone Number Only for Staff */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Phone Number
-                  </label>
-                  <Input
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    data-testid="input-phone-school"
-                    className="w-full h-12 text-base rounded-lg"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    For Teachers and Head Teachers
-                  </p>
-                </div>
-              </>
-            )}
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Password | پاس ورڈ
+              </label>
+              <Input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                data-testid="input-password"
+                className="w-full h-12 text-base rounded-lg"
+              />
+            </div>
 
             {/* Error */}
             {error && (
@@ -299,29 +237,18 @@ export default function Login() {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={
-                loading ||
-                !phoneNumber ||
-                (loginMode === 'standard' && !password)
-              }
+              disabled={loading || !phoneNumber || !password}
               data-testid="button-login"
               className="w-full h-12 text-base font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               size="lg"
             >
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? 'Signing In...' : 'Sign In | لاگ ان'}
             </Button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-              {loginMode === 'standard'
-                ? 'Default password for admin accounts: admin123'
-                : 'Simply enter your registered phone number to log in'
-              }
-            </p>
-
             {/* Create Account Link */}
-            <div className="mt-4 text-center">
+            <div className="text-center">
               <button
                 type="button"
                 onClick={() => navigate('/signup')}
