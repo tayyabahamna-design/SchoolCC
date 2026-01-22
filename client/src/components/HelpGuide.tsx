@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { HelpCircle, X, ChevronLeft, ChevronRight, Languages, BookOpen } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { X, ChevronLeft, ChevronRight, Languages, BookOpen, ArrowDown, ArrowUp, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 
@@ -9,6 +9,8 @@ interface GuideStep {
   title: { en: string; ur: string };
   description: { en: string; ur: string };
   tip?: { en: string; ur: string };
+  target?: string;
+  position?: 'top' | 'bottom' | 'left' | 'right' | 'center';
 }
 
 interface ScreenGuide {
@@ -18,321 +20,148 @@ interface ScreenGuide {
 }
 
 const guides: Record<string, ScreenGuide> = {
-  '/': {
-    screenName: { en: 'Login Screen', ur: 'لاگ ان سکرین' },
-    introduction: {
-      en: 'Welcome to TaleemHub! This is where you sign in to access your education management dashboard.',
-      ur: 'تعلیم ہب میں خوش آمدید! یہاں سے آپ اپنے تعلیمی انتظامی ڈیش بورڈ تک رسائی کے لیے سائن ان کریں۔'
-    },
-    steps: [
-      {
-        title: { en: 'Step 1: Enter Phone Number', ur: 'مرحلہ 1: فون نمبر درج کریں' },
-        description: {
-          en: 'Type your 11-digit mobile phone number in the first field. This is the same number you used when creating your account. Example: 03001234567',
-          ur: 'پہلے خانے میں اپنا 11 ہندسوں کا موبائل فون نمبر ٹائپ کریں۔ یہ وہی نمبر ہے جو آپ نے اکاؤنٹ بناتے وقت استعمال کیا تھا۔ مثال: 03001234567'
-        },
-        tip: {
-          en: 'Make sure to enter all 11 digits without any spaces or dashes.',
-          ur: 'یقینی بنائیں کہ تمام 11 ہندسے بغیر کسی خلا یا ڈیش کے درج کریں۔'
-        }
-      },
-      {
-        title: { en: 'Step 2: Enter Password', ur: 'مرحلہ 2: پاس ورڈ درج کریں' },
-        description: {
-          en: 'Type your password in the second field. This is the password you created during account registration. The password is hidden for security.',
-          ur: 'دوسرے خانے میں اپنا پاس ورڈ ٹائپ کریں۔ یہ وہ پاس ورڈ ہے جو آپ نے اکاؤنٹ رجسٹریشن کے دوران بنایا تھا۔ سیکیورٹی کے لیے پاس ورڈ چھپا ہوا ہے۔'
-        },
-        tip: {
-          en: 'If you forgot your password, contact your supervisor for help.',
-          ur: 'اگر آپ اپنا پاس ورڈ بھول گئے ہیں تو مدد کے لیے اپنے سپروائزر سے رابطہ کریں۔'
-        }
-      },
-      {
-        title: { en: 'Step 3: Tap Sign In', ur: 'مرحلہ 3: سائن ان پر ٹیپ کریں' },
-        description: {
-          en: 'After entering your phone number and password, tap the blue "Sign In" button. If your credentials are correct, you will be taken to your dashboard.',
-          ur: 'اپنا فون نمبر اور پاس ورڈ درج کرنے کے بعد نیلے "سائن ان" بٹن پر ٹیپ کریں۔ اگر آپ کی تفصیلات درست ہیں تو آپ کو اپنے ڈیش بورڈ پر لے جایا جائے گا۔'
-        }
-      },
-      {
-        title: { en: 'New User? Create Account', ur: 'نئے صارف؟ اکاؤنٹ بنائیں' },
-        description: {
-          en: 'If you don\'t have an account yet, tap "Create Account" at the bottom of the screen. You will need your CNIC, phone number, and school information to register.',
-          ur: 'اگر آپ کا ابھی تک اکاؤنٹ نہیں ہے تو اسکرین کے نیچے "اکاؤنٹ بنائیں" پر ٹیپ کریں۔ رجسٹر کرنے کے لیے آپ کو اپنا شناختی کارڈ، فون نمبر اور اسکول کی معلومات درکار ہوں گی۔'
-        }
-      },
-    ],
-  },
-  '/signup': {
-    screenName: { en: 'Create Account', ur: 'اکاؤنٹ بنائیں' },
-    introduction: {
-      en: 'Register a new account to join TaleemHub. Fill in all required fields carefully.',
-      ur: 'تعلیم ہب میں شامل ہونے کے لیے نیا اکاؤنٹ رجسٹر کریں۔ تمام مطلوبہ خانے احتیاط سے پُر کریں۔'
-    },
-    steps: [
-      {
-        title: { en: 'Step 1: Enter Your Full Name', ur: 'مرحلہ 1: اپنا پورا نام درج کریں' },
-        description: {
-          en: 'Enter your complete name exactly as it appears on your official documents (CNIC). Include your full name with father\'s name if required.',
-          ur: 'اپنا مکمل نام بالکل اسی طرح درج کریں جیسے یہ آپ کے سرکاری دستاویزات (شناختی کارڈ) پر ہے۔ اگر ضرورت ہو تو والد کا نام بھی شامل کریں۔'
-        },
-        tip: {
-          en: 'Use your official name as per government records.',
-          ur: 'سرکاری ریکارڈ کے مطابق اپنا سرکاری نام استعمال کریں۔'
-        }
-      },
-      {
-        title: { en: 'Step 2: Enter Phone Number', ur: 'مرحلہ 2: فون نمبر درج کریں' },
-        description: {
-          en: 'Enter your 11-digit mobile phone number. This will be used for login and communication. Only numbers are allowed - the system will automatically remove any letters or special characters.',
-          ur: 'اپنا 11 ہندسوں کا موبائل فون نمبر درج کریں۔ یہ لاگ ان اور رابطے کے لیے استعمال ہوگا۔ صرف نمبر درج کریں - سسٹم خودکار طور پر کسی بھی حرف یا خاص علامت کو ہٹا دے گا۔'
-        },
-        tip: {
-          en: 'Example: 03001234567 (must be exactly 11 digits)',
-          ur: 'مثال: 03001234567 (بالکل 11 ہندسے ہونے چاہئیں)'
-        }
-      },
-      {
-        title: { en: 'Step 3: Enter CNIC Number', ur: 'مرحلہ 3: شناختی کارڈ نمبر درج کریں' },
-        description: {
-          en: 'Enter your 13-digit CNIC (Computerized National Identity Card) number. The system will automatically add dashes in the correct format (12345-1234567-1).',
-          ur: 'اپنا 13 ہندسوں کا شناختی کارڈ نمبر درج کریں۔ سسٹم خودکار طور پر درست فارمیٹ میں ڈیش لگا دے گا (12345-1234567-1)۔'
-        },
-        tip: {
-          en: 'Just type the numbers, dashes will be added automatically.',
-          ur: 'صرف نمبر ٹائپ کریں، ڈیش خودکار طور پر لگ جائیں گے۔'
-        }
-      },
-      {
-        title: { en: 'Step 4: Select Your Role', ur: 'مرحلہ 4: اپنا کردار منتخب کریں' },
-        description: {
-          en: 'Choose your job position from the dropdown menu. Options include: Teacher (استاد), Head Teacher (ہیڈ ٹیچر), AEO (اسسٹنٹ ایجوکیشن آفیسر), Training Manager (ٹریننگ مینیجر), and others.',
-          ur: 'ڈراپ ڈاؤن مینو سے اپنا عہدہ منتخب کریں۔ اختیارات میں شامل ہیں: استاد، ہیڈ ٹیچر، AEO (اسسٹنٹ ایجوکیشن آفیسر)، ٹریننگ مینیجر اور دیگر۔'
-        },
-        tip: {
-          en: 'Select the role that matches your official designation.',
-          ur: 'وہ کردار منتخب کریں جو آپ کی سرکاری عہدے سے مطابقت رکھتا ہو۔'
-        }
-      },
-      {
-        title: { en: 'Step 5: Select District & School', ur: 'مرحلہ 5: ضلع اور اسکول منتخب کریں' },
-        description: {
-          en: 'First select your district from the dropdown. Then select your school using the EMIS code or school name. For AEOs, select your Markaz and assigned schools.',
-          ur: 'پہلے ڈراپ ڈاؤن سے اپنا ضلع منتخب کریں۔ پھر EMIS کوڈ یا اسکول کے نام سے اپنا اسکول منتخب کریں۔ AEOs کے لیے اپنا مرکز اور تفویض کردہ اسکول منتخب کریں۔'
-        }
-      },
-      {
-        title: { en: 'Step 6: Create Password', ur: 'مرحلہ 6: پاس ورڈ بنائیں' },
-        description: {
-          en: 'Create a secure password with at least 6 characters. Use a mix of letters and numbers for better security. Remember this password for future logins.',
-          ur: 'کم از کم 6 حروف کے ساتھ ایک محفوظ پاس ورڈ بنائیں۔ بہتر سیکیورٹی کے لیے حروف اور نمبروں کا مرکب استعمال کریں۔ مستقبل میں لاگ ان کے لیے یہ پاس ورڈ یاد رکھیں۔'
-        },
-        tip: {
-          en: 'Write down your password somewhere safe.',
-          ur: 'اپنا پاس ورڈ کہیں محفوظ جگہ لکھ لیں۔'
-        }
-      },
-      {
-        title: { en: 'Step 7: Submit Registration', ur: 'مرحلہ 7: رجسٹریشن جمع کریں' },
-        description: {
-          en: 'After filling all fields, tap the "Create Account" button. If successful, you will see a confirmation message and can proceed to login.',
-          ur: 'تمام خانے پُر کرنے کے بعد "اکاؤنٹ بنائیں" بٹن پر ٹیپ کریں۔ کامیاب ہونے پر آپ کو تصدیقی پیغام نظر آئے گا اور لاگ ان کر سکتے ہیں۔'
-        }
-      },
-    ],
-  },
   '/dashboard': {
     screenName: { en: 'Dashboard', ur: 'ڈیش بورڈ' },
     introduction: {
-      en: 'Your dashboard is the main control center. From here, you can access all features of TaleemHub.',
-      ur: 'آپ کا ڈیش بورڈ مرکزی کنٹرول سینٹر ہے۔ یہاں سے آپ تعلیم ہب کی تمام خصوصیات تک رسائی حاصل کر سکتے ہیں۔'
+      en: 'Welcome to your Dashboard! This is your control center where you can access all TaleemHub features.',
+      ur: 'اپنے ڈیش بورڈ میں خوش آمدید! یہ آپ کا کنٹرول سینٹر ہے جہاں سے آپ تعلیم ہب کی تمام خصوصیات تک رسائی حاصل کر سکتے ہیں۔'
     },
     steps: [
       {
-        title: { en: 'Understanding Your Dashboard', ur: 'اپنے ڈیش بورڈ کو سمجھیں' },
+        title: { en: 'Quick Action Cards', ur: 'فوری عمل کارڈز' },
         description: {
-          en: 'The dashboard shows quick access cards for different features. Each card represents a different section of the app. Tap any card to open that section.',
-          ur: 'ڈیش بورڈ مختلف خصوصیات کے لیے فوری رسائی کارڈز دکھاتا ہے۔ ہر کارڈ ایپ کے ایک مختلف حصے کی نمائندگی کرتا ہے۔ اس حصے کو کھولنے کے لیے کسی بھی کارڈ پر ٹیپ کریں۔'
-        }
+          en: 'These cards give you quick access to main features. Each card opens a different section of the app. Tap any card to explore that feature.',
+          ur: 'یہ کارڈز آپ کو اہم خصوصیات تک فوری رسائی دیتے ہیں۔ ہر کارڈ ایپ کا ایک مختلف حصہ کھولتا ہے۔ اس خصوصیت کو دریافت کرنے کے لیے کسی بھی کارڈ پر ٹیپ کریں۔'
+        },
+        target: '[data-testid="dashboard-cards"], .grid',
+        position: 'bottom'
       },
       {
         title: { en: 'Leave Calendar', ur: 'چھٹی کیلنڈر' },
         description: {
-          en: 'Tap the "Leave Calendar" card to view and manage staff leave records. You can see which staff members are on leave and add new leave entries.',
-          ur: '"چھٹی کیلنڈر" کارڈ پر ٹیپ کریں تاکہ عملے کی چھٹیوں کے ریکارڈ دیکھ سکیں اور ان کا انتظام کر سکیں۔ آپ دیکھ سکتے ہیں کہ کون سے عملے کے ارکان چھٹی پر ہیں اور نئی چھٹی کے اندراجات شامل کر سکتے ہیں۔'
+          en: 'Tap here to open the Leave Calendar. You can view all staff leaves and add new leave records by tapping on any date.',
+          ur: 'چھٹی کیلنڈر کھولنے کے لیے یہاں ٹیپ کریں۔ آپ عملے کی تمام چھٹیاں دیکھ سکتے ہیں اور کسی بھی تاریخ پر ٹیپ کرکے نئی چھٹی کا ریکارڈ شامل کر سکتے ہیں۔'
         },
         tip: {
-          en: 'All leaves are automatically approved - no approval workflow needed.',
-          ur: 'تمام چھٹیاں خودکار طور پر منظور ہو جاتی ہیں - کسی منظوری کے عمل کی ضرورت نہیں۔'
-        }
+          en: 'All leaves are automatically approved - no waiting needed!',
+          ur: 'تمام چھٹیاں خودکار طور پر منظور ہو جاتی ہیں - انتظار کی ضرورت نہیں!'
+        },
+        target: '[href="/calendar"], a[href="/calendar"]',
+        position: 'bottom'
       },
       {
         title: { en: 'Data Requests', ur: 'ڈیٹا کی درخواستیں' },
         description: {
-          en: 'Access data collection requests from your supervisors. View pending requests, fill in required information, and submit your responses before the deadline.',
-          ur: 'اپنے سپروائزرز کی طرف سے ڈیٹا جمع کرنے کی درخواستوں تک رسائی حاصل کریں۔ زیر التوا درخواستیں دیکھیں، مطلوبہ معلومات پُر کریں اور آخری تاریخ سے پہلے اپنے جوابات جمع کریں۔'
-        }
+          en: 'Here you can see and respond to data collection requests from your supervisors. Check for pending requests that need your attention.',
+          ur: 'یہاں آپ اپنے سپروائزرز کی طرف سے ڈیٹا جمع کرنے کی درخواستیں دیکھ سکتے ہیں اور ان کا جواب دے سکتے ہیں۔ ان زیر التوا درخواستوں کی جانچ کریں جن پر توجہ درکار ہے۔'
+        },
+        target: '[href="/data-requests"], a[href="/data-requests"]',
+        position: 'bottom'
       },
       {
         title: { en: 'School Visits', ur: 'اسکول دورے' },
         description: {
-          en: 'For AEOs and supervisors: Record and track school visits including monitoring visits, mentoring sessions, and office activities.',
-          ur: 'AEOs اور سپروائزرز کے لیے: اسکول کے دوروں کا ریکارڈ رکھیں بشمول نگرانی کے دورے، رہنمائی کے سیشنز اور دفتری سرگرمیاں۔'
-        }
+          en: 'For AEOs: Record your school monitoring visits, mentoring sessions, and office activities here with photo evidence.',
+          ur: 'AEOs کے لیے: یہاں اپنے اسکول کے نگرانی دورے، رہنمائی کے سیشنز اور دفتری سرگرمیاں تصویری ثبوت کے ساتھ ریکارڈ کریں۔'
+        },
+        target: '[href="/school-visits"], a[href="/school-visits"]',
+        position: 'bottom'
       },
       {
-        title: { en: 'Profile & Settings', ur: 'پروفائل اور ترتیبات' },
+        title: { en: 'Your Profile', ur: 'آپ کا پروفائل' },
         description: {
-          en: 'Tap the profile icon in the top-right corner to view your account details, change theme (light/dark mode), or logout from the app.',
-          ur: 'اپنے اکاؤنٹ کی تفصیلات دیکھنے، تھیم تبدیل کرنے (لائٹ/ڈارک موڈ) یا ایپ سے لاگ آؤٹ کرنے کے لیے اوپر دائیں کونے میں پروفائل آئیکن پر ٹیپ کریں۔'
-        }
+          en: 'Tap the profile icon to view your account details, change app theme (light/dark), or logout from the app.',
+          ur: 'اپنے اکاؤنٹ کی تفصیلات دیکھنے، ایپ تھیم تبدیل کرنے (لائٹ/ڈارک) یا ایپ سے لاگ آؤٹ کرنے کے لیے پروفائل آئیکن پر ٹیپ کریں۔'
+        },
+        target: '[href="/profile"], a[href="/profile"], [data-testid*="profile"]',
+        position: 'bottom'
       },
     ],
   },
   '/calendar': {
     screenName: { en: 'Leave Calendar', ur: 'چھٹی کیلنڈر' },
     introduction: {
-      en: 'The Leave Calendar helps you track and manage staff absences. All leaves are automatically approved.',
-      ur: 'چھٹی کیلنڈر آپ کو عملے کی غیر حاضریوں کو ٹریک اور منظم کرنے میں مدد کرتا ہے۔ تمام چھٹیاں خودکار طور پر منظور ہو جاتی ہیں۔'
+      en: 'The Leave Calendar helps you track staff absences. All leaves are automatically approved.',
+      ur: 'چھٹی کیلنڈر آپ کو عملے کی غیر حاضریوں کو ٹریک کرنے میں مدد کرتا ہے۔ تمام چھٹیاں خودکار طور پر منظور ہو جاتی ہیں۔'
     },
     steps: [
       {
-        title: { en: 'Viewing the Calendar', ur: 'کیلنڈر دیکھنا' },
+        title: { en: 'Month Navigation', ur: 'مہینے کی نیویگیشن' },
         description: {
-          en: 'The calendar shows the current month with colored dots indicating leave days. Different colors represent different leave types. Use the arrow buttons at the top to navigate between months.',
-          ur: 'کیلنڈر موجودہ مہینہ دکھاتا ہے جس میں رنگین نقطے چھٹی کے دنوں کی نشاندہی کرتے ہیں۔ مختلف رنگ مختلف اقسام کی چھٹیوں کی نمائندگی کرتے ہیں۔ مہینوں کے درمیان جانے کے لیے اوپر تیر کے بٹن استعمال کریں۔'
-        }
+          en: 'Use these arrow buttons to move between months. The left arrow goes to the previous month, and the right arrow goes to the next month.',
+          ur: 'مہینوں کے درمیان جانے کے لیے ان تیر کے بٹنوں کا استعمال کریں۔ بائیں تیر پچھلے مہینے پر جاتا ہے اور دائیں تیر اگلے مہینے پر۔'
+        },
+        target: '[data-testid*="prev"], [data-testid*="next"], .calendar-nav',
+        position: 'bottom'
       },
       {
-        title: { en: 'How to Add a Leave', ur: 'چھٹی کیسے شامل کریں' },
+        title: { en: 'Calendar Grid - Tap to Add Leave', ur: 'کیلنڈر گرڈ - چھٹی شامل کرنے کے لیے ٹیپ کریں' },
         description: {
-          en: 'To add a new leave record, simply TAP on the date when the leave occurred. A form will appear where you can fill in the details. For Teachers: just tap the calendar date. For Head Teachers/AEOs: you can also use the "Add Leave" button.',
-          ur: 'نئی چھٹی کا ریکارڈ شامل کرنے کے لیے صرف اس تاریخ پر ٹیپ کریں جب چھٹی ہوئی۔ ایک فارم ظاہر ہوگا جہاں آپ تفصیلات پُر کر سکتے ہیں۔ اساتذہ کے لیے: بس کیلنڈر کی تاریخ پر ٹیپ کریں۔ ہیڈ ٹیچرز/AEOs کے لیے: آپ "چھٹی شامل کریں" بٹن بھی استعمال کر سکتے ہیں۔'
+          en: 'TAP ON ANY DATE to add a new leave! A form will appear where you select the teacher, leave type, and dates. Colored dots show existing leaves.',
+          ur: 'نئی چھٹی شامل کرنے کے لیے کسی بھی تاریخ پر ٹیپ کریں! ایک فارم ظاہر ہوگا جہاں آپ استاد، چھٹی کی قسم اور تاریخیں منتخب کریں۔ رنگین نقطے موجودہ چھٹیاں دکھاتے ہیں۔'
         },
         tip: {
-          en: 'Tap directly on a date to add leave for that day.',
-          ur: 'اس دن کی چھٹی شامل کرنے کے لیے تاریخ پر براہ راست ٹیپ کریں۔'
-        }
+          en: 'Just tap a date - no button needed!',
+          ur: 'بس تاریخ پر ٹیپ کریں - کسی بٹن کی ضرورت نہیں!'
+        },
+        target: '.calendar-grid, [data-testid*="calendar"], .grid-cols-7',
+        position: 'top'
       },
       {
-        title: { en: 'Filling the Leave Form', ur: 'چھٹی کا فارم پُر کرنا' },
+        title: { en: 'Leave Types & Colors', ur: 'چھٹی کی اقسام اور رنگ' },
         description: {
-          en: 'When adding a leave: 1) Select the staff member name, 2) Choose the leave type (Casual/Sick/Earned/Special), 3) Select start and end dates, 4) Add any notes if needed, 5) Tap "Add Leave" to save.',
-          ur: 'چھٹی شامل کرتے وقت: 1) عملے کے رکن کا نام منتخب کریں، 2) چھٹی کی قسم منتخب کریں (عارضی/بیماری/کمائی ہوئی/خصوصی)، 3) شروع اور اختتام کی تاریخیں منتخب کریں، 4) ضرورت ہو تو کوئی نوٹ شامل کریں، 5) محفوظ کرنے کے لیے "چھٹی شامل کریں" پر ٹیپ کریں۔'
-        }
+          en: 'GREEN = Casual Leave (عارضی), BLUE = Sick Leave (بیماری), PURPLE = Earned Leave (کمائی ہوئی), ORANGE = Special Leave (خصوصی). Look for the colored dots on dates.',
+          ur: 'سبز = عارضی چھٹی، نیلا = بیماری کی چھٹی، جامنی = کمائی ہوئی چھٹی، نارنجی = خصوصی چھٹی۔ تاریخوں پر رنگین نقطے تلاش کریں۔'
+        },
+        target: '.legend, [data-testid*="legend"], [data-testid*="guide"]',
+        position: 'top'
       },
       {
-        title: { en: 'Leave Types Explained', ur: 'چھٹی کی اقسام کی وضاحت' },
+        title: { en: 'View Leave Details', ur: 'چھٹی کی تفصیلات دیکھیں' },
         description: {
-          en: 'CASUAL (عارضی): For personal matters, short notice leaves. SICK (بیماری): When unwell, may need medical certificate. EARNED (کمائی ہوئی): Pre-planned vacation leave. SPECIAL (خصوصی): For special circumstances like maternity, emergency, etc.',
-          ur: 'عارضی: ذاتی معاملات، مختصر نوٹس والی چھٹیاں۔ بیماری: جب طبیعت خراب ہو، طبی سرٹیفکیٹ درکار ہو سکتا ہے۔ کمائی ہوئی: پہلے سے منصوبہ بند چھٹی۔ خصوصی: خاص حالات جیسے زچگی، ایمرجنسی وغیرہ کے لیے۔'
-        }
-      },
-      {
-        title: { en: 'Understanding the Guide Legend', ur: 'گائیڈ لیجنڈ کو سمجھنا' },
-        description: {
-          en: 'At the bottom of the calendar, you will see a color guide showing what each color means. Green = Casual, Blue = Sick, Purple = Earned, Orange = Special. This helps you quickly identify leave types at a glance.',
-          ur: 'کیلنڈر کے نیچے آپ کو ایک رنگین گائیڈ نظر آئے گا جو بتاتا ہے کہ ہر رنگ کا کیا مطلب ہے۔ سبز = عارضی، نیلا = بیماری، جامنی = کمائی ہوئی، نارنجی = خصوصی۔ یہ آپ کو ایک نظر میں چھٹی کی اقسام پہچاننے میں مدد کرتا ہے۔'
-        }
-      },
-      {
-        title: { en: 'Viewing Leave Details', ur: 'چھٹی کی تفصیلات دیکھنا' },
-        description: {
-          en: 'Tap on any date with a colored dot to see the details of leaves on that day. You can view who is on leave, the type of leave, and any notes that were added.',
-          ur: 'رنگین نقطے والی کسی بھی تاریخ پر ٹیپ کریں تاکہ اس دن کی چھٹیوں کی تفصیلات دیکھ سکیں۔ آپ دیکھ سکتے ہیں کہ کون چھٹی پر ہے، چھٹی کی قسم اور کوئی نوٹ جو شامل کیے گئے تھے۔'
-        }
+          en: 'Tap on any date with a colored dot to see who is on leave that day, the leave type, and any notes that were added.',
+          ur: 'رنگین نقطے والی کسی بھی تاریخ پر ٹیپ کریں تاکہ دیکھ سکیں کہ اس دن کون چھٹی پر ہے، چھٹی کی قسم اور کوئی نوٹ جو شامل کیے گئے تھے۔'
+        },
+        position: 'center'
       },
     ],
   },
   '/data-requests': {
     screenName: { en: 'Data Requests', ur: 'ڈیٹا کی درخواستیں' },
     introduction: {
-      en: 'Data Requests allow supervisors to collect information from staff. You will receive requests and need to respond before the deadline.',
-      ur: 'ڈیٹا کی درخواستیں سپروائزرز کو عملے سے معلومات جمع کرنے کی اجازت دیتی ہیں۔ آپ کو درخواستیں موصول ہوں گی اور آخری تاریخ سے پہلے جواب دینا ہوگا۔'
+      en: 'View and respond to data collection requests from your supervisors.',
+      ur: 'اپنے سپروائزرز کی طرف سے ڈیٹا جمع کرنے کی درخواستیں دیکھیں اور ان کا جواب دیں۔'
     },
     steps: [
       {
-        title: { en: 'Viewing Your Requests', ur: 'اپنی درخواستیں دیکھنا' },
+        title: { en: 'Filter Tabs', ur: 'فلٹر ٹیبز' },
         description: {
-          en: 'This screen shows all data requests assigned to you. Each request card shows: the title, who sent it, deadline date, and current status (pending/submitted). Pending requests need your attention.',
-          ur: 'یہ اسکرین آپ کو تفویض کردہ تمام ڈیٹا کی درخواستیں دکھاتی ہے۔ ہر درخواست کارڈ دکھاتا ہے: عنوان، کس نے بھیجی، آخری تاریخ اور موجودہ حیثیت (زیر التوا/جمع کرائی گئی)۔ زیر التوا درخواستوں پر توجہ درکار ہے۔'
-        }
+          en: 'Use these tabs to filter: ALL shows everything, PENDING shows requests you haven\'t submitted yet, SUBMITTED shows completed ones.',
+          ur: 'فلٹر کرنے کے لیے یہ ٹیبز استعمال کریں: سب کچھ دکھاتا ہے، زیر التوا وہ درخواستیں دکھاتا ہے جو آپ نے ابھی تک جمع نہیں کرائیں، جمع شدہ مکمل شدہ دکھاتا ہے۔'
+        },
+        target: '[data-testid*="filter"], .tabs, [role="tablist"]',
+        position: 'bottom'
       },
       {
-        title: { en: 'Filtering Requests', ur: 'درخواستیں فلٹر کرنا' },
+        title: { en: 'Request Cards', ur: 'درخواست کارڈز' },
         description: {
-          en: 'Use the filter buttons at the top to view: ALL requests, only PENDING (not yet submitted), or only SUBMITTED requests. This helps you focus on what needs to be done.',
-          ur: 'اوپر فلٹر بٹن استعمال کریں: تمام درخواستیں، صرف زیر التوا (ابھی تک جمع نہیں کرائی گئیں)، یا صرف جمع کرائی گئی درخواستیں دیکھنے کے لیے۔ یہ آپ کو اس بات پر توجہ مرکوز کرنے میں مدد کرتا ہے کہ کیا کرنا ہے۔'
-        }
-      },
-      {
-        title: { en: 'Opening a Request', ur: 'درخواست کھولنا' },
-        description: {
-          en: 'Tap on any request card to open it and see the full details. You will see all the fields that need to be filled and any instructions from your supervisor.',
-          ur: 'کسی بھی درخواست کارڈ پر ٹیپ کریں تاکہ اسے کھول سکیں اور مکمل تفصیلات دیکھ سکیں۔ آپ تمام وہ خانے دیکھیں گے جو پُر کرنے ہیں اور اپنے سپروائزر کی کوئی ہدایات۔'
-        }
-      },
-      {
-        title: { en: 'Submitting Your Response', ur: 'اپنا جواب جمع کرانا' },
-        description: {
-          en: 'Fill in all required fields carefully. Upload any requested files or photos. When complete, tap the "Submit" button. Once submitted, you cannot make changes.',
-          ur: 'تمام مطلوبہ خانے احتیاط سے پُر کریں۔ کوئی بھی مطلوبہ فائلیں یا تصاویر اپ لوڈ کریں۔ مکمل ہونے پر "جمع کریں" بٹن پر ٹیپ کریں۔ ایک بار جمع کرانے کے بعد آپ تبدیلیاں نہیں کر سکتے۔'
+          en: 'Each card shows a request with its title, sender, deadline, and status. Tap a card to open it and submit your response.',
+          ur: 'ہر کارڈ ایک درخواست دکھاتا ہے جس میں عنوان، بھیجنے والا، آخری تاریخ اور حیثیت ہوتی ہے۔ اسے کھولنے اور اپنا جواب جمع کرنے کے لیے کارڈ پر ٹیپ کریں۔'
         },
         tip: {
-          en: 'Submit before the deadline to avoid missing the request.',
-          ur: 'درخواست چھوٹنے سے بچنے کے لیے آخری تاریخ سے پہلے جمع کریں۔'
-        }
+          en: 'Check deadlines! Submit before time expires.',
+          ur: 'آخری تاریخیں چیک کریں! وقت ختم ہونے سے پہلے جمع کریں۔'
+        },
+        target: '[data-testid*="request-card"], .request-list',
+        position: 'bottom'
       },
       {
-        title: { en: 'Deadlines are Important', ur: 'آخری تاریخیں اہم ہیں' },
+        title: { en: 'Submitting a Response', ur: 'جواب جمع کرانا' },
         description: {
-          en: 'Each request has a deadline shown in red or orange. Make sure to submit your response before this date. After the deadline, you may not be able to submit.',
-          ur: 'ہر درخواست کی آخری تاریخ سرخ یا نارنجی میں دکھائی جاتی ہے۔ یقینی بنائیں کہ اس تاریخ سے پہلے اپنا جواب جمع کر دیں۔ آخری تاریخ کے بعد آپ شاید جمع نہ کر سکیں۔'
-        }
-      },
-    ],
-  },
-  '/create-request': {
-    screenName: { en: 'Create Data Request', ur: 'ڈیٹا کی درخواست بنائیں' },
-    introduction: {
-      en: 'Create a new data collection request to gather information from your team members.',
-      ur: 'اپنی ٹیم کے اراکین سے معلومات جمع کرنے کے لیے نئی ڈیٹا جمع کرنے کی درخواست بنائیں۔'
-    },
-    steps: [
-      {
-        title: { en: 'Step 1: Request Title', ur: 'مرحلہ 1: درخواست کا عنوان' },
-        description: {
-          en: 'Enter a clear, descriptive title for your request. This helps recipients understand what data you are collecting. Example: "Monthly Attendance Report" or "Student Enrollment Update".',
-          ur: 'اپنی درخواست کے لیے واضح، وضاحتی عنوان درج کریں۔ یہ وصول کنندگان کو سمجھنے میں مدد کرتا ہے کہ آپ کون سا ڈیٹا جمع کر رہے ہیں۔ مثال: "ماہانہ حاضری رپورٹ" یا "طالب علم داخلہ اپ ڈیٹ"۔'
-        }
-      },
-      {
-        title: { en: 'Step 2: Add Data Fields', ur: 'مرحلہ 2: ڈیٹا فیلڈز شامل کریں' },
-        description: {
-          en: 'Add the fields you need. Choose field types like: Text (for names/descriptions), Number (for counts/amounts), Date (for dates), File (for documents/photos). Each field can be marked as required or optional.',
-          ur: 'وہ خانے شامل کریں جو آپ کو چاہئیں۔ فیلڈ کی اقسام منتخب کریں جیسے: ٹیکسٹ (ناموں/تفصیل کے لیے)، نمبر (گنتی/رقم کے لیے)، تاریخ (تاریخوں کے لیے)، فائل (دستاویزات/تصاویر کے لیے)۔ ہر فیلڈ کو لازمی یا اختیاری کے طور پر نشان زد کیا جا سکتا ہے۔'
-        }
-      },
-      {
-        title: { en: 'Step 3: Set Deadline', ur: 'مرحلہ 3: آخری تاریخ مقرر کریں' },
-        description: {
-          en: 'Choose when responses are due. Give recipients enough time to collect and submit their data. You can select the date and time from the calendar picker.',
-          ur: 'منتخب کریں کہ جوابات کب تک آنے چاہئیں۔ وصول کنندگان کو اپنا ڈیٹا جمع کرنے اور جمع کرانے کے لیے کافی وقت دیں۔ آپ کیلنڈر پیکر سے تاریخ اور وقت منتخب کر سکتے ہیں۔'
-        }
-      },
-      {
-        title: { en: 'Step 4: Select Recipients', ur: 'مرحلہ 4: وصول کنندگان منتخب کریں' },
-        description: {
-          en: 'Choose who should receive this request. You can select individual users, all users in a school, or all users in your area. Only users under your supervision will appear.',
-          ur: 'منتخب کریں کہ کس کو یہ درخواست ملنی چاہیے۔ آپ انفرادی صارفین، کسی اسکول کے تمام صارفین، یا اپنے علاقے کے تمام صارفین کو منتخب کر سکتے ہیں۔ صرف آپ کی نگرانی میں آنے والے صارفین ظاہر ہوں گے۔'
-        }
-      },
-      {
-        title: { en: 'Step 5: Review and Send', ur: 'مرحلہ 5: جائزہ لیں اور بھیجیں' },
-        description: {
-          en: 'Review all details before sending. Once sent, recipients will be notified and can start submitting their responses. You can track responses in the Data Requests section.',
-          ur: 'بھیجنے سے پہلے تمام تفصیلات کا جائزہ لیں۔ بھیجنے کے بعد وصول کنندگان کو مطلع کیا جائے گا اور وہ اپنے جوابات جمع کرانا شروع کر سکتے ہیں۔ آپ ڈیٹا کی درخواستوں کے سیکشن میں جوابات کو ٹریک کر سکتے ہیں۔'
-        }
+          en: 'After tapping a request, fill in all required fields carefully. Upload any needed files or photos. Tap "Submit" when done - you cannot change it after!',
+          ur: 'درخواست پر ٹیپ کرنے کے بعد تمام مطلوبہ خانے احتیاط سے پُر کریں۔ کوئی بھی ضروری فائلیں یا تصاویر اپ لوڈ کریں۔ مکمل ہونے پر "جمع کریں" پر ٹیپ کریں - بعد میں تبدیل نہیں ہو سکتا!'
+        },
+        position: 'center'
       },
     ],
   },
@@ -340,47 +169,86 @@ const guides: Record<string, ScreenGuide> = {
     screenName: { en: 'School Visits', ur: 'اسکول دورے' },
     introduction: {
       en: 'Record and track your school visits for monitoring, mentoring, and office activities.',
-      ur: 'نگرانی، رہنمائی اور دفتری سرگرمیوں کے لیے اپنے اسکول کے دوروں کا ریکارڈ رکھیں اور ٹریک کریں۔'
+      ur: 'نگرانی، رہنمائی اور دفتری سرگرمیوں کے لیے اپنے اسکول کے دوروں کا ریکارڈ رکھیں۔'
     },
     steps: [
       {
-        title: { en: 'Types of Visits', ur: 'دوروں کی اقسام' },
+        title: { en: 'Visit Type Tabs', ur: 'دورے کی قسم کے ٹیبز' },
         description: {
-          en: 'There are three types of visits: MONITORING (نگرانی) - Regular school inspections, MENTORING (رہنمائی) - Teacher coaching sessions, OFFICE (دفتر) - Office-based activities. Each type has its own form and requirements.',
-          ur: 'دوروں کی تین اقسام ہیں: نگرانی - باقاعدہ اسکول معائنہ، رہنمائی - اساتذہ کی کوچنگ سیشنز، دفتر - دفتر میں سرگرمیاں۔ ہر قسم کا اپنا فارم اور تقاضے ہیں۔'
-        }
+          en: 'Choose the type of visit: MONITORING (school inspections), MENTORING (teacher coaching), OFFICE (administrative work). Each has different forms.',
+          ur: 'دورے کی قسم منتخب کریں: نگرانی (اسکول معائنہ)، رہنمائی (اساتذہ کی کوچنگ)، دفتر (انتظامی کام)۔ ہر ایک کے مختلف فارمز ہیں۔'
+        },
+        target: '[data-testid*="tab"], [role="tablist"], .tabs',
+        position: 'bottom'
       },
       {
-        title: { en: 'Starting a New Visit', ur: 'نیا دورہ شروع کرنا' },
+        title: { en: 'New Visit Button', ur: 'نیا دورہ بٹن' },
         description: {
-          en: 'Tap "New Visit" and select the visit type. Choose the school you are visiting from the dropdown. The system will record your arrival time automatically.',
-          ur: '"نیا دورہ" پر ٹیپ کریں اور دورے کی قسم منتخب کریں۔ ڈراپ ڈاؤن سے وہ اسکول منتخب کریں جہاں آپ جا رہے ہیں۔ سسٹم خودکار طور پر آپ کے پہنچنے کا وقت ریکارڈ کرے گا۔'
-        }
+          en: 'Tap "New Visit" to start recording a visit. Select the school, and the system will record your arrival time automatically.',
+          ur: 'دورہ ریکارڈ کرنا شروع کرنے کے لیے "نیا دورہ" پر ٹیپ کریں۔ اسکول منتخب کریں اور سسٹم خودکار طور پر آپ کے پہنچنے کا وقت ریکارڈ کرے گا۔'
+        },
+        target: '[data-testid*="new-visit"], [data-testid*="create"], button:contains("New")',
+        position: 'bottom'
       },
       {
-        title: { en: 'Filling Visit Details', ur: 'دورے کی تفصیلات پُر کرنا' },
+        title: { en: 'Add Photos as Evidence', ur: 'ثبوت کے طور پر تصاویر شامل کریں' },
         description: {
-          en: 'Complete all required fields during your visit. This includes teacher attendance, student count, facility conditions, classroom observations, and any issues found. Be accurate and thorough.',
-          ur: 'اپنے دورے کے دوران تمام مطلوبہ خانے پُر کریں۔ اس میں اساتذہ کی حاضری، طلباء کی تعداد، سہولیات کی حالت، کلاس روم کے مشاہدات اور کوئی بھی مسائل شامل ہیں۔ درست اور مکمل ہوں۔'
-        }
-      },
-      {
-        title: { en: 'Adding Evidence Photos', ur: 'ثبوت کی تصاویر شامل کرنا' },
-        description: {
-          en: 'Take photos as evidence of your visit. Tap "Add Photo" to capture or upload images. Photos help verify your visit and document conditions at the school.',
-          ur: 'اپنے دورے کے ثبوت کے طور پر تصاویر لیں۔ تصاویر کھینچنے یا اپ لوڈ کرنے کے لیے "تصویر شامل کریں" پر ٹیپ کریں۔ تصاویر آپ کے دورے کی تصدیق کرنے اور اسکول میں حالات کی دستاویز کرنے میں مدد کرتی ہیں۔'
+          en: 'During your visit, tap "Add Photo" to capture evidence. Take clear photos of classrooms, facilities, and any issues you find.',
+          ur: 'اپنے دورے کے دوران ثبوت حاصل کرنے کے لیے "تصویر شامل کریں" پر ٹیپ کریں۔ کلاس رومز، سہولیات اور کسی بھی مسئلے کی واضح تصاویر لیں۔'
         },
         tip: {
-          en: 'Take clear photos of classrooms, facilities, and any issues you find.',
-          ur: 'کلاس رومز، سہولیات اور کسی بھی مسئلے کی واضح تصاویر لیں۔'
-        }
+          en: 'Photos help verify your visit!',
+          ur: 'تصاویر آپ کے دورے کی تصدیق کرتی ہیں!'
+        },
+        position: 'center'
       },
       {
-        title: { en: 'Submitting Your Visit', ur: 'اپنا دورہ جمع کرانا' },
+        title: { en: 'Submit Your Visit', ur: 'اپنا دورہ جمع کریں' },
         description: {
-          en: 'When you complete your visit, record your departure time and tap "Submit". Your visit will be saved and visible to your supervisors. Once submitted, changes cannot be made.',
-          ur: 'جب آپ اپنا دورہ مکمل کر لیں، اپنے جانے کا وقت ریکارڈ کریں اور "جمع کریں" پر ٹیپ کریں۔ آپ کا دورہ محفوظ ہو جائے گا اور آپ کے سپروائزرز کو نظر آئے گا۔ ایک بار جمع کرانے کے بعد تبدیلیاں نہیں کی جا سکتیں۔'
-        }
+          en: 'Fill all required fields, record your departure time, and tap "Submit". Once submitted, your supervisor can see the visit report.',
+          ur: 'تمام مطلوبہ خانے پُر کریں، اپنے جانے کا وقت ریکارڈ کریں اور "جمع کریں" پر ٹیپ کریں۔ جمع کرنے کے بعد آپ کا سپروائزر دورے کی رپورٹ دیکھ سکتا ہے۔'
+        },
+        position: 'center'
+      },
+    ],
+  },
+  '/profile': {
+    screenName: { en: 'Your Profile', ur: 'آپ کا پروفائل' },
+    introduction: {
+      en: 'View your account information and manage app settings.',
+      ur: 'اپنے اکاؤنٹ کی معلومات دیکھیں اور ایپ کی ترتیبات کا انتظام کریں۔'
+    },
+    steps: [
+      {
+        title: { en: 'Your Information', ur: 'آپ کی معلومات' },
+        description: {
+          en: 'Here you can see your name, role, phone number, and assigned school. This info is from your registration.',
+          ur: 'یہاں آپ اپنا نام، کردار، فون نمبر اور تفویض کردہ اسکول دیکھ سکتے ہیں۔ یہ معلومات آپ کی رجسٹریشن سے ہے۔'
+        },
+        target: '.profile-info, [data-testid*="user-info"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'Theme Toggle', ur: 'تھیم ٹوگل' },
+        description: {
+          en: 'Switch between Light Mode (bright) and Dark Mode (dark background). Dark mode is easier on eyes at night.',
+          ur: 'لائٹ موڈ (روشن) اور ڈارک موڈ (گہرا پس منظر) کے درمیان سوئچ کریں۔ رات کو ڈارک موڈ آنکھوں کے لیے آسان ہے۔'
+        },
+        target: '[data-testid*="theme"], .theme-toggle',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'Logout Button', ur: 'لاگ آؤٹ بٹن' },
+        description: {
+          en: 'Tap "Logout" to sign out. Always logout when using a shared or borrowed device for security.',
+          ur: 'سائن آؤٹ کرنے کے لیے "لاگ آؤٹ" پر ٹیپ کریں۔ سیکیورٹی کے لیے مشترکہ یا ادھار لی گئی ڈیوائس پر ہمیشہ لاگ آؤٹ کریں۔'
+        },
+        tip: {
+          en: 'Always logout on shared devices!',
+          ur: 'مشترکہ ڈیوائسز پر ہمیشہ لاگ آؤٹ کریں!'
+        },
+        target: '[data-testid*="logout"], button:contains("Logout")',
+        position: 'top'
       },
     ],
   },
@@ -394,179 +262,114 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'School Profile', ur: 'اسکول کا پروفائل' },
         description: {
-          en: 'View your school\'s basic information including EMIS code, name, address, and contact details. This information comes from the official records.',
-          ur: 'اپنے اسکول کی بنیادی معلومات دیکھیں بشمول EMIS کوڈ، نام، پتہ اور رابطے کی تفصیلات۔ یہ معلومات سرکاری ریکارڈ سے آتی ہیں۔'
-        }
+          en: 'View EMIS code, school name, address, and contact details from official records.',
+          ur: 'سرکاری ریکارڈ سے EMIS کوڈ، اسکول کا نام، پتہ اور رابطے کی تفصیلات دیکھیں۔'
+        },
+        position: 'center'
       },
       {
-        title: { en: 'Staff and Students', ur: 'عملہ اور طلباء' },
+        title: { en: 'Staff & Student Count', ur: 'عملہ اور طالب علم کی تعداد' },
         description: {
-          en: 'See the count of teachers and students at your school. This includes current enrollment numbers and staff positions.',
-          ur: 'اپنے اسکول میں اساتذہ اور طلباء کی تعداد دیکھیں۔ اس میں موجودہ داخلہ نمبر اور عملے کی پوزیشنیں شامل ہیں۔'
-        }
+          en: 'See current teacher count and student enrollment numbers at your school.',
+          ur: 'اپنے اسکول میں موجودہ اساتذہ کی تعداد اور طلباء کے داخلے کی تعداد دیکھیں۔'
+        },
+        position: 'center'
       },
       {
-        title: { en: 'Inventory Management', ur: 'انوینٹری کا انتظام' },
+        title: { en: 'Edit School Data', ur: 'اسکول کا ڈیٹا ایڈٹ کریں' },
         description: {
-          en: 'Track school furniture, equipment, and supplies. Record items like desks, chairs, whiteboards, computers, and other resources. Update counts as items are added or removed.',
-          ur: 'اسکول کے فرنیچر، آلات اور سامان کو ٹریک کریں۔ ڈیسک، کرسیاں، وائٹ بورڈز، کمپیوٹرز اور دیگر وسائل جیسی اشیاء کا ریکارڈ رکھیں۔ اشیاء شامل ہونے یا ہٹانے پر تعداد اپ ڈیٹ کریں۔'
-        }
-      },
-      {
-        title: { en: 'Editing School Data', ur: 'اسکول کا ڈیٹا ایڈٹ کرنا' },
-        description: {
-          en: 'If you have permission, tap "Edit" to update school information. Changes are tracked and may require approval from your supervisor.',
-          ur: 'اگر آپ کے پاس اجازت ہے تو اسکول کی معلومات اپ ڈیٹ کرنے کے لیے "ایڈٹ" پر ٹیپ کریں۔ تبدیلیاں ٹریک کی جاتی ہیں اور آپ کے سپروائزر سے منظوری کی ضرورت ہو سکتی ہے۔'
-        }
+          en: 'If you have permission, tap "Edit" to update school information. Changes may need supervisor approval.',
+          ur: 'اگر آپ کے پاس اجازت ہے تو اسکول کی معلومات اپ ڈیٹ کرنے کے لیے "ایڈٹ" پر ٹیپ کریں۔ تبدیلیوں کو سپروائزر کی منظوری درکار ہو سکتی ہے۔'
+        },
+        target: '[data-testid*="edit"], button:contains("Edit")',
+        position: 'bottom'
       },
     ],
   },
-  '/profile': {
-    screenName: { en: 'Your Profile', ur: 'آپ کا پروفائل' },
+  '/queries': {
+    screenName: { en: 'Queries', ur: 'سوالات' },
     introduction: {
-      en: 'View your account details and manage app settings.',
-      ur: 'اپنے اکاؤنٹ کی تفصیلات دیکھیں اور ایپ کی ترتیبات کا انتظام کریں۔'
+      en: 'Submit questions and track responses from your supervisors.',
+      ur: 'سوالات جمع کریں اور اپنے سپروائزرز کے جوابات کو ٹریک کریں۔'
     },
     steps: [
       {
-        title: { en: 'Your Information', ur: 'آپ کی معلومات' },
+        title: { en: 'Your Queries', ur: 'آپ کے سوالات' },
         description: {
-          en: 'View your name, phone number, role, and school assignment. This information was set during registration and is linked to official records.',
-          ur: 'اپنا نام، فون نمبر، کردار اور اسکول کی تفویض دیکھیں۔ یہ معلومات رجسٹریشن کے دوران مقرر کی گئی تھیں اور سرکاری ریکارڈ سے منسلک ہیں۔'
-        }
-      },
-      {
-        title: { en: 'Theme Settings', ur: 'تھیم کی ترتیبات' },
-        description: {
-          en: 'Switch between Light Mode (bright background) and Dark Mode (dark background) based on your preference. Dark mode is easier on the eyes in low light.',
-          ur: 'اپنی پسند کے مطابق لائٹ موڈ (روشن پس منظر) اور ڈارک موڈ (گہرا پس منظر) کے درمیان سوئچ کریں۔ کم روشنی میں ڈارک موڈ آنکھوں کے لیے آسان ہے۔'
-        }
-      },
-      {
-        title: { en: 'Logging Out', ur: 'لاگ آؤٹ کرنا' },
-        description: {
-          en: 'Tap "Logout" to sign out of your account. You will need to enter your phone number and password again to log back in. Logout when using shared devices.',
-          ur: 'اپنے اکاؤنٹ سے سائن آؤٹ کرنے کے لیے "لاگ آؤٹ" پر ٹیپ کریں۔ دوبارہ لاگ ان کرنے کے لیے آپ کو اپنا فون نمبر اور پاس ورڈ دوبارہ درج کرنا ہوگا۔ مشترکہ ڈیوائسز استعمال کرتے وقت لاگ آؤٹ کریں۔'
+          en: 'See all your submitted queries. "Pending" means waiting for response. "Resolved" means answered.',
+          ur: 'اپنے تمام جمع کرائے گئے سوالات دیکھیں۔ "زیر التوا" کا مطلب جواب کا انتظار۔ "حل شدہ" کا مطلب جواب دے دیا گیا۔'
         },
-        tip: {
-          en: 'Always logout when using someone else\'s device.',
-          ur: 'دوسرے کی ڈیوائس استعمال کرتے وقت ہمیشہ لاگ آؤٹ کریں۔'
-        }
+        position: 'center'
+      },
+      {
+        title: { en: 'Create New Query', ur: 'نیا سوال بنائیں' },
+        description: {
+          en: 'Tap "Create Query" to ask a new question. Describe your problem clearly so your supervisor can help.',
+          ur: 'نیا سوال پوچھنے کے لیے "سوال بنائیں" پر ٹیپ کریں۔ اپنے مسئلے کو واضح طور پر بیان کریں تاکہ آپ کا سپروائزر مدد کر سکے۔'
+        },
+        target: '[data-testid*="create"], button:contains("Create")',
+        position: 'bottom'
       },
     ],
   },
   '/user-management': {
     screenName: { en: 'User Management', ur: 'صارف کا انتظام' },
     introduction: {
-      en: 'Manage users in your area of responsibility. View, filter, and access user profiles.',
-      ur: 'اپنے ذمہ داری کے علاقے میں صارفین کا انتظام کریں۔ صارف پروفائلز دیکھیں، فلٹر کریں اور رسائی حاصل کریں۔'
+      en: 'View and manage users under your supervision.',
+      ur: 'اپنی نگرانی میں صارفین کو دیکھیں اور ان کا انتظام کریں۔'
     },
     steps: [
       {
-        title: { en: 'Viewing Users', ur: 'صارفین دیکھنا' },
+        title: { en: 'User List', ur: 'صارف کی فہرست' },
         description: {
-          en: 'See all users under your supervision. The list shows their name, role, school, and account status. You can only see users in your assigned area.',
-          ur: 'اپنی نگرانی میں تمام صارفین دیکھیں۔ فہرست ان کا نام، کردار، اسکول اور اکاؤنٹ کی حیثیت دکھاتی ہے۔ آپ صرف اپنے تفویض کردہ علاقے کے صارفین دیکھ سکتے ہیں۔'
-        }
+          en: 'See all users in your area. The list shows name, role, school, and account status.',
+          ur: 'اپنے علاقے کے تمام صارفین دیکھیں۔ فہرست نام، کردار، اسکول اور اکاؤنٹ کی حیثیت دکھاتی ہے۔'
+        },
+        position: 'center'
       },
       {
-        title: { en: 'Filtering Users', ur: 'صارفین کو فلٹر کرنا' },
+        title: { en: 'Filter Users', ur: 'صارفین فلٹر کریں' },
         description: {
-          en: 'Use filters to find specific users. Filter by role (Teacher, Head Teacher, etc.), by school, or by district. This helps you quickly find the person you need.',
-          ur: 'مخصوص صارفین تلاش کرنے کے لیے فلٹرز استعمال کریں۔ کردار (استاد، ہیڈ ٹیچر وغیرہ)، اسکول یا ضلع کے لحاظ سے فلٹر کریں۔ یہ آپ کو جس شخص کی ضرورت ہے جلدی تلاش کرنے میں مدد کرتا ہے۔'
-        }
+          en: 'Use filters to find users by role, school, or district. This helps quickly find who you need.',
+          ur: 'کردار، اسکول یا ضلع کے لحاظ سے صارفین تلاش کرنے کے لیے فلٹرز استعمال کریں۔ یہ جلدی تلاش کرنے میں مدد کرتا ہے۔'
+        },
+        target: '[data-testid*="filter"], .filters',
+        position: 'bottom'
       },
       {
-        title: { en: 'User Details', ur: 'صارف کی تفصیلات' },
+        title: { en: 'View User Profile', ur: 'صارف کا پروفائل دیکھیں' },
         description: {
-          en: 'Tap on any user to view their complete profile. See their contact information, assigned school, and activity history.',
-          ur: 'ان کا مکمل پروفائل دیکھنے کے لیے کسی بھی صارف پر ٹیپ کریں۔ ان کی رابطے کی معلومات، تفویض کردہ اسکول اور سرگرمی کی تاریخ دیکھیں۔'
-        }
-      },
-    ],
-  },
-  '/queries': {
-    screenName: { en: 'Queries & Questions', ur: 'سوالات اور استفسارات' },
-    introduction: {
-      en: 'Submit questions or issues and track responses from your supervisors.',
-      ur: 'سوالات یا مسائل جمع کریں اور اپنے سپروائزرز کے جوابات کو ٹریک کریں۔'
-    },
-    steps: [
-      {
-        title: { en: 'Viewing Your Queries', ur: 'اپنے سوالات دیکھنا' },
-        description: {
-          en: 'See all queries you have submitted and their current status. Pending queries are waiting for response. Resolved queries have been answered.',
-          ur: 'آپ نے جمع کرائے ہوئے تمام سوالات اور ان کی موجودہ حیثیت دیکھیں۔ زیر التوا سوالات جواب کے منتظر ہیں۔ حل شدہ سوالات کا جواب دے دیا گیا ہے۔'
-        }
-      },
-      {
-        title: { en: 'Creating a New Query', ur: 'نیا سوال بنانا' },
-        description: {
-          en: 'Tap "Create Query" to submit a new question or issue. Describe your problem clearly so your supervisor can understand and help. Add any relevant details.',
-          ur: 'نیا سوال یا مسئلہ جمع کرنے کے لیے "سوال بنائیں" پر ٹیپ کریں۔ اپنے مسئلے کو واضح طور پر بیان کریں تاکہ آپ کا سپروائزر سمجھ سکے اور مدد کر سکے۔ کوئی بھی متعلقہ تفصیلات شامل کریں۔'
-        }
-      },
-      {
-        title: { en: 'Tracking Responses', ur: 'جوابات کو ٹریک کرنا' },
-        description: {
-          en: 'Check back regularly for responses to your queries. When a supervisor responds, you will see their answer in the query details. You can reply to continue the conversation.',
-          ur: 'اپنے سوالات کے جوابات کے لیے باقاعدگی سے چیک کریں۔ جب کوئی سپروائزر جواب دے تو آپ کو سوال کی تفصیلات میں ان کا جواب نظر آئے گا۔ آپ گفتگو جاری رکھنے کے لیے جواب دے سکتے ہیں۔'
-        }
-      },
-    ],
-  },
-  '/collaborative-forms': {
-    screenName: { en: 'Collaborative Forms', ur: 'اشتراکی فارمز' },
-    introduction: {
-      en: 'Participate in collaborative data collection forms where multiple users contribute.',
-      ur: 'اشتراکی ڈیٹا جمع کرنے کے فارمز میں شریک ہوں جہاں متعدد صارفین شراکت کرتے ہیں۔'
-    },
-    steps: [
-      {
-        title: { en: 'Available Forms', ur: 'دستیاب فارمز' },
-        description: {
-          en: 'See all collaborative forms you can participate in. Each form shows its title, description, and deadline. Tap a form to start filling it.',
-          ur: 'تمام اشتراکی فارمز دیکھیں جن میں آپ شریک ہو سکتے ہیں۔ ہر فارم اپنا عنوان، تفصیل اور آخری تاریخ دکھاتا ہے۔ اسے پُر کرنا شروع کرنے کے لیے فارم پر ٹیپ کریں۔'
-        }
-      },
-      {
-        title: { en: 'Filling a Form', ur: 'فارم پُر کرنا' },
-        description: {
-          en: 'Enter your data in the form fields. Your responses are combined with others to create a complete picture. Submit when you have completed all required fields.',
-          ur: 'فارم کے خانوں میں اپنا ڈیٹا درج کریں۔ آپ کے جوابات دوسروں کے ساتھ مل کر ایک مکمل تصویر بناتے ہیں۔ تمام مطلوبہ خانے مکمل کرنے کے بعد جمع کریں۔'
-        }
-      },
-      {
-        title: { en: 'Viewing Responses', ur: 'جوابات دیکھنا' },
-        description: {
-          en: 'See how others have responded (if allowed). This helps you understand the overall picture and ensures consistency in data collection.',
-          ur: 'دیکھیں کہ دوسروں نے کیسے جواب دیا ہے (اگر اجازت ہو)۔ یہ آپ کو مجموعی تصویر سمجھنے اور ڈیٹا جمع کرنے میں مطابقت یقینی بنانے میں مدد کرتا ہے۔'
-        }
+          en: 'Tap any user to see their complete profile, contact info, and activity history.',
+          ur: 'ان کا مکمل پروفائل، رابطے کی معلومات اور سرگرمی کی تاریخ دیکھنے کے لیے کسی بھی صارف پر ٹیپ کریں۔'
+        },
+        position: 'center'
       },
     ],
   },
 };
 
 const defaultGuide: ScreenGuide = {
-  screenName: { en: 'Help', ur: 'مدد' },
+  screenName: { en: 'Help Guide', ur: 'مدد گائیڈ' },
   introduction: {
-    en: 'Welcome to TaleemHub! Use this guide to learn how to use the app.',
-    ur: 'تعلیم ہب میں خوش آمدید! ایپ استعمال کرنا سیکھنے کے لیے یہ گائیڈ استعمال کریں۔'
+    en: 'Learn how to use this screen and its features.',
+    ur: 'اس اسکرین اور اس کی خصوصیات کو استعمال کرنا سیکھیں۔'
   },
   steps: [
     {
       title: { en: 'Navigation', ur: 'نیویگیشن' },
       description: {
-        en: 'Use the back button or menu to move between screens. Tap on cards and buttons to access different features.',
-        ur: 'اسکرینز کے درمیان جانے کے لیے واپس بٹن یا مینو استعمال کریں۔ مختلف خصوصیات تک رسائی کے لیے کارڈز اور بٹنوں پر ٹیپ کریں۔'
-      }
+        en: 'Use the back button or menu to move between screens. Tap on buttons and cards to access features.',
+        ur: 'اسکرینز کے درمیان جانے کے لیے واپس بٹن یا مینو استعمال کریں۔ خصوصیات تک رسائی کے لیے بٹنوں اور کارڈز پر ٹیپ کریں۔'
+      },
+      position: 'center'
     },
     {
-      title: { en: 'Need More Help?', ur: 'مزید مدد چاہیے؟' },
+      title: { en: 'Need Help?', ur: 'مدد چاہیے؟' },
       description: {
-        en: 'If you need assistance, contact your supervisor or use the Queries section to submit a question.',
-        ur: 'اگر آپ کو مدد کی ضرورت ہو تو اپنے سپروائزر سے رابطہ کریں یا سوال جمع کرنے کے لیے سوالات کا سیکشن استعمال کریں۔'
-      }
+        en: 'Contact your supervisor or use Queries section to ask questions.',
+        ur: 'اپنے سپروائزر سے رابطہ کریں یا سوالات پوچھنے کے لیے سوالات کا سیکشن استعمال کریں۔'
+      },
+      position: 'center'
     },
   ],
 };
@@ -576,28 +379,59 @@ export function HelpGuide() {
   const [currentStep, setCurrentStep] = useState(0);
   const [language, setLanguage] = useState<Language>('en');
   const [showIntro, setShowIntro] = useState(true);
+  const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [location] = useLocation();
 
-  useEffect(() => {
-    setCurrentStep(0);
-    setShowIntro(true);
-  }, [location]);
-
-  const getGuide = (): ScreenGuide => {
+  const getGuide = useCallback((): ScreenGuide => {
     if (guides[location]) return guides[location];
-    
     const pathParts = location.split('/');
     if (pathParts[1] === 'request') return guides['/data-requests'] || defaultGuide;
     if (pathParts[1] === 'visit') return guides['/school-visits'] || defaultGuide;
     if (pathParts[1] === 'query') return guides['/queries'] || defaultGuide;
     if (pathParts[1] === 'album') return guides['/school-data'] || defaultGuide;
-    if (pathParts[1] === 'collaborative-form') return guides['/collaborative-forms'] || defaultGuide;
-    
+    if (pathParts[1] === 'collaborative-form') return defaultGuide;
     return defaultGuide;
-  };
+  }, [location]);
 
   const currentGuide = getGuide();
   const steps = currentGuide.steps;
+  const currentStepData = steps[currentStep];
+
+  useEffect(() => {
+    setCurrentStep(0);
+    setShowIntro(true);
+    setTargetRect(null);
+  }, [location]);
+
+  useEffect(() => {
+    if (!isOpen || showIntro || !currentStepData?.target) {
+      setTargetRect(null);
+      return;
+    }
+
+    const findTarget = () => {
+      const selectors = currentStepData.target!.split(',').map(s => s.trim());
+      for (const selector of selectors) {
+        try {
+          const element = document.querySelector(selector);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+              setTargetRect(rect);
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              return;
+            }
+          }
+        } catch (e) {
+          // Invalid selector, skip
+        }
+      }
+      setTargetRect(null);
+    };
+
+    const timer = setTimeout(findTarget, 300);
+    return () => clearTimeout(timer);
+  }, [isOpen, showIntro, currentStep, currentStepData]);
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -607,6 +441,7 @@ export function HelpGuide() {
 
   const handleClose = () => {
     setIsOpen(false);
+    setTargetRect(null);
   };
 
   const startGuide = () => {
@@ -636,6 +471,54 @@ export function HelpGuide() {
   const hideOnPages = ['/', '/signup'];
   const shouldHideButton = hideOnPages.includes(location);
 
+  const getTooltipPosition = () => {
+    if (!targetRect) return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+    
+    const pos = currentStepData?.position || 'bottom';
+    const padding = 16;
+    
+    switch (pos) {
+      case 'top':
+        return {
+          bottom: `${window.innerHeight - targetRect.top + padding}px`,
+          left: `${Math.max(padding, Math.min(targetRect.left + targetRect.width / 2, window.innerWidth - 200))}px`,
+          transform: 'translateX(-50%)'
+        };
+      case 'bottom':
+        return {
+          top: `${targetRect.bottom + padding}px`,
+          left: `${Math.max(padding, Math.min(targetRect.left + targetRect.width / 2, window.innerWidth - 200))}px`,
+          transform: 'translateX(-50%)'
+        };
+      case 'left':
+        return {
+          top: `${targetRect.top + targetRect.height / 2}px`,
+          right: `${window.innerWidth - targetRect.left + padding}px`,
+          transform: 'translateY(-50%)'
+        };
+      case 'right':
+        return {
+          top: `${targetRect.top + targetRect.height / 2}px`,
+          left: `${targetRect.right + padding}px`,
+          transform: 'translateY(-50%)'
+        };
+      default:
+        return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
+    }
+  };
+
+  const ArrowIcon = () => {
+    if (!targetRect) return null;
+    const pos = currentStepData?.position || 'bottom';
+    switch (pos) {
+      case 'top': return <ArrowDown className="w-6 h-6 animate-bounce" />;
+      case 'bottom': return <ArrowUp className="w-6 h-6 animate-bounce" />;
+      case 'left': return <ArrowRight className="w-6 h-6 animate-bounce" />;
+      case 'right': return <ArrowLeft className="w-6 h-6 animate-bounce" />;
+      default: return null;
+    }
+  };
+
   return (
     <>
       {!shouldHideButton && (
@@ -650,98 +533,146 @@ export function HelpGuide() {
       )}
 
       {isOpen && (
-        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div 
-            className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300 max-h-[85vh] flex flex-col"
+        <>
+          {/* Spotlight overlay */}
+          {targetRect && !showIntro && (
+            <div className="fixed inset-0 z-[69] pointer-events-none">
+              <svg className="w-full h-full">
+                <defs>
+                  <mask id="spotlight-mask">
+                    <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                    <rect
+                      x={targetRect.left - 8}
+                      y={targetRect.top - 8}
+                      width={targetRect.width + 16}
+                      height={targetRect.height + 16}
+                      rx="8"
+                      fill="black"
+                    />
+                  </mask>
+                </defs>
+                <rect
+                  x="0"
+                  y="0"
+                  width="100%"
+                  height="100%"
+                  fill="rgba(0,0,0,0.6)"
+                  mask="url(#spotlight-mask)"
+                />
+              </svg>
+              {/* Highlight border */}
+              <div
+                className="absolute border-2 border-blue-400 rounded-lg animate-pulse pointer-events-none"
+                style={{
+                  left: targetRect.left - 8,
+                  top: targetRect.top - 8,
+                  width: targetRect.width + 16,
+                  height: targetRect.height + 16,
+                }}
+              />
+            </div>
+          )}
+
+          {/* Dark overlay for intro or when no target */}
+          {(showIntro || !targetRect) && (
+            <div className="fixed inset-0 z-[69] bg-black/50 backdrop-blur-sm" onClick={handleClose} />
+          )}
+
+          {/* Guide panel */}
+          <div
+            className="fixed z-[70] w-[calc(100%-32px)] max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300"
+            style={showIntro || !targetRect ? { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' } : getTooltipPosition()}
             dir={language === 'ur' ? 'rtl' : 'ltr'}
           >
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 flex-shrink-0">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  <h2 className="font-bold text-lg">
-                    {language === 'en' ? 'Help Guide' : 'مدد گائیڈ'}
-                  </h2>
+                  <BookOpen className="w-4 h-4" />
+                  <span className="font-semibold text-sm">
+                    {currentGuide.screenName[language]}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <button
                     onClick={toggleLanguage}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-sm font-medium transition-colors"
+                    className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/20 hover:bg-white/30 text-xs font-medium transition-colors"
                     data-testid="button-toggle-language"
                   >
-                    <Languages className="w-4 h-4" />
-                    {language === 'en' ? 'اردو' : 'English'}
+                    <Languages className="w-3 h-3" />
+                    {language === 'en' ? 'اردو' : 'EN'}
                   </button>
                   <button
                     onClick={handleClose}
-                    className="p-1.5 rounded-full hover:bg-white/20 transition-colors"
+                    className="p-1 rounded-full hover:bg-white/20 transition-colors"
                     aria-label="Close"
                     data-testid="button-close-help"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               </div>
-              <p className="text-sm text-white/90 mt-1 font-medium">
-                {currentGuide.screenName[language]}
-              </p>
             </div>
 
-            <div className="p-6 overflow-y-auto flex-1">
+            {/* Content */}
+            <div className="p-4">
               {showIntro ? (
-                <div className="text-center py-4">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full flex items-center justify-center">
-                    <BookOpen className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                <div className="text-center py-2">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full flex items-center justify-center">
+                    <BookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">
-                    {currentGuide.screenName[language]}
+                  <h3 className="text-lg font-bold text-foreground mb-2">
+                    {language === 'en' ? 'Welcome!' : 'خوش آمدید!'}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed mb-6">
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                     {currentGuide.introduction[language]}
                   </p>
                   <Button
                     onClick={startGuide}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 px-8"
-                    size="lg"
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                    size="sm"
                   >
-                    {language === 'en' ? 'Start Guide' : 'گائیڈ شروع کریں'}
+                    {language === 'en' ? `Start Tour (${steps.length} steps)` : `ٹور شروع کریں (${steps.length} مراحل)`}
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-4">
-                    {language === 'en' 
-                      ? `${steps.length} steps to learn this feature`
-                      : `اس خصوصیت کو سیکھنے کے لیے ${steps.length} مراحل`}
-                  </p>
                 </div>
               ) : (
                 <>
-                  <div className="mb-4">
-                    <div className="flex items-start gap-3 mb-3">
-                      <span className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+                  {/* Arrow indicator */}
+                  {targetRect && (
+                    <div className="flex justify-center text-blue-500 mb-2">
+                      <ArrowIcon />
+                    </div>
+                  )}
+
+                  <div className="mb-3">
+                    <div className="flex items-start gap-2 mb-2">
+                      <span className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
                         {currentStep + 1}
                       </span>
-                      <h3 className="font-bold text-lg text-foreground leading-tight pt-1">
-                        {steps[currentStep]?.title[language]}
+                      <h3 className="font-bold text-sm text-foreground leading-tight">
+                        {currentStepData?.title[language]}
                       </h3>
                     </div>
-                    <p className="text-muted-foreground leading-relaxed text-base mb-4 pl-11">
-                      {steps[currentStep]?.description[language]}
+                    <p className="text-sm text-muted-foreground leading-relaxed pl-8">
+                      {currentStepData?.description[language]}
                     </p>
-                    {steps[currentStep]?.tip && (
-                      <div className="ml-11 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                        <p className="text-sm text-amber-700 dark:text-amber-300">
-                          <span className="font-semibold">{language === 'en' ? '💡 Tip: ' : '💡 ٹپ: '}</span>
-                          {steps[currentStep]?.tip?.[language]}
+                    {currentStepData?.tip && (
+                      <div className="ml-8 mt-2 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                        <p className="text-xs text-amber-700 dark:text-amber-300">
+                          <span className="font-semibold">💡 </span>
+                          {currentStepData.tip[language]}
                         </p>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex gap-1.5 mb-6">
+                  {/* Progress dots */}
+                  <div className="flex gap-1 mb-3">
                     {steps.map((_, idx) => (
                       <button
                         key={idx}
                         onClick={() => setCurrentStep(idx)}
-                        className={`h-2 flex-1 rounded-full transition-all ${
+                        className={`h-1.5 flex-1 rounded-full transition-all ${
                           idx === currentStep 
                             ? 'bg-gradient-to-r from-blue-500 to-purple-600' 
                             : idx < currentStep 
@@ -752,35 +683,31 @@ export function HelpGuide() {
                     ))}
                   </div>
 
+                  {/* Navigation */}
                   <div className="flex items-center justify-between">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={prevStep}
-                      className="gap-1"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
+                    <Button variant="outline" size="sm" onClick={prevStep} className="gap-1 text-xs h-8">
+                      <ChevronLeft className="w-3 h-3" />
                       {language === 'en' ? 'Back' : 'واپس'}
                     </Button>
-                    <span className="text-sm text-muted-foreground font-medium">
-                      {currentStep + 1} / {steps.length}
+                    <span className="text-xs text-muted-foreground">
+                      {currentStep + 1}/{steps.length}
                     </span>
                     <Button
                       size="sm"
                       onClick={nextStep}
-                      className="gap-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                      className="gap-1 text-xs h-8 bg-gradient-to-r from-blue-500 to-purple-600"
                     >
                       {currentStep === steps.length - 1 
                         ? (language === 'en' ? 'Done' : 'مکمل') 
                         : (language === 'en' ? 'Next' : 'اگلا')}
-                      {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4" />}
+                      {currentStep < steps.length - 1 && <ChevronRight className="w-3 h-3" />}
                     </Button>
                   </div>
                 </>
               )}
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );
