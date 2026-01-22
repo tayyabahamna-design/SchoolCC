@@ -442,7 +442,7 @@ export default function Dashboard() {
         {/* Sidebar Header */}
         <div className="p-6 border-b border-border">
           <div className="flex items-center gap-3 mb-2">
-            <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-10 h-10" />
+            <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-14 h-14" />
             <h1 className="text-xl font-bold gradient-text-gold">TaleemHub</h1>
           </div>
           <p className="text-sm text-muted-foreground mt-1">{user.role.replace(/_/g, ' ')}</p>
@@ -682,7 +682,7 @@ export default function Dashboard() {
         <div className="lg:hidden bg-card/95 dark:bg-card backdrop-blur-xl border-b border-border sticky top-0 z-50">
           <div className="px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-10 h-10" />
+              <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-14 h-14" />
               <div>
                 <h1 className="text-lg font-bold gradient-text-gold">TaleemHub</h1>
                 <p className="text-sm text-muted-foreground">{user.name} • {user.role.replace(/_/g, ' ')}</p>
