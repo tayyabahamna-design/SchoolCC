@@ -222,17 +222,6 @@ export default function PersistentHelpBanner({
           </Button>
         </div>
 
-        {/* Skip option (optional) */}
-        {currentStep === 0 && (
-          <div className="text-center mt-3">
-            <button
-              onClick={handleComplete}
-              className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium underline"
-            >
-              I know what to do, skip guide
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Handle bar at bottom if top position */}
