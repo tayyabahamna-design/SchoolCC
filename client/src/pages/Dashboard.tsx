@@ -202,29 +202,28 @@ export default function Dashboard() {
           { text: "Build trust first - teachers improve faster when they feel supported, not judged.", category: "Trust Building", gradient: "from-orange-500 to-amber-500" },
         ];
         
-        // Shuffle and pick a random quote/tip on each page visit
+        // Shuffle and pick random quotes/tips on each page visit
         const shuffledQuotes = [...teachingQuotes].sort(() => Math.random() - 0.5);
         const shuffledTips = [...coachingTips].sort(() => Math.random() - 0.5);
         const dailyQuote = shuffledQuotes[0];
-        const dailyTip = shuffledTips[0];
+        const randomCoachingTips = shuffledTips.slice(0, 3);
         
         if (user.role === 'HEAD_TEACHER') {
           return (
-            <div key="requests" data-testid="widget-coaching-tip">
-              <h2 className="text-2xl font-bold gradient-text mb-6">Coaching Tip of the Day</h2>
-              <Card className="p-8 bg-white dark:bg-card border border-border shadow-xl overflow-hidden relative">
-                <div className="relative">
-                  <div className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-gradient-to-r ${dailyTip.gradient} text-white`}>
-                    {dailyTip.category}
-                  </div>
-                  <p className={`text-xl md:text-2xl font-medium leading-relaxed mb-4 bg-gradient-to-r ${dailyTip.gradient} bg-clip-text text-transparent`}>
-                    {dailyTip.text}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-4">
-                    💡 Tip: Great coaching leads to better teaching and improved student learning!
-                  </p>
-                </div>
-              </Card>
+            <div key="requests" data-testid="widget-coaching-tips">
+              <h2 className="text-2xl font-bold gradient-text mb-6">Quick Coaching Tips</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {randomCoachingTips.map((tip, idx) => (
+                  <Card key={idx} className="p-5 bg-white dark:bg-card border border-border shadow-md hover:shadow-lg transition-all duration-300">
+                    <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mb-3 bg-gradient-to-r ${tip.gradient} text-white`}>
+                      {tip.category}
+                    </div>
+                    <p className={`text-sm font-medium leading-relaxed bg-gradient-to-r ${tip.gradient} bg-clip-text text-transparent`}>
+                      {tip.text}
+                    </p>
+                  </Card>
+                ))}
+              </div>
             </div>
           );
         }
