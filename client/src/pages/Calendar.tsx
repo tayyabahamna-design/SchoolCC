@@ -276,6 +276,7 @@ export default function Calendar() {
                     } ${canAddLeave && isCurrentMonth ? 'cursor-pointer hover:bg-muted/50' : ''}`}
                     onClick={(e) => {
                       e.preventDefault();
+                      console.log('Day clicked:', day.toDateString(), 'isCurrentMonth:', isCurrentMonth, 'canAddLeave:', canAddLeave);
                       if (isCurrentMonth && canAddLeave) {
                         handleDateClick(day);
                       }
