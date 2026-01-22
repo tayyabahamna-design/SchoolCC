@@ -97,6 +97,11 @@ export default function Dashboard() {
               const getClickHandler = () => {
                 if ('taskType' in stat) return () => navigate('/data-requests');
                 if ('teacherType' in stat) return () => openTeacherDialog(stat.teacherType);
+                // Lesson Plans shows "Coming Soon" for teachers
+                if (stat.label === 'Lesson Plans') return () => toast({
+                  title: "Coming Soon!",
+                  description: "Lesson Plans feature is under development.",
+                });
                 return undefined;
               };
               return (
