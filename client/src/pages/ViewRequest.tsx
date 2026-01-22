@@ -538,30 +538,52 @@ export default function ViewRequest() {
           </Card>
         )}
 
-        {/* Audit Trail */}
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Assignee Status</h2>
-          <div className="space-y-3">
-            {request.assignees.map((assignee) => (
-              <div key={assignee.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                <div>
-                  <p className="font-medium text-foreground">{assignee.userName}</p>
-                  <p className="text-xs text-muted-foreground">{assignee.schoolName || 'N/A'}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium capitalize">{assignee.status}</p>
-                  {assignee.submittedAt && (
-                    <p className="text-xs text-muted-foreground">
-                      Submitted: {assignee.submittedAt.toLocaleDateString()}
-                    </p>
+        {/* Assignee Status - Only visible to Head Teacher and above */}
+        {user.role !== 'TEACHER' && (
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">All Responses</h2>
+            <div className="space-y-3">
+              {request.assignees.map((assignee) => (
+                <div key={assignee.id} className="p-4 border border-border rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="font-medium text-foreground">{assignee.userName}</p>
+                      <p className="text-xs text-muted-foreground">{assignee.schoolName || 'N/A'}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-sm font-medium capitalize ${
+                        assignee.status === 'submitted' ? 'text-green-600' : 
+                        assignee.status === 'in_progress' ? 'text-yellow-600' : 'text-muted-foreground'
+                      }`}>{assignee.status}</p>
+                      {assignee.submittedAt && (
+                        <p className="text-xs text-muted-foreground">
+                          Submitted: {assignee.submittedAt.toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {/* Show field responses for Head Teacher and above */}
+                  {assignee.status === 'submitted' && assignee.fields && (
+                    <div className="mt-2 pt-2 border-t border-border space-y-2">
+                      {assignee.fields.map((field) => (
+                        <div key={field.id} className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">{field.name}:</span>
+                          <span className="font-medium text-foreground">
+                            {field.type === 'file' || field.type === 'photo' || field.type === 'voice_note' 
+                              ? (field.value ? 'Attached' : 'No file')
+                              : (field.value || '-')}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+              ))}
+            </div>
+          </Card>
+        )}
 
-        {/* Export */}
+        {/* Export - Only visible to Head Teacher and above */}
         {(user.role === 'DEO' || user.role === 'DDEO' || user.role === 'AEO' || user.role === 'HEAD_TEACHER') && (
           <Button variant="outline" className="w-full" onClick={handleExportExcel} data-testid="button-export-response">
             <Download className="w-4 h-4 mr-2" />
