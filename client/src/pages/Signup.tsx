@@ -113,6 +113,7 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const { hasCompleted, reset: resetGuide } = useTooltipGuideStatus(SIGNUP_GUIDE_KEY);
   const [showGuide, setShowGuide] = useState(false);
@@ -216,8 +217,9 @@ export default function Signup() {
         email: formData.email,
         districtId: formData.districtId,
       });
+      setSuccessMessage(data.message || 'Account created successfully!');
       setSuccess(true);
-      setTimeout(() => navigate('/'), 3000);
+      setTimeout(() => navigate('/'), 4000);
     } catch (err: any) {
       console.error('Signup error:', err);
       setError(err.message || 'Failed to create account');
@@ -228,14 +230,24 @@ export default function Signup() {
   };
 
   if (success) {
+    // Determine if account needs approval
+    const needsApproval = successMessage.includes('Awaiting approval') || successMessage.includes('approval from');
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
         <Card className="p-8 max-w-md w-full text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2 text-foreground">Account Created Successfully!</h2>
+          <h2 className="text-2xl font-bold mb-2 text-foreground">
+            {needsApproval ? 'Account Request Submitted!' : 'Account Created Successfully!'}
+          </h2>
           <p className="text-muted-foreground mb-6">
-            Your account has been created. You can now log in using your phone number.
+            {successMessage}
           </p>
+          {needsApproval && (
+            <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg mb-6">
+              Your account will be activated once approved. You'll be notified when you can log in.
+            </p>
+          )}
           <Button onClick={() => navigate('/')} className="w-full">Go to Login</Button>
         </Card>
       </div>
