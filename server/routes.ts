@@ -8,6 +8,7 @@ import {
 } from "@shared/schema";
 import multer from "multer";
 import { transcribeAudio, generateVisitSummary } from "./lib/claude";
+import * as XLSX from "xlsx";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -121,6 +122,69 @@ export async function registerRoutes(
       res.json(sheets);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to generate sheets" });
+    }
+  });
+
+  // Export request responses as Excel file
+  app.get("/api/requests/:id/export-excel", async (req, res) => {
+    try {
+      const request = await storage.getDataRequest(req.params.id);
+      if (!request) {
+        return res.status(404).json({ error: "Request not found" });
+      }
+
+      const assignees = await storage.getRequestAssignees(req.params.id);
+      
+      // Get field definitions from the request
+      const fields = request.fields as Array<{ id: string; name: string; type: string }>;
+      
+      // Build header row: Teacher Name, School, Status, then each field
+      const headers = ["Teacher Name", "School", "Status", "Submitted At", ...fields.map(f => f.name)];
+      
+      // Build data rows
+      const dataRows = assignees.map(assignee => {
+        const responses = (assignee.fieldResponses as Record<string, any>) || {};
+        const row: any[] = [
+          assignee.userName,
+          assignee.schoolName || "N/A",
+          assignee.status,
+          assignee.submittedAt ? new Date(assignee.submittedAt).toLocaleDateString() : "Not submitted"
+        ];
+        
+        // Add each field value
+        fields.forEach(field => {
+          const value = responses[field.id];
+          if (field.type === 'file' || field.type === 'photo' || field.type === 'voice_note') {
+            row.push(value ? "Attached" : "No file");
+          } else {
+            row.push(value || "");
+          }
+        });
+        
+        return row;
+      });
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const wsData = [headers, ...dataRows];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      
+      // Set column widths
+      ws['!cols'] = headers.map(() => ({ wch: 20 }));
+      
+      XLSX.utils.book_append_sheet(wb, ws, "Responses");
+      
+      // Generate buffer
+      const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+      
+      // Set headers for download
+      const filename = `${request.title.replace(/[^a-z0-9]/gi, '_')}_responses.xlsx`;
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(buffer);
+    } catch (error: any) {
+      console.error("Excel export error:", error);
+      res.status(500).json({ error: error.message || "Failed to export Excel" });
     }
   });
 

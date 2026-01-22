@@ -165,6 +165,33 @@ export default function ViewRequest() {
   const canDelegate = userAssignee && 
     (user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DEO' || user.role === 'DDEO');
 
+  // Export responses to Excel
+  const handleExportExcel = async () => {
+    if (!request) return;
+    
+    try {
+      const response = await fetch(`/api/requests/${request.id}/export-excel`);
+      if (!response.ok) {
+        throw new Error('Failed to export');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${request.title.replace(/[^a-z0-9]/gi, '_')}_responses.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Excel file downloaded successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export Excel file');
+    }
+  };
+
   const handleFieldChange = (fieldId: string, value: string | number | null) => {
     if (!editedAssignee) return;
 
@@ -535,10 +562,10 @@ export default function ViewRequest() {
         </Card>
 
         {/* Export */}
-        {(user.role === 'DEO' || user.role === 'DDEO' || user.role === 'AEO') && (
-          <Button variant="outline" className="w-full" data-testid="button-export-response">
+        {(user.role === 'DEO' || user.role === 'DDEO' || user.role === 'AEO' || user.role === 'HEAD_TEACHER') && (
+          <Button variant="outline" className="w-full" onClick={handleExportExcel} data-testid="button-export-response">
             <Download className="w-4 h-4 mr-2" />
-            Export All Responses as CSV
+            Export All Responses as Excel
           </Button>
         )}
       </div>
