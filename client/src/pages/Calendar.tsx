@@ -260,6 +260,65 @@ export default function Calendar() {
                   ? getLeavesByDateForTeacher(day, user.id)
                   : getLeavesByDate(day);
 
+                const dayContent = (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-foreground">{day.getDate()}</span>
+                      {canAddLeave && isCurrentMonth && (
+                        <Plus className="w-3 h-3 text-muted-foreground" />
+                      )}
+                    </div>
+                    {leavesForDay.length > 0 && (
+                      <div className="mt-1 space-y-0.5">
+                        {leavesForDay.slice(0, 2).map((leave) => (
+                          <div
+                            key={leave.id}
+                            className={`text-xs px-1 py-0.5 rounded truncate border ${leaveTypeColors[leave.leaveType]} ${leave.status === 'pending' ? 'opacity-60' : ''}`}
+                            title={`${leave.teacherName} - ${leave.reason}${leave.status === 'pending' ? ' (Pending)' : ''}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewLeave(leave);
+                            }}
+                          >
+                            {isTeacher ? leave.leaveType : leave.teacherName}
+                            {leave.status === 'pending' && <span className="ml-1 text-amber-600">⏳</span>}
+                          </div>
+                        ))}
+                        {leavesForDay.length > 2 && (
+                          <div 
+                            className="text-xs text-center bg-muted/50 rounded py-0.5"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleShowMoreLeaves(day, leavesForDay);
+                            }}
+                          >
+                            +{leavesForDay.length - 2} more
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                );
+
+                // Use button for clickable days, div for non-clickable
+                if (canAddLeave && isCurrentMonth) {
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`relative p-2 rounded-lg min-h-24 border-2 transition-all text-left touch-manipulation ${
+                        isToday
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border bg-card hover:border-primary/30 hover:bg-muted/30 active:bg-muted/50'
+                      }`}
+                      onClick={() => handleDateClick(day)}
+                      data-testid={`calendar-day-${day.getDate()}`}
+                    >
+                      {dayContent}
+                    </button>
+                  );
+                }
+
                 return (
                   <div
                     key={idx}
@@ -267,49 +326,12 @@ export default function Calendar() {
                       isCurrentMonth
                         ? isToday
                           ? 'border-primary bg-primary/10'
-                          : 'border-border bg-card hover:border-primary/30'
+                          : 'border-border bg-card'
                         : 'border-transparent bg-muted/20 text-muted-foreground'
                     }`}
                     data-testid={`calendar-day-${day.getDate()}`}
                   >
-                    {/* Clickable overlay for adding leave */}
-                    {canAddLeave && isCurrentMonth && (
-                      <button
-                        type="button"
-                        className="absolute inset-0 w-full h-full z-10 bg-blue-500/10 hover:bg-blue-500/20 active:bg-blue-500/30 rounded-lg touch-manipulation cursor-pointer"
-                        onClick={() => {
-                          console.log('Button clicked for date:', day.toDateString());
-                          handleDateClick(day);
-                        }}
-                        aria-label={`Add leave for ${day.toDateString()}`}
-                      />
-                    )}
-                    <div className="text-sm font-semibold text-foreground text-center relative z-0">{day.getDate()}</div>
-                    {leavesForDay.length > 0 && (
-                      <div className="mt-1 space-y-0.5 relative z-20">
-                        {leavesForDay.slice(0, 2).map((leave) => (
-                          <button
-                            type="button"
-                            key={leave.id}
-                            className={`w-full text-left text-xs px-1 py-0.5 rounded truncate hover:opacity-80 border touch-manipulation ${leaveTypeColors[leave.leaveType]} ${leave.status === 'pending' ? 'opacity-60' : ''}`}
-                            title={`${leave.teacherName} - ${leave.reason}${leave.status === 'pending' ? ' (Pending)' : ''}`}
-                            onClick={() => handleViewLeave(leave)}
-                          >
-                            {isTeacher ? leave.leaveType : leave.teacherName}
-                            {leave.status === 'pending' && <span className="ml-1 text-amber-600">⏳</span>}
-                          </button>
-                        ))}
-                        {leavesForDay.length > 2 && (
-                          <button 
-                            type="button"
-                            className="w-full text-xs text-center bg-muted/50 rounded py-0.5 hover:bg-muted touch-manipulation"
-                            onClick={() => handleShowMoreLeaves(day, leavesForDay)}
-                          >
-                            +{leavesForDay.length - 2} more
-                          </button>
-                        )}
-                      </div>
-                    )}
+                    {dayContent}
                   </div>
                 );
               })}
