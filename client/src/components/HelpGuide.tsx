@@ -535,6 +535,16 @@ export function HelpGuide() {
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [location] = useLocation();
 
+  useEffect(() => {
+    const handleOpenGuide = () => {
+      setIsOpen(true);
+      setCurrentStep(0);
+      setShowIntro(true);
+    };
+    window.addEventListener('openHelpGuide', handleOpenGuide);
+    return () => window.removeEventListener('openHelpGuide', handleOpenGuide);
+  }, []);
+
   const getGuide = useCallback((): ScreenGuide => {
     if (guides[location]) return guides[location];
     const pathParts = location.split('/');

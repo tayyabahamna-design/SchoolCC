@@ -675,10 +675,7 @@ export default function Dashboard() {
             </div>
             
             <button
-              onClick={() => {
-                const helpButton = document.querySelector('[data-testid="button-help-guide"]') as HTMLButtonElement;
-                if (helpButton) helpButton.click();
-              }}
+              onClick={() => window.dispatchEvent(new CustomEvent('openHelpGuide'))}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
               data-testid="button-help-guide-sidebar"
             >
@@ -801,10 +798,7 @@ export default function Dashboard() {
                 Lesson Plans
               </Button>
               <Button
-                onClick={() => {
-                  const helpButton = document.querySelector('[data-testid="button-help-guide"]') as HTMLButtonElement;
-                  if (helpButton) helpButton.click();
-                }}
+                onClick={() => window.dispatchEvent(new CustomEvent('openHelpGuide'))}
                 size="sm"
                 className="rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0 animate-pulse"
                 data-testid="button-help-guide-mobile"
