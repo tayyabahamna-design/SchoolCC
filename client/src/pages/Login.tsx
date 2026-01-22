@@ -34,7 +34,7 @@ const loginHelpSteps: HelpStep[] = [
   },
   {
     title: 'Login Methods',
-    content: 'Admin roles (CEO, DEO, DDEO) use phone + password. Field staff (AEO, Teachers, Head Teachers) use phone number only.\n\nایڈمن رولز (CEO, DEO, DDEO) فون + پاس ورڈ استعمال کرتے ہیں۔ فیلڈ سٹاف (AEO، اساتذہ، ہیڈ ٹیچرز) صرف فون نمبر استعمال کرتے ہیں۔',
+    content: 'Admin roles (CEO, DEO, DDEO, AEO) use phone + password. School staff (Teachers, Head Teachers) use phone number only.\n\nایڈمن رولز (CEO, DEO, DDEO, AEO) فون + پاس ورڈ استعمال کرتے ہیں۔ سکول سٹاف (اساتذہ، ہیڈ ٹیچرز) صرف فون نمبر استعمال کرتے ہیں۔',
     action: 'Switch tabs: "Admin Login" or "School Staff Login" | ٹیبز سوئچ کریں',
   },
 ];
