@@ -35,7 +35,7 @@ const signupGuideSteps: TooltipStep[] = [
   {
     target: '[data-guide="password-input"]',
     title: '3. پاس ورڈ | Password',
-    message: 'کم از کم 4 حروف کا پاس ورڈ بنائیں۔\nCreate a password (min 4 characters).',
+    message: 'کم از کم 6 حروف کا پاس ورڈ بنائیں۔\nCreate a password (min 6 characters).',
     placement: 'bottom',
   },
   {
@@ -176,8 +176,8 @@ export default function Signup() {
       return;
     }
 
-    if (formData.password.length < 4) {
-      setError('Password must be at least 4 characters');
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
       setLoading(false);
       return;
     }
@@ -311,7 +311,7 @@ export default function Signup() {
                     type="password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="Min 4 characters"
+                    placeholder="Min 6 characters"
                     required
                     data-testid="input-password"
                   />
