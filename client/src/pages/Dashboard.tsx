@@ -512,16 +512,29 @@ export default function Dashboard() {
               </div>
               <span className="font-medium text-foreground">Leave Calendar</span>
             </button>
-            <button
-              onClick={() => navigate('/school-data')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group press-effect"
-              data-testid="button-view-schools"
-            >
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                <Building2 className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-medium text-foreground">School Inventory</span>
-            </button>
+            {user.role === 'TEACHER' ? (
+              <button
+                onClick={() => navigate(user.schoolId ? `/album/${user.schoolId}` : '/dashboard')}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-pink-100/80 dark:hover:bg-pink-900/30 transition-all duration-300 group press-effect"
+                data-testid="button-school-album"
+              >
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-medium text-foreground">School Album</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/school-data')}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group press-effect"
+                data-testid="button-view-schools"
+              >
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-medium text-foreground">School Inventory</span>
+              </button>
+            )}
             {(user.role === 'AEO' || user.role === 'DDEO') && (
               <button
                 onClick={() => navigate('/school-visits')}
