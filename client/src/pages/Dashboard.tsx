@@ -470,7 +470,10 @@ export default function Dashboard() {
             </div>
             
             <button
-              onClick={() => navigate('/data-requests')}
+              onClick={() => toast({
+                title: "Coming Soon!",
+                description: "All Requests feature is under development and will be available soon.",
+              })}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-all duration-300 group press-effect"
               data-testid="button-view-requests"
             >
@@ -618,7 +621,10 @@ export default function Dashboard() {
                 </>
               )}
               <Button
-                onClick={() => navigate('/data-requests')}
+                onClick={() => toast({
+                  title: "Coming Soon!",
+                  description: "All Requests feature is under development.",
+                })}
                 size="sm"
                 className="rounded-full bg-gradient-to-r from-slate-400 to-slate-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0"
                 data-testid="button-view-requests-mobile"
