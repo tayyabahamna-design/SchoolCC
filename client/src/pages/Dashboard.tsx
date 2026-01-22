@@ -448,7 +448,7 @@ export default function Dashboard() {
     HEAD_TEACHER: [
       { label: 'Pending Tasks', value: pendingCount, icon: FileText, color: 'bg-orange-50', taskType: 'pending' as const },
       { label: 'Completed', value: completedCount, icon: TrendingUp, color: 'bg-emerald-50', taskType: 'completed' as const },
-      { label: 'Staff Present Today', value: presentToday, icon: Users, color: 'bg-blue-50', teacherType: 'present' as const },
+      { label: 'Lesson Plans', value: 0, icon: BookOpen, color: 'bg-blue-50' },
     ],
     TEACHER: [
       { label: 'My Tasks', value: pendingCount, icon: FileText, color: 'bg-orange-50', taskType: 'pending' as const },
