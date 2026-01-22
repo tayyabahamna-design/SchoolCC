@@ -205,6 +205,7 @@ export default function Signup() {
       });
 
       const data = await response.json();
+      console.log('[Signup] Backend response:', data);
 
       if (!response.ok) {
         const errorMsg = data.details ? `${data.error}: ${data.details}` : data.error;
@@ -217,7 +218,10 @@ export default function Signup() {
         email: formData.email,
         districtId: formData.districtId,
       });
-      setSuccessMessage(data.message || 'Account created successfully!');
+
+      const message = data.message || 'Account created successfully!';
+      console.log('[Signup] Setting success message:', message);
+      setSuccessMessage(message);
       setSuccess(true);
       setTimeout(() => navigate('/'), 4000);
     } catch (err: any) {
@@ -232,6 +236,7 @@ export default function Signup() {
   if (success) {
     // Determine if account needs approval
     const needsApproval = successMessage.includes('Awaiting approval') || successMessage.includes('approval from');
+    console.log('[Signup Success Screen] successMessage:', successMessage, 'needsApproval:', needsApproval);
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
@@ -241,7 +246,7 @@ export default function Signup() {
             {needsApproval ? 'Account Request Submitted!' : 'Account Created Successfully!'}
           </h2>
           <p className="text-muted-foreground mb-6">
-            {successMessage}
+            {successMessage || 'No message received from server'}
           </p>
           {needsApproval && (
             <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg mb-6">
