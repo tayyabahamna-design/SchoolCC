@@ -23,7 +23,7 @@ const leaveTypeColors: Record<string, string> = {
 export default function Calendar() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
-  const { getApprovedLeaves, getLeavesByDate, addLeave } = useLeaveRecords();
+  const { getApprovedLeaves, getLeavesByDate, getLeavesByDateForTeacher, getLeavesByTeacher, addLeave } = useLeaveRecords();
   const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -53,20 +53,9 @@ export default function Calendar() {
 
   if (!user) return null;
 
-  if (user.role === 'TEACHER') {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="p-6 text-center max-w-md">
-          <CalendarIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-lg font-semibold text-foreground mb-2">Access Restricted</h2>
-          <p className="text-muted-foreground mb-4">The leave calendar is only accessible to management staff.</p>
-          <Button onClick={() => navigate('/dashboard')} data-testid="button-go-back">
-            Go to Dashboard
-          </Button>
-        </Card>
-      </div>
-    );
-  }
+  const isTeacher = user.role === 'TEACHER';
+  const canAddLeave = user.role === 'TEACHER' || user.role === 'HEAD_TEACHER';
+  const canSeeAllLeaves = ['HEAD_TEACHER', 'AEO', 'DDEO', 'DEO', 'TRAINING_MANAGER'].includes(user.role);
 
   const today = new Date();
   const currentMonth = currentDate.getMonth();
@@ -82,7 +71,10 @@ export default function Calendar() {
     days.push(new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000));
   }
 
-  const approvedLeaves = getApprovedLeaves();
+  // For teachers, show only their own leaves. For management, show all approved leaves
+  const approvedLeaves = isTeacher 
+    ? getLeavesByTeacher(user.id) 
+    : getApprovedLeaves();
 
   const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
@@ -104,7 +96,10 @@ export default function Calendar() {
   };
 
   const handleCreateLeave = () => {
-    if (!newLeave.teacherName || !newLeave.startDate || !newLeave.endDate || !newLeave.reason) {
+    // For teachers, their name is pre-filled; for HEAD_TEACHER, teacher name is required
+    const teacherName = isTeacher ? user.name : newLeave.teacherName;
+    
+    if (!teacherName || !newLeave.startDate || !newLeave.endDate || !newLeave.reason) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -113,9 +108,12 @@ export default function Calendar() {
       return;
     }
 
+    // Teachers submit pending leaves; Head Teachers can directly approve
+    const leaveStatus = isTeacher ? 'pending' : 'approved';
+
     addLeave({
-      teacherId: `teacher-${Date.now()}`,
-      teacherName: newLeave.teacherName,
+      teacherId: isTeacher ? user.id : `teacher-${Date.now()}`,
+      teacherName: teacherName,
       schoolId: user.schoolId || 'SCH-001',
       schoolName: user.schoolName || 'Demo School',
       leaveType: newLeave.leaveType,
@@ -123,15 +121,19 @@ export default function Calendar() {
       endDate: new Date(newLeave.endDate),
       numberOfDays: calculateDays(newLeave.startDate, newLeave.endDate),
       reason: newLeave.reason,
-      status: 'approved',
-      approvedBy: user.id,
-      approvedByName: user.name,
-      approvedAt: new Date(),
+      status: leaveStatus,
+      ...(leaveStatus === 'approved' && {
+        approvedBy: user.id,
+        approvedByName: user.name,
+        approvedAt: new Date(),
+      }),
     });
 
     toast({
-      title: "Leave Added",
-      description: "The leave has been added to the calendar.",
+      title: isTeacher ? "Leave Request Submitted" : "Leave Added",
+      description: isTeacher 
+        ? "Your leave request has been submitted for approval." 
+        : "The leave has been added to the calendar.",
     });
 
     setNewLeave({
@@ -152,7 +154,7 @@ export default function Calendar() {
   };
 
   const handleDateClick = (day: Date) => {
-    if (user.role !== 'HEAD_TEACHER') return;
+    if (!canAddLeave) return;
     const year = day.getFullYear();
     const month = String(day.getMonth() + 1).padStart(2, '0');
     const dayOfMonth = String(day.getDate()).padStart(2, '0');
@@ -185,38 +187,44 @@ export default function Calendar() {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Staff Leave Calendar</h1>
+              <h1 className="text-2xl font-bold text-foreground">
+                {isTeacher ? 'My Leave Calendar' : 'Staff Leave Calendar'}
+              </h1>
               <p className="text-sm text-muted-foreground">
-                {user.role === 'HEAD_TEACHER' 
-                  ? 'Click on any date to add a leave. Click on teacher name to view details.'
-                  : 'Track and manage teacher leave requests'}
+                {isTeacher 
+                  ? 'Click on any date to request a leave. View your leave history below.'
+                  : user.role === 'HEAD_TEACHER' 
+                    ? 'Click on any date to add a leave. Click on teacher name to view details.'
+                    : 'Track and manage teacher leave requests'}
               </p>
             </div>
           </div>
           
-          {user.role === 'HEAD_TEACHER' && (
+          {canAddLeave && (
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-blue-600 to-purple-600" data-testid="button-add-leave">
                   <Plus className="w-4 h-4 mr-2" />
-                  Add Leave
+                  {isTeacher ? 'Request Leave' : 'Add Leave'}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Add Teacher Leave</DialogTitle>
+                  <DialogTitle>{isTeacher ? 'Request Leave' : 'Add Teacher Leave'}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="teacherName">Teacher Name *</Label>
-                    <Input
-                      id="teacherName"
-                      value={newLeave.teacherName}
-                      onChange={(e) => setNewLeave(prev => ({ ...prev, teacherName: e.target.value }))}
-                      placeholder="Enter teacher name"
-                      data-testid="input-teacher-name"
-                    />
-                  </div>
+                  {!isTeacher && (
+                    <div className="space-y-2">
+                      <Label htmlFor="teacherName">Teacher Name *</Label>
+                      <Input
+                        id="teacherName"
+                        value={newLeave.teacherName}
+                        onChange={(e) => setNewLeave(prev => ({ ...prev, teacherName: e.target.value }))}
+                        placeholder="Enter teacher name"
+                        data-testid="input-teacher-name"
+                      />
+                    </div>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="leaveType">Leave Type</Label>
                     <Select
@@ -280,12 +288,17 @@ export default function Calendar() {
                       data-testid="input-reason"
                     />
                   </div>
+                  {isTeacher && (
+                    <p className="text-sm text-amber-600 bg-amber-50 p-2 rounded">
+                      Your leave request will be submitted for approval by your Head Teacher.
+                    </p>
+                  )}
                   <div className="flex justify-end gap-2 pt-4">
                     <Button variant="outline" onClick={() => setShowCreateDialog(false)} data-testid="button-cancel-leave">
                       Cancel
                     </Button>
                     <Button onClick={handleCreateLeave} data-testid="button-save-leave">
-                      Add Leave
+                      {isTeacher ? 'Submit Request' : 'Add Leave'}
                     </Button>
                   </div>
                 </div>
@@ -340,7 +353,10 @@ export default function Calendar() {
               {days.map((day, idx) => {
                 const isCurrentMonth = day.getMonth() === currentMonth;
                 const isToday = day.toDateString() === today.toDateString();
-                const leavesForDay = getLeavesByDate(day);
+                // Teachers only see their own leaves; management sees all approved leaves
+                const leavesForDay = isTeacher 
+                  ? getLeavesByDateForTeacher(day, user.id)
+                  : getLeavesByDate(day);
 
                 return (
                   <div
@@ -351,7 +367,7 @@ export default function Calendar() {
                           ? 'border-primary bg-primary/10'
                           : 'border-border bg-card hover:border-primary/30'
                         : 'border-transparent bg-muted/20 text-muted-foreground'
-                    } ${user.role === 'HEAD_TEACHER' && isCurrentMonth ? 'cursor-pointer' : ''}`}
+                    } ${canAddLeave && isCurrentMonth ? 'cursor-pointer' : ''}`}
                     onClick={() => isCurrentMonth && handleDateClick(day)}
                     data-testid={`calendar-day-${day.getDate()}`}
                   >
@@ -361,14 +377,15 @@ export default function Calendar() {
                         {leavesForDay.slice(0, 2).map((leave) => (
                           <div
                             key={leave.id}
-                            className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer hover:opacity-80 border ${leaveTypeColors[leave.leaveType]}`}
-                            title={`${leave.teacherName} - ${leave.reason}`}
+                            className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer hover:opacity-80 border ${leaveTypeColors[leave.leaveType]} ${leave.status === 'pending' ? 'opacity-60' : ''}`}
+                            title={`${leave.teacherName} - ${leave.reason}${leave.status === 'pending' ? ' (Pending)' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleViewLeave(leave);
                             }}
                           >
-                            {leave.teacherName}
+                            {isTeacher ? leave.leaveType : leave.teacherName}
+                            {leave.status === 'pending' && <span className="ml-1 text-amber-600">⏳</span>}
                           </div>
                         ))}
                         {leavesForDay.length > 2 && (
@@ -392,30 +409,41 @@ export default function Calendar() {
 
           <div className="space-y-6">
             <Card className="p-6">
-              <h3 className="font-semibold text-foreground mb-4">Upcoming Leaves</h3>
+              <h3 className="font-semibold text-foreground mb-4">
+                {isTeacher ? 'My Leaves' : 'Upcoming Leaves'}
+              </h3>
               <div className="space-y-3 max-h-48 overflow-y-auto">
                 {approvedLeaves
-                  .filter(l => new Date(l.startDate) >= today)
+                  .filter(l => isTeacher || new Date(l.startDate) >= today)
                   .slice(0, 5)
                   .map((leave) => (
                     <div 
                       key={leave.id} 
-                      className="border border-border rounded-lg p-3 text-sm cursor-pointer hover:bg-muted/50"
+                      className={`border border-border rounded-lg p-3 text-sm cursor-pointer hover:bg-muted/50 ${leave.status === 'pending' ? 'bg-amber-50/50' : ''}`}
                       onClick={() => handleViewLeave(leave)}
                     >
                       <div className="flex items-center justify-between">
-                        <p className="font-medium text-foreground">{leave.teacherName}</p>
-                        <span className={`text-xs px-2 py-0.5 rounded border ${leaveTypeColors[leave.leaveType]}`}>
-                          {leave.leaveType}
-                        </span>
+                        <p className="font-medium text-foreground">
+                          {isTeacher ? leave.leaveType.charAt(0).toUpperCase() + leave.leaveType.slice(1) + ' Leave' : leave.teacherName}
+                        </p>
+                        <div className="flex items-center gap-1">
+                          {leave.status === 'pending' && (
+                            <span className="text-xs px-2 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">
+                              Pending
+                            </span>
+                          )}
+                          <span className={`text-xs px-2 py-0.5 rounded border ${leaveTypeColors[leave.leaveType]}`}>
+                            {leave.leaveType}
+                          </span>
+                        </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
                         {leave.startDate.toLocaleDateString()} - {leave.endDate.toLocaleDateString()} ({leave.numberOfDays} days)
                       </p>
                     </div>
                   ))}
-                {approvedLeaves.filter(l => new Date(l.startDate) >= today).length === 0 && (
-                  <p className="text-xs text-muted-foreground">No upcoming leaves</p>
+                {approvedLeaves.filter(l => isTeacher || new Date(l.startDate) >= today).length === 0 && (
+                  <p className="text-xs text-muted-foreground">{isTeacher ? 'No leave records yet' : 'No upcoming leaves'}</p>
                 )}
               </div>
             </Card>
@@ -439,6 +467,12 @@ export default function Calendar() {
                   <div className="w-4 h-4 bg-purple-100 rounded border border-purple-200" />
                   <span className="text-muted-foreground">Special Leave</span>
                 </div>
+                {isTeacher && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-amber-100 rounded border border-amber-200 flex items-center justify-center text-xs">⏳</div>
+                    <span className="text-muted-foreground">Pending Approval</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-2 pt-2 border-t">
                   <div className="w-4 h-4 border-2 border-primary rounded" />
                   <span className="text-muted-foreground">Today</span>
@@ -464,9 +498,21 @@ export default function Calendar() {
           {selectedLeave && (
             <div className="space-y-4 mt-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Teacher</span>
-                <span className="font-medium">{selectedLeave.teacherName}</span>
+                <span className="text-sm text-muted-foreground">Status</span>
+                <span className={`text-xs px-2 py-1 rounded border capitalize ${
+                  selectedLeave.status === 'approved' ? 'bg-green-100 text-green-700 border-green-200' :
+                  selectedLeave.status === 'pending' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                  'bg-red-100 text-red-700 border-red-200'
+                }`}>
+                  {selectedLeave.status}
+                </span>
               </div>
+              {!isTeacher && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Teacher</span>
+                  <span className="font-medium">{selectedLeave.teacherName}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">School</span>
                 <span className="font-medium">{selectedLeave.schoolName}</span>

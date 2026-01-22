@@ -103,6 +103,24 @@ export function useLeaveRecords() {
     return leaves.filter(l => l.schoolId === schoolId);
   }, [leaves]);
 
+  const getLeavesByTeacher = useCallback((teacherId: string) => {
+    return leaves.filter(l => l.teacherId === teacherId);
+  }, [leaves]);
+
+  const getLeavesByDateForTeacher = useCallback((date: Date, teacherId: string) => {
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    return leaves.filter(l => {
+      if (l.teacherId !== teacherId) return false;
+      const start = new Date(l.startDate);
+      const end = new Date(l.endDate);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(0, 0, 0, 0);
+      return checkDate >= start && checkDate <= end;
+    });
+  }, [leaves]);
+
   const getLeavesByDate = useCallback((date: Date) => {
     const checkDate = new Date(date);
     checkDate.setHours(0, 0, 0, 0);
@@ -165,7 +183,9 @@ export function useLeaveRecords() {
     getApprovedLeaves,
     getPendingLeaves,
     getLeavesBySchool,
+    getLeavesByTeacher,
     getLeavesByDate,
+    getLeavesByDateForTeacher,
     addLeave,
     approveLeave,
     rejectLeave,
