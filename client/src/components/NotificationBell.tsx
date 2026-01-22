@@ -47,6 +47,7 @@ export default function NotificationBell() {
         size="icon"
         className="relative"
         onClick={() => setOpen(true)}
+        data-testid="button-notifications"
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (

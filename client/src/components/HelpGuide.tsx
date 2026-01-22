@@ -23,58 +23,123 @@ const guides: Record<string, ScreenGuide> = {
   '/dashboard': {
     screenName: { en: 'Dashboard', ur: 'ڈیش بورڈ' },
     introduction: {
-      en: 'Welcome to your Dashboard! This is your control center where you can access all TaleemHub features.',
-      ur: 'اپنے ڈیش بورڈ میں خوش آمدید! یہ آپ کا کنٹرول سینٹر ہے جہاں سے آپ تعلیم ہب کی تمام خصوصیات تک رسائی حاصل کر سکتے ہیں۔'
+      en: 'Welcome to your Dashboard! This is your control center where you can access all TaleemHub features. Let me show you each feature step by step.',
+      ur: 'اپنے ڈیش بورڈ میں خوش آمدید! یہ آپ کا کنٹرول سینٹر ہے۔ آئیں میں آپ کو ہر خصوصیت قدم بہ قدم دکھاتا ہوں۔'
     },
     steps: [
       {
-        title: { en: 'Quick Action Cards', ur: 'فوری عمل کارڈز' },
+        title: { en: 'Your Profile Section', ur: 'آپ کا پروفائل سیکشن' },
         description: {
-          en: 'These cards give you quick access to main features. Each card opens a different section of the app. Tap any card to explore that feature.',
-          ur: 'یہ کارڈز آپ کو اہم خصوصیات تک فوری رسائی دیتے ہیں۔ ہر کارڈ ایپ کا ایک مختلف حصہ کھولتا ہے۔ اس خصوصیت کو دریافت کرنے کے لیے کسی بھی کارڈ پر ٹیپ کریں۔'
-        },
-        target: '[data-testid="dashboard-cards"], .grid',
-        position: 'bottom'
-      },
-      {
-        title: { en: 'Leave Calendar', ur: 'چھٹی کیلنڈر' },
-        description: {
-          en: 'Tap here to open the Leave Calendar. You can view all staff leaves and add new leave records by tapping on any date.',
-          ur: 'چھٹی کیلنڈر کھولنے کے لیے یہاں ٹیپ کریں۔ آپ عملے کی تمام چھٹیاں دیکھ سکتے ہیں اور کسی بھی تاریخ پر ٹیپ کرکے نئی چھٹی کا ریکارڈ شامل کر سکتے ہیں۔'
+          en: 'This shows your name and role. Tap here to go to your profile where you can: Update personal information, Add or change your profile picture, View your assigned school details.',
+          ur: 'یہ آپ کا نام اور کردار دکھاتا ہے۔ اپنے پروفائل پر جانے کے لیے یہاں ٹیپ کریں جہاں آپ: ذاتی معلومات اپڈیٹ کر سکتے ہیں، پروفائل تصویر شامل یا تبدیل کر سکتے ہیں، اپنے اسکول کی تفصیلات دیکھ سکتے ہیں۔'
         },
         tip: {
-          en: 'All leaves are automatically approved - no waiting needed!',
-          ur: 'تمام چھٹیاں خودکار طور پر منظور ہو جاتی ہیں - انتظار کی ضرورت نہیں!'
+          en: 'Add a profile picture to personalize your account!',
+          ur: 'اپنے اکاؤنٹ کو ذاتی بنانے کے لیے پروفائل تصویر شامل کریں!'
         },
-        target: '[href="/calendar"], a[href="/calendar"]',
+        target: '[data-testid="user-profile-section"]',
+        position: 'right'
+      },
+      {
+        title: { en: 'Task & Stats Cards', ur: 'کام اور اعدادوشمار کارڈز' },
+        description: {
+          en: 'These cards show your task overview: My Tasks (pending work), Completed (finished tasks), and Lesson Plans (coming soon). Tap any card to learn more!',
+          ur: 'یہ کارڈز آپ کے کام کا جائزہ دکھاتے ہیں: میرے کام (زیر التوا کام)، مکمل (ختم شدہ کام)، اور سبق کے منصوبے (جلد آ رہے ہیں)۔ مزید جاننے کے لیے کسی بھی کارڈ پر ٹیپ کریں!'
+        },
+        tip: {
+          en: 'These features are coming soon!',
+          ur: 'یہ خصوصیات جلد آ رہی ہیں!'
+        },
+        target: '[data-testid="widget-stats"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Data Requests', ur: 'ڈیٹا کی درخواستیں' },
+        title: { en: 'Today\'s Inspiration Quote', ur: 'آج کا حوصلہ افزا اقتباس' },
         description: {
-          en: 'Here you can see and respond to data collection requests from your supervisors. Check for pending requests that need your attention.',
-          ur: 'یہاں آپ اپنے سپروائزرز کی طرف سے ڈیٹا جمع کرنے کی درخواستیں دیکھ سکتے ہیں اور ان کا جواب دے سکتے ہیں۔ ان زیر التوا درخواستوں کی جانچ کریں جن پر توجہ درکار ہے۔'
+          en: 'Every time you visit the dashboard, you see a new inspiring quote about teaching. These motivational quotes change randomly to keep you inspired!',
+          ur: 'جب بھی آپ ڈیش بورڈ دیکھتے ہیں، آپ کو تدریس کے بارے میں ایک نیا حوصلہ افزا اقتباس نظر آتا ہے۔ یہ اقتباسات تصادفی طور پر بدلتے ہیں!'
         },
-        target: '[href="/data-requests"], a[href="/data-requests"]',
-        position: 'bottom'
+        tip: {
+          en: 'Refresh the page to see a new quote!',
+          ur: 'نیا اقتباس دیکھنے کے لیے صفحہ ریفریش کریں!'
+        },
+        target: '[data-testid="widget-quote"]',
+        position: 'top'
       },
       {
-        title: { en: 'School Visits', ur: 'اسکول دورے' },
+        title: { en: 'Teaching Tips Section', ur: 'تدریسی تجاویز سیکشن' },
         description: {
-          en: 'For AEOs: Record your school monitoring visits, mentoring sessions, and office activities here with photo evidence.',
-          ur: 'AEOs کے لیے: یہاں اپنے اسکول کے نگرانی دورے، رہنمائی کے سیشنز اور دفتری سرگرمیاں تصویری ثبوت کے ساتھ ریکارڈ کریں۔'
+          en: 'Get 3 random teaching tips every time you visit! These tips help you improve your classroom teaching with practical advice and techniques.',
+          ur: 'ہر بار جب آپ آئیں تو 3 تصادفی تدریسی تجاویز حاصل کریں! یہ تجاویز آپ کو عملی مشورے اور تکنیکوں کے ساتھ اپنی کلاس روم تدریس بہتر بنانے میں مدد کرتی ہیں۔'
         },
-        target: '[href="/school-visits"], a[href="/school-visits"]',
-        position: 'bottom'
+        tip: {
+          en: 'Tips change on every page refresh!',
+          ur: 'ہر صفحہ ریفریش پر تجاویز بدل جاتی ہیں!'
+        },
+        target: '[data-testid="widget-tips"]',
+        position: 'top'
       },
       {
-        title: { en: 'Your Profile', ur: 'آپ کا پروفائل' },
+        title: { en: 'Leave Calendar Button', ur: 'چھٹی کیلنڈر بٹن' },
         description: {
-          en: 'Tap the profile icon to view your account details, change app theme (light/dark), or logout from the app.',
-          ur: 'اپنے اکاؤنٹ کی تفصیلات دیکھنے، ایپ تھیم تبدیل کرنے (لائٹ/ڈارک) یا ایپ سے لاگ آؤٹ کرنے کے لیے پروفائل آئیکن پر ٹیپ کریں۔'
+          en: 'Tap here to open the Leave Calendar. You can: View all your approved leaves, Apply for new leave by tapping any date, See different leave types (Casual, Sick, Earned, Special). All leaves are automatically approved!',
+          ur: 'چھٹی کیلنڈر کھولنے کے لیے یہاں ٹیپ کریں۔ آپ: اپنی تمام منظور شدہ چھٹیاں دیکھ سکتے ہیں، کسی بھی تاریخ پر ٹیپ کرکے نئی چھٹی کے لیے درخواست دے سکتے ہیں، مختلف قسم کی چھٹیاں دیکھ سکتے ہیں۔ تمام چھٹیاں خودکار طور پر منظور ہو جاتی ہیں!'
         },
-        target: '[href="/profile"], a[href="/profile"], [data-testid*="profile"]',
-        position: 'bottom'
+        tip: {
+          en: 'All leaves are auto-approved - no waiting!',
+          ur: 'تمام چھٹیاں خودکار منظور - کوئی انتظار نہیں!'
+        },
+        target: '[data-testid="button-view-calendar"]',
+        position: 'right'
+      },
+      {
+        title: { en: 'Community Album Button', ur: 'کمیونٹی البم بٹن' },
+        description: {
+          en: 'Tap here to view the Community Album! Here you can: See photos and activities from ALL schools, Post your own classroom activities with photos, Like and comment on other teachers\' posts, Share your teaching achievements with the community.',
+          ur: 'کمیونٹی البم دیکھنے کے لیے یہاں ٹیپ کریں! یہاں آپ: تمام اسکولوں کی تصاویر اور سرگرمیاں دیکھ سکتے ہیں، اپنی کلاس روم سرگرمیاں تصاویر کے ساتھ پوسٹ کر سکتے ہیں، دوسرے اساتذہ کی پوسٹس کو لائک اور کمنٹ کر سکتے ہیں۔'
+        },
+        tip: {
+          en: 'Share your best classroom moments with everyone!',
+          ur: 'اپنے بہترین کلاس روم لمحات سب کے ساتھ شیئر کریں!'
+        },
+        target: '[data-testid="button-community-album"]',
+        position: 'right'
+      },
+      {
+        title: { en: 'Queries Button', ur: 'سوالات بٹن' },
+        description: {
+          en: 'Tap here to submit queries or questions to your supervisors. You can: Ask questions about policies or procedures, Report issues or concerns, Get responses from Head Teacher or AEO.',
+          ur: 'اپنے سپروائزرز کو سوالات یا استفسارات بھیجنے کے لیے یہاں ٹیپ کریں۔ آپ: پالیسیوں یا طریقہ کار کے بارے میں سوالات پوچھ سکتے ہیں، مسائل یا خدشات رپورٹ کر سکتے ہیں، ہیڈ ٹیچر یا AEO سے جوابات حاصل کر سکتے ہیں۔'
+        },
+        target: '[data-testid="button-view-queries"]',
+        position: 'right'
+      },
+      {
+        title: { en: 'Theme Toggle (Light/Dark Mode)', ur: 'تھیم ٹوگل (لائٹ/ڈارک موڈ)' },
+        description: {
+          en: 'Tap this button to switch between light and dark mode. Dark mode is easier on the eyes at night and saves battery on some devices.',
+          ur: 'لائٹ اور ڈارک موڈ کے درمیان سوئچ کرنے کے لیے یہ بٹن ٹیپ کریں۔ ڈارک موڈ رات میں آنکھوں کے لیے آسان ہے اور کچھ ڈیوائسز پر بیٹری بچاتا ہے۔'
+        },
+        target: '[data-testid="button-theme-toggle"]',
+        position: 'left'
+      },
+      {
+        title: { en: 'Notifications Bell', ur: 'نوٹیفیکیشن گھنٹی' },
+        description: {
+          en: 'Tap the bell icon to see your notifications. You will be notified when: Someone reacts to your Community Album posts, You receive new tasks or requests, Important announcements are made.',
+          ur: 'اپنی نوٹیفیکیشنز دیکھنے کے لیے گھنٹی کا آئیکن ٹیپ کریں۔ آپ کو مطلع کیا جائے گا جب: کوئی آپ کی کمیونٹی البم پوسٹس پر ری ایکٹ کرے، آپ کو نئے کام یا درخواستیں ملیں، اہم اعلانات کیے جائیں۔'
+        },
+        target: '[data-testid="button-notifications"]',
+        position: 'left'
+      },
+      {
+        title: { en: 'Logout Button', ur: 'لاگ آؤٹ بٹن' },
+        description: {
+          en: 'Tap here to safely logout from your account. Always logout when using a shared device to keep your account secure.',
+          ur: 'اپنے اکاؤنٹ سے محفوظ طریقے سے لاگ آؤٹ کرنے کے لیے یہاں ٹیپ کریں۔ مشترکہ ڈیوائس استعمال کرتے وقت ہمیشہ لاگ آؤٹ کریں تاکہ آپ کا اکاؤنٹ محفوظ رہے۔'
+        },
+        target: '[data-testid="button-logout"]',
+        position: 'right'
       },
     ],
   },
@@ -309,6 +374,94 @@ const guides: Record<string, ScreenGuide> = {
         },
         target: '[data-testid*="create"], button:contains("Create")',
         position: 'bottom'
+      },
+    ],
+  },
+  '/community-album': {
+    screenName: { en: 'Community Album', ur: 'کمیونٹی البم' },
+    introduction: {
+      en: 'Welcome to the Community Album! This is where teachers from ALL schools share their classroom activities, achievements, and memorable moments. Let me show you how to use it!',
+      ur: 'کمیونٹی البم میں خوش آمدید! یہاں تمام اسکولوں کے اساتذہ اپنی کلاس روم سرگرمیاں، کامیابیاں اور یادگار لمحات شیئر کرتے ہیں۔ آئیں میں آپ کو دکھاتا ہوں کہ اسے کیسے استعمال کریں!'
+    },
+    steps: [
+      {
+        title: { en: 'Feed & Albums Tabs', ur: 'فیڈ اور البمز ٹیبز' },
+        description: {
+          en: 'Switch between Feed (all posts) and Albums (organized by school). Feed shows recent activities from all schools. Albums lets you browse by school.',
+          ur: 'فیڈ (تمام پوسٹس) اور البمز (اسکول کے لحاظ سے منظم) کے درمیان سوئچ کریں۔ فیڈ تمام اسکولوں کی حالیہ سرگرمیاں دکھاتی ہے۔ البمز آپ کو اسکول کے لحاظ سے براؤز کرنے دیتے ہیں۔'
+        },
+        tip: {
+          en: 'You can see what other schools are doing for inspiration!',
+          ur: 'آپ دوسرے اسکولوں کی سرگرمیاں دیکھ کر تحریک حاصل کر سکتے ہیں!'
+        },
+        target: '[data-testid="button-view-feed"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'Create New Post Button', ur: 'نئی پوسٹ بنائیں بٹن' },
+        description: {
+          en: 'Tap this button to share your classroom activity! You can: Add up to 10 photos at once, Write a title and description, Share achievements, events, or daily activities.',
+          ur: 'اپنی کلاس روم سرگرمی شیئر کرنے کے لیے یہ بٹن ٹیپ کریں! آپ: ایک وقت میں 10 تصاویر تک شامل کر سکتے ہیں، عنوان اور تفصیل لکھ سکتے ہیں، کامیابیاں، تقریبات یا روزانہ کی سرگرمیاں شیئر کر سکتے ہیں۔'
+        },
+        tip: {
+          en: 'Maximum 10 photos per post!',
+          ur: 'ہر پوسٹ میں زیادہ سے زیادہ 10 تصاویر!'
+        },
+        target: '[data-testid="button-create-activity"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'React to Posts', ur: 'پوسٹس پر ری ایکٹ کریں' },
+        description: {
+          en: 'Show appreciation by reacting to posts! Tap the reaction button to: Like, Love, Clap, or Celebrate someone\'s work. The poster will be notified when you react!',
+          ur: 'پوسٹس پر ری ایکٹ کرکے تعریف ظاہر کریں! ری ایکشن بٹن ٹیپ کریں: لائک، لو، تالی یا جشن منائیں۔ جب آپ ری ایکٹ کریں گے تو پوسٹ کرنے والے کو مطلع کیا جائے گا!'
+        },
+        tip: {
+          en: 'Reactions notify the teacher who posted!',
+          ur: 'ری ایکشنز پوسٹ کرنے والے استاد کو مطلع کرتے ہیں!'
+        },
+        target: '[data-testid^="button-reaction-"]',
+        position: 'top'
+      },
+      {
+        title: { en: 'Add Comments', ur: 'تبصرے شامل کریں' },
+        description: {
+          en: 'Type in the comment box to add a comment. Share your thoughts, ask questions, or appreciate the activity. Comments help build community!',
+          ur: 'تبصرہ شامل کرنے کے لیے تبصرے کے باکس میں ٹائپ کریں۔ اپنے خیالات شیئر کریں، سوالات پوچھیں یا سرگرمی کی تعریف کریں۔ تبصرے کمیونٹی بنانے میں مدد کرتے ہیں!'
+        },
+        target: '[data-testid^="input-comment-"]',
+        position: 'top'
+      },
+      {
+        title: { en: 'Post Menu (Delete/Manage)', ur: 'پوسٹ مینو (حذف/انتظام)' },
+        description: {
+          en: 'Tap the three dots menu on your posts to delete them. Teachers can delete their own posts. Head Teachers can delete posts from their school.',
+          ur: 'اپنی پوسٹس حذف کرنے کے لیے تین نقطوں کے مینو پر ٹیپ کریں۔ اساتذہ اپنی پوسٹس حذف کر سکتے ہیں۔ ہیڈ ٹیچرز اپنے اسکول کی پوسٹس حذف کر سکتے ہیں۔'
+        },
+        tip: {
+          en: 'Only you can delete your posts!',
+          ur: 'صرف آپ اپنی پوسٹس حذف کر سکتے ہیں!'
+        },
+        target: '[data-testid^="button-menu-"]',
+        position: 'left'
+      },
+      {
+        title: { en: 'Download Photos', ur: 'تصاویر ڈاؤن لوڈ کریں' },
+        description: {
+          en: 'You can download individual photos or all photos from a post. Tap the download button on any photo to save it to your device.',
+          ur: 'آپ انفرادی تصاویر یا پوسٹ کی تمام تصاویر ڈاؤن لوڈ کر سکتے ہیں۔ کسی بھی تصویر کو اپنے ڈیوائس میں محفوظ کرنے کے لیے ڈاؤن لوڈ بٹن پر ٹیپ کریں۔'
+        },
+        target: '[data-testid="button-download-png"]',
+        position: 'top'
+      },
+      {
+        title: { en: 'Back to Dashboard', ur: 'ڈیش بورڈ پر واپس' },
+        description: {
+          en: 'Tap the back arrow at the top to return to your Dashboard.',
+          ur: 'اپنے ڈیش بورڈ پر واپس جانے کے لیے اوپر والے بیک ایرو پر ٹیپ کریں۔'
+        },
+        target: '[data-testid="button-back"]',
+        position: 'right'
       },
     ],
   },

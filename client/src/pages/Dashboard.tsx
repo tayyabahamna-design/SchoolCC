@@ -461,6 +461,7 @@ export default function Dashboard() {
           <div
             onClick={() => navigate('/profile')}
             className="flex items-center gap-3 p-3 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl hover-lift cursor-pointer"
+            data-testid="user-profile-section"
           >
             {user.profilePicture ? (
               <img src={user.profilePicture} alt={user.name} className="w-10 h-10 rounded-full object-cover shadow-lg" />
