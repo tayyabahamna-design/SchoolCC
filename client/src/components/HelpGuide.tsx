@@ -736,8 +736,8 @@ export function HelpGuide() {
 
           {/* Guide panel */}
           <div
-            className="fixed z-[70] w-[calc(100%-32px)] max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300"
-            style={showIntro || !targetRect ? { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' } : getTooltipPosition()}
+            className="fixed z-[70] w-[calc(100%-32px)] max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 max-h-[80vh] overflow-y-auto"
+            style={{ bottom: '16px', left: '50%', transform: 'translateX(-50%)' }}
             dir={language === 'ur' ? 'rtl' : 'ltr'}
           >
             {/* Header */}
