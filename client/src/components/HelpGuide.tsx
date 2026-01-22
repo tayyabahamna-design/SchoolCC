@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight, Languages, BookOpen, ArrowDown, ArrowUp, ArrowLeft, ArrowRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Languages, BookOpen, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 
@@ -677,11 +677,11 @@ export function HelpGuide() {
       {!shouldHideButton && (
         <button
           onClick={handleOpen}
-          className="fixed bottom-20 right-4 z-[60] w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95"
+          className="fixed bottom-24 right-4 z-[60] w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full shadow-2xl hover:shadow-xl transition-all duration-300 flex items-center justify-center hover:scale-110 active:scale-95 animate-pulse ring-4 ring-blue-300/50"
           aria-label="Open Help Guide"
           data-testid="button-help-guide"
         >
-          <BookOpen className="w-6 h-6" />
+          <HelpCircle className="w-7 h-7" />
         </button>
       )}
 
