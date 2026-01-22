@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
+import { AlertCircle, CheckCircle, ArrowLeft, HelpCircle } from 'lucide-react';
 import type { UserRole } from '@/contexts/auth';
 import { analytics } from '@/lib/analytics';
 import CompactTooltipGuide, { TooltipStep, useTooltipGuideStatus } from '@/components/CompactTooltipGuide';
@@ -213,6 +213,22 @@ export default function Signup() {
         </Button>
 
         <Card className="p-8">
+          {/* Persistent Help Button */}
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.removeItem(SIGNUP_GUIDE_KEY);
+                setShowGuide(true);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium hover:from-blue-700 hover:to-purple-700 transition-all shadow-md"
+            >
+              <HelpCircle className="w-5 h-5" />
+              <span className="text-left">Let me help you!</span>
+              <span className="text-right" dir="rtl">مدد کے لیے یہاں کلک کریں</span>
+            </button>
+          </div>
+
           <div data-guide="welcome">
             <h1 className="text-3xl font-bold mb-6">Create Account | اکاؤنٹ بنائیں</h1>
           </div>
