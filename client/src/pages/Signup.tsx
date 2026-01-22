@@ -72,7 +72,7 @@ export default function Signup() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const { hasCompleted } = useTooltipGuideStatus(SIGNUP_GUIDE_KEY);
+  const { hasCompleted, reset: resetGuide } = useTooltipGuideStatus(SIGNUP_GUIDE_KEY);
   const [showGuide, setShowGuide] = useState(false);
 
   // Form state
@@ -218,7 +218,7 @@ export default function Signup() {
             <button
               type="button"
               onClick={() => {
-                localStorage.removeItem(SIGNUP_GUIDE_KEY);
+                resetGuide();
                 setShowGuide(true);
               }}
               className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium hover:from-blue-700 hover:to-purple-700 transition-all shadow-md"
