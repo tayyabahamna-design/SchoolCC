@@ -320,6 +320,46 @@ export default function Dashboard() {
         );
       
       case 'calendar':
+        // Teaching tips for teachers
+        const allTeachingTips = [
+          { tip: "Start each class with a quick review of the previous lesson to refresh students' memory.", icon: "🔄", color: "from-blue-500 to-cyan-500" },
+          { tip: "Use visual aids like charts and diagrams to explain complex concepts.", icon: "📊", color: "from-purple-500 to-pink-500" },
+          { tip: "Encourage students to ask questions - there are no silly questions!", icon: "❓", color: "from-emerald-500 to-teal-500" },
+          { tip: "Give positive feedback to boost student confidence and motivation.", icon: "⭐", color: "from-amber-500 to-orange-500" },
+          { tip: "Break down large tasks into smaller, manageable steps for students.", icon: "📝", color: "from-rose-500 to-red-500" },
+          { tip: "Use real-life examples to make lessons more relatable and engaging.", icon: "🌍", color: "from-indigo-500 to-blue-500" },
+          { tip: "Create a safe learning environment where mistakes are seen as opportunities.", icon: "🛡️", color: "from-teal-500 to-emerald-500" },
+          { tip: "Include group activities to develop teamwork and communication skills.", icon: "👥", color: "from-violet-500 to-purple-500" },
+          { tip: "Take short breaks during long lessons to maintain student attention.", icon: "⏸️", color: "from-pink-500 to-rose-500" },
+          { tip: "End each lesson with a summary of key points learned today.", icon: "📌", color: "from-cyan-500 to-blue-500" },
+          { tip: "Celebrate small achievements to keep students motivated.", icon: "🎉", color: "from-orange-500 to-amber-500" },
+          { tip: "Use storytelling to make lessons memorable and interesting.", icon: "📖", color: "from-red-500 to-rose-500" },
+        ];
+        
+        // Shuffle and pick 3 random tips on each render
+        const shuffledTips = [...allTeachingTips].sort(() => Math.random() - 0.5);
+        const randomTips = shuffledTips.slice(0, 3);
+        
+        if (user.role === 'TEACHER') {
+          return (
+            <div key="calendar" data-testid="widget-tips">
+              <h2 className="text-2xl font-bold gradient-text mb-6">Teaching Tips</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {randomTips.map((item, idx) => (
+                  <Card key={idx} className="p-5 bg-white dark:bg-card border border-border shadow-md hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-start gap-3">
+                      <div className="text-3xl">{item.icon}</div>
+                      <p className={`text-sm font-medium bg-gradient-to-r ${item.color} bg-clip-text text-transparent leading-relaxed`}>
+                        {item.tip}
+                      </p>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        
         return (
           <div key="calendar" data-testid="widget-calendar">
             <h2 className="text-2xl font-bold gradient-text mb-6">Leave Calendar</h2>
