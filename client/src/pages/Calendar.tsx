@@ -276,8 +276,11 @@ export default function Calendar() {
                     {canAddLeave && isCurrentMonth && (
                       <button
                         type="button"
-                        className="absolute inset-0 w-full h-full z-10 bg-transparent hover:bg-muted/30 active:bg-muted/50 rounded-lg touch-manipulation"
-                        onClick={() => handleDateClick(day)}
+                        className="absolute inset-0 w-full h-full z-10 bg-blue-500/10 hover:bg-blue-500/20 active:bg-blue-500/30 rounded-lg touch-manipulation cursor-pointer"
+                        onClick={() => {
+                          console.log('Button clicked for date:', day.toDateString());
+                          handleDateClick(day);
+                        }}
                         aria-label={`Add leave for ${day.toDateString()}`}
                       />
                     )}
