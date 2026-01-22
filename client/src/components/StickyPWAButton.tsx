@@ -91,7 +91,7 @@ export default function StickyPWAButton() {
   }
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 z-40 sm:left-auto sm:right-4 sm:w-auto animate-in slide-in-from-bottom-5 duration-500">
+    <div className="fixed bottom-20 left-4 right-4 z-[50] sm:left-auto sm:right-4 sm:w-auto animate-in slide-in-from-bottom-5 duration-500">
       <div className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-2xl px-4 py-3 sm:px-5 sm:py-3">
         <div className="flex-shrink-0">
           <div className="rounded-full bg-white/20 p-2">
@@ -100,8 +100,8 @@ export default function StickyPWAButton() {
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm sm:text-base font-semibold">Install TaleemHub</p>
-          <p className="text-xs sm:text-sm opacity-90 truncate">Get the app for best experience</p>
+          <p className="text-sm sm:text-base font-semibold">ٹیلیم ہب انسٹال کریں</p>
+          <p className="text-xs sm:text-sm opacity-90 truncate">بہترین تجربے کے لیے ایپ حاصل کریں</p>
         </div>
 
         <Button
@@ -109,7 +109,7 @@ export default function StickyPWAButton() {
           size="sm"
           className="bg-white text-blue-600 hover:bg-white/90 font-semibold px-4 py-2 h-auto min-h-[44px] touch-manipulation"
         >
-          Install
+          انسٹال Install
         </Button>
 
         <button

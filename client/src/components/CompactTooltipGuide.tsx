@@ -51,10 +51,11 @@ export default function CompactTooltipGuide({
     const arrowSize = 8;
     const padding = 12;
 
-    // Get safe areas (avoid PWA banner at top)
-    const pwaBarHeight = 60; // Approximate PWA banner height
+    // Get safe areas (avoid PWA banner at top and sticky button at bottom)
+    const pwaBarHeight = 70; // Approximate PWA banner height (with safety margin)
+    const stickyButtonHeight = 90; // Approximate sticky PWA button height at bottom
     const safeTop = pwaBarHeight + padding;
-    const safeBottom = window.innerHeight - padding;
+    const safeBottom = window.innerHeight - stickyButtonHeight - padding;
     const safeLeft = padding;
     const safeRight = window.innerWidth - padding;
 
@@ -270,8 +271,8 @@ export default function CompactTooltipGuide({
               {step.title}
             </h3>
 
-            {/* Message - compact */}
-            <p className="text-xs text-amber-800 dark:text-amber-200 leading-snug mb-3">
+            {/* Message - compact, supports multiline for bilingual text */}
+            <p className="text-xs text-amber-800 dark:text-amber-200 leading-snug mb-3 whitespace-pre-line">
               {step.message}
             </p>
 

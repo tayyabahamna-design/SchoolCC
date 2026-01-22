@@ -16,32 +16,32 @@ const SIGNUP_GUIDE_KEY = 'taleemhub_signup_guide_v2';
 const signupGuideSteps: TooltipStep[] = [
   {
     target: '[data-guide="welcome"]',
-    title: '👋 Welcome!',
-    message: 'Let\'s create your account in 4 quick steps.',
+    title: '👋 خوش آمدید! Welcome!',
+    message: 'آئیں 4 آسان مراحل میں اپنا اکاؤنٹ بنائیں۔\nLet\'s create your account in 4 quick steps.',
     placement: 'bottom',
   },
   {
     target: '[data-guide="role-select"]',
-    title: 'Step 1: Choose Role',
-    message: 'Tap here to select your role. Teachers & Head Teachers can sign up directly!',
+    title: 'مرحلہ 1: اپنا کردار منتخب کریں\nStep 1: Choose Role',
+    message: 'یہاں ٹیپ کریں اور اپنا کردار منتخب کریں۔ ٹیچرز اور ہیڈ ٹیچرز فوری طور پر سائن اپ کر سکتے ہیں!\nTap here to select your role. Teachers & Head Teachers can sign up directly!',
     placement: 'bottom',
   },
   {
     target: '[data-guide="name-input"]',
-    title: 'Step 2: Enter Name',
-    message: 'Type your full name here.',
+    title: 'مرحلہ 2: نام درج کریں\nStep 2: Enter Name',
+    message: 'اپنا پورا نام یہاں لکھیں۔\nType your full name here.',
     placement: 'auto',
   },
   {
     target: '[data-guide="phone-input"]',
-    title: 'Step 3: Phone Number',
-    message: 'Enter your phone number. Teachers use this to log in (no password needed).',
+    title: 'مرحلہ 3: فون نمبر\nStep 3: Phone Number',
+    message: 'اپنا فون نمبر درج کریں۔ ٹیچرز صرف فون نمبر سے لاگ ان ہو سکتے ہیں (پاس ورڈ کی ضرورت نہیں)۔\nEnter your phone number. Teachers use this to log in (no password needed).',
     placement: 'auto',
   },
   {
     target: '[data-guide="submit-button"]',
-    title: 'Step 4: Submit!',
-    message: 'Fill any required fields, then tap here to create your account.',
+    title: 'مرحلہ 4: جمع کرائیں!\nStep 4: Submit!',
+    message: 'تمام ضروری خانے بھریں، پھر اپنا اکاؤنٹ بنانے کے لیے یہاں ٹیپ کریں۔\nFill required fields, then tap here to create your account.',
     placement: 'top',
   },
 ];
