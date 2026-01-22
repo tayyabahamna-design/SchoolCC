@@ -8,11 +8,14 @@ import { useMockDataRequests, type DataRequest, DataField } from '@/hooks/useMoc
 import { useMockCollaborativeForms, FormField } from '@/hooks/useMockCollaborativeForms';
 import { useMockTeacherData } from '@/hooks/useMockTeacherData';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
+import { VoiceRecorder } from '@/components/VoiceRecorder';
 import { useLocation } from 'wouter';
-import { Plus, X, ArrowLeft, Mic, Square, Play, Download, ChevronRight, Clock, CheckCircle, AlertCircle, Search, Filter, ListFilter } from 'lucide-react';
+import { Plus, X, ArrowLeft, Mic, Square, Play, Download, ChevronRight, Clock, CheckCircle, AlertCircle, Search, Filter, ListFilter, CalendarIcon } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { analytics } from '@/lib/analytics';
 import { useToast } from '@/hooks/use-toast';
+
+type Priority = 'low' | 'medium' | 'high' | 'urgent';
 
 const FIELD_TYPES = ['text', 'number', 'file', 'photo', 'voice_note'];
 
@@ -51,6 +54,8 @@ export default function DataRequests() {
   const [recordedVoiceNotes, setRecordedVoiceNotes] = useState<Record<string, boolean>>({});
   const [allUsers, setAllUsers] = useState<UserOption[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [priority, setPriority] = useState<Priority>('medium');
+  const [dueDate, setDueDate] = useState('');
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -173,6 +178,12 @@ export default function DataRequests() {
     setFields([]);
     setSelectedAssignees([]);
     setRecordedVoiceNotes({});
+    setPriority('medium');
+    setDueDate('');
+  };
+
+  const handleVoiceTranscription = (text: string) => {
+    setDescription(prev => prev ? `${prev}\n\n${text}` : text);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -410,6 +421,42 @@ export default function DataRequests() {
                     className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary min-h-20"
                     data-testid="textarea-description"
                   />
+                </div>
+                
+                <VoiceRecorder
+                  onTranscriptionComplete={handleVoiceTranscription}
+                  disabled={false}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Priority / ترجیح</label>
+                    <select
+                      value={priority}
+                      onChange={(e) => setPriority(e.target.value as Priority)}
+                      className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      data-testid="select-priority"
+                    >
+                      <option value="low">Low / کم</option>
+                      <option value="medium">Medium / درمیانی</option>
+                      <option value="high">High / زیادہ</option>
+                      <option value="urgent">Urgent / فوری</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">Due Date / آخری تاریخ</label>
+                    <div className="relative">
+                      <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        type="date"
+                        value={dueDate}
+                        onChange={(e) => setDueDate(e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                        className="w-full pl-10 pr-3 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        data-testid="input-due-date"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </Card>
