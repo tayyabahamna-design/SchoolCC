@@ -654,6 +654,7 @@ export function HelpGuide() {
   const [showIntro, setShowIntro] = useState(true);
   const [showMenu, setShowMenu] = useState(false);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const [isFirstTimeUser, setIsFirstTimeUser] = useState(false);
   const [location] = useLocation();
   const { user } = useAuth();
 
@@ -662,26 +663,26 @@ export function HelpGuide() {
       setIsOpen(true);
       setCurrentStep(0);
       setShowIntro(true);
+      setIsFirstTimeUser(false); // Manual open is always skippable
     };
     window.addEventListener('openHelpGuide', handleOpenGuide);
     return () => window.removeEventListener('openHelpGuide', handleOpenGuide);
   }, []);
 
-  // Auto-show guide for first-time users
+  // Auto-show guide for first-time users (unskippable until completed)
   useEffect(() => {
     if (!user?.id) return;
     
-    const guideSeenKey = `taleemhub_guide_seen_${user.id}`;
-    const hasSeenGuide = localStorage.getItem(guideSeenKey);
+    const guideCompletedKey = `taleemhub_guide_completed_${user.id}`;
+    const hasCompletedGuide = localStorage.getItem(guideCompletedKey);
     
-    if (!hasSeenGuide) {
+    if (!hasCompletedGuide) {
       // Small delay to let the dashboard render first
       const timer = setTimeout(() => {
         setIsOpen(true);
         setCurrentStep(0);
         setShowIntro(true);
-        // Mark as seen after opening
-        localStorage.setItem(guideSeenKey, 'true');
+        setIsFirstTimeUser(true); // Mark as first-time (unskippable)
       }, 1500);
       return () => clearTimeout(timer);
     }
@@ -763,6 +764,19 @@ export function HelpGuide() {
   };
 
   const handleClose = () => {
+    // First-time users cannot skip - they must complete the guide
+    if (isFirstTimeUser) return;
+    setIsOpen(false);
+    setTargetRect(null);
+  };
+
+  const handleComplete = () => {
+    // Mark guide as completed for this user
+    if (user?.id) {
+      const guideCompletedKey = `taleemhub_guide_completed_${user.id}`;
+      localStorage.setItem(guideCompletedKey, 'true');
+    }
+    setIsFirstTimeUser(false);
     setIsOpen(false);
     setTargetRect(null);
   };
@@ -775,7 +789,8 @@ export function HelpGuide() {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      handleClose();
+      // Last step - complete the guide
+      handleComplete();
     }
   };
 
@@ -897,7 +912,10 @@ export function HelpGuide() {
 
           {/* Dark overlay for intro or when no target */}
           {(showIntro || !targetRect) && (
-            <div className="fixed inset-0 z-[69] bg-black/50 backdrop-blur-sm" onClick={handleClose} />
+            <div 
+              className="fixed inset-0 z-[69] bg-black/50 backdrop-blur-sm" 
+              onClick={isFirstTimeUser ? undefined : handleClose}
+            />
           )}
 
           {/* Guide panel */}
@@ -924,14 +942,16 @@ export function HelpGuide() {
                     <Languages className="w-3 h-3" />
                     {language === 'en' ? 'اردو' : 'EN'}
                   </button>
-                  <button
-                    onClick={handleClose}
-                    className="p-1 rounded-full hover:bg-white/20 transition-colors"
-                    aria-label="Close"
-                    data-testid="button-close-help"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                  {!isFirstTimeUser && (
+                    <button
+                      onClick={handleClose}
+                      className="p-1 rounded-full hover:bg-white/20 transition-colors"
+                      aria-label="Close"
+                      data-testid="button-close-help"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -949,6 +969,15 @@ export function HelpGuide() {
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                     {currentGuide.introduction[language]}
                   </p>
+                  {isFirstTimeUser && (
+                    <div className="mb-4 p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                      <p className="text-xs text-amber-700 dark:text-amber-300">
+                        {language === 'en' 
+                          ? '⚠️ Please complete this quick tour to learn how to use the app. It only takes a minute!'
+                          : '⚠️ براہ کرم ایپ استعمال کرنا سیکھنے کے لیے یہ فوری ٹور مکمل کریں۔ صرف ایک منٹ لگے گا!'}
+                      </p>
+                    </div>
+                  )}
                   <Button
                     onClick={startGuide}
                     className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
