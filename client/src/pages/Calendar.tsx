@@ -54,7 +54,7 @@ export default function Calendar() {
   if (!user) return null;
 
   const isTeacher = user.role === 'TEACHER';
-  const canAddLeave = user.role === 'TEACHER' || user.role === 'HEAD_TEACHER';
+  const canAddLeave = ['TEACHER', 'HEAD_TEACHER', 'AEO', 'TRAINING_MANAGER'].includes(user.role);
   const canSeeAllLeaves = ['HEAD_TEACHER', 'AEO', 'DDEO', 'DEO', 'TRAINING_MANAGER'].includes(user.role);
 
   const today = new Date();
@@ -197,14 +197,14 @@ export default function Calendar() {
             </div>
           </div>
           
-          {canAddLeave && (
+          {canAddLeave && !isTeacher && (
             <Button 
               className="bg-gradient-to-r from-blue-600 to-purple-600" 
               data-testid="button-add-leave"
               onClick={() => setShowCreateDialog(true)}
             >
               <Plus className="w-4 h-4 mr-2" />
-              {isTeacher ? 'Request Leave' : 'Add Leave'}
+              Add Leave
             </Button>
           )}
         </div>
