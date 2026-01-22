@@ -281,7 +281,7 @@ export function PersistentHelpButton({
       data-testid="help-guide-button"
     >
       <HelpCircle className="w-5 h-5" />
-      <span className="text-sm font-medium">مدد Guide</span>
+      <span className="text-sm font-medium">Let me help you! مدد کے لیے یہاں کلک کریں</span>
     </button>
   );
 }
