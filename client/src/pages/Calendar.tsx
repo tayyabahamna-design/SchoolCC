@@ -56,6 +56,9 @@ export default function Calendar() {
   const isTeacher = user.role === 'TEACHER';
   const canAddLeave = user.role === 'TEACHER' || user.role === 'HEAD_TEACHER';
   const canSeeAllLeaves = ['HEAD_TEACHER', 'AEO', 'DDEO', 'DEO', 'TRAINING_MANAGER'].includes(user.role);
+  
+  // Debug logging
+  console.log('Calendar Debug - User role:', user.role, 'canAddLeave:', canAddLeave, 'isTeacher:', isTeacher);
 
   const today = new Date();
   const currentMonth = currentDate.getMonth();
