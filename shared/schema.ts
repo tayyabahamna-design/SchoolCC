@@ -136,6 +136,22 @@ export const requestAssignees = pgTable("request_assignees", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// Voice Recordings table - stores audio files for data requests
+export const voiceRecordings = pgTable("voice_recordings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  requestId: varchar("request_id"), // Linked data request (optional)
+  assigneeId: varchar("assignee_id"), // Linked assignee response (optional)
+  fieldId: varchar("field_id"), // Field the recording is for (optional)
+  userId: varchar("user_id").notNull(), // User who created the recording
+  userName: text("user_name").notNull(),
+  language: text("language").notNull().default("en-US"), // en-US or ur-PK
+  transcription: text("transcription"), // Speech-to-text result
+  audioData: text("audio_data"), // Base64 encoded audio data
+  audioMimeType: text("audio_mime_type").default("audio/webm"),
+  durationSeconds: integer("duration_seconds").default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Teacher leaves table
 export const teacherLeaves = pgTable("teacher_leaves", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -450,6 +466,11 @@ export const insertRequestAssigneeSchema = createInsertSchema(requestAssignees).
   createdAt: true,
 });
 
+export const insertVoiceRecordingSchema = createInsertSchema(voiceRecordings).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertNotificationSchema = createInsertSchema(notifications).omit({
   id: true,
   createdAt: true,
@@ -537,6 +558,8 @@ export type InsertDataRequest = z.infer<typeof insertDataRequestSchema>;
 export type DataRequest = typeof dataRequests.$inferSelect;
 export type InsertRequestAssignee = z.infer<typeof insertRequestAssigneeSchema>;
 export type RequestAssignee = typeof requestAssignees.$inferSelect;
+export type InsertVoiceRecording = z.infer<typeof insertVoiceRecordingSchema>;
+export type VoiceRecording = typeof voiceRecordings.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertQuery = z.infer<typeof insertQuerySchema>;

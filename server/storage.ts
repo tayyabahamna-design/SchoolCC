@@ -1,7 +1,8 @@
 import { db } from "./db";
-import { users, dataRequests, requestAssignees, districts, clusters, schools, notifications, queries, queryResponses, visitLogs, schoolAlbums, albumPhotos, albumComments, albumReactions, announcements, monitoringVisits, mentoringVisits, officeVisits, otherActivities, visitSessions } from "@shared/schema";
+import { users, dataRequests, requestAssignees, voiceRecordings, districts, clusters, schools, notifications, queries, queryResponses, visitLogs, schoolAlbums, albumPhotos, albumComments, albumReactions, announcements, monitoringVisits, mentoringVisits, officeVisits, otherActivities, visitSessions } from "@shared/schema";
 import type {
   InsertUser, User, InsertDataRequest, DataRequest, InsertRequestAssignee, RequestAssignee,
+  InsertVoiceRecording, VoiceRecording,
   InsertDistrict, District, InsertCluster, Cluster, InsertSchool, School,
   InsertNotification, Notification, InsertQuery, Query, InsertQueryResponse, QueryResponse,
   InsertVisitLog, VisitLog, InsertSchoolAlbum, SchoolAlbum, InsertAlbumPhoto, AlbumPhoto,
@@ -62,6 +63,12 @@ export interface IStorage {
   createRequestAssignee(assignee: InsertRequestAssignee): Promise<RequestAssignee>;
   getRequestAssignees(requestId: string): Promise<RequestAssignee[]>;
   updateRequestAssignee(id: string, updates: Partial<RequestAssignee>): Promise<RequestAssignee>;
+
+  // Voice recording operations
+  createVoiceRecording(recording: InsertVoiceRecording): Promise<VoiceRecording>;
+  getVoiceRecording(id: string): Promise<VoiceRecording | undefined>;
+  getVoiceRecordingsByRequest(requestId: string): Promise<VoiceRecording[]>;
+  deleteVoiceRecording(id: string): Promise<void>;
 
   // Notification operations
   createNotification(notification: InsertNotification): Promise<Notification>;
@@ -365,6 +372,25 @@ export class DBStorage implements IStorage {
       .where(eq(requestAssignees.id, id))
       .returning();
     return result[0];
+  }
+
+  // Voice recording operations
+  async createVoiceRecording(recording: InsertVoiceRecording): Promise<VoiceRecording> {
+    const result = await db.insert(voiceRecordings).values(recording).returning();
+    return result[0];
+  }
+
+  async getVoiceRecording(id: string): Promise<VoiceRecording | undefined> {
+    const result = await db.select().from(voiceRecordings).where(eq(voiceRecordings.id, id));
+    return result[0];
+  }
+
+  async getVoiceRecordingsByRequest(requestId: string): Promise<VoiceRecording[]> {
+    return await db.select().from(voiceRecordings).where(eq(voiceRecordings.requestId, requestId));
+  }
+
+  async deleteVoiceRecording(id: string): Promise<void> {
+    await db.delete(voiceRecordings).where(eq(voiceRecordings.id, id));
   }
 
   // Notification operations

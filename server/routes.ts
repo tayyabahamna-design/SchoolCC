@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import {
-  insertDataRequestSchema, insertRequestAssigneeSchema,
+  insertDataRequestSchema, insertRequestAssigneeSchema, insertVoiceRecordingSchema,
   insertDistrictSchema, insertClusterSchema, insertSchoolSchema, insertUserSchema
 } from "@shared/schema";
 import multer from "multer";
@@ -112,6 +112,48 @@ export async function registerRoutes(
       res.json(assignee);
     } catch (error) {
       res.status(500).json({ error: "Failed to update assignee" });
+    }
+  });
+
+  // Voice Recordings endpoints
+  app.post("/api/voice-recordings", async (req, res) => {
+    try {
+      const body = insertVoiceRecordingSchema.parse(req.body);
+      const recording = await storage.createVoiceRecording(body);
+      res.json(recording);
+    } catch (error: any) {
+      console.error("Voice recording error:", error?.message || error);
+      res.status(400).json({ error: "Invalid voice recording", details: error?.message || String(error) });
+    }
+  });
+
+  app.get("/api/voice-recordings/:id", async (req, res) => {
+    try {
+      const recording = await storage.getVoiceRecording(req.params.id);
+      if (!recording) {
+        return res.status(404).json({ error: "Recording not found" });
+      }
+      res.json(recording);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch recording" });
+    }
+  });
+
+  app.get("/api/voice-recordings/request/:requestId", async (req, res) => {
+    try {
+      const recordings = await storage.getVoiceRecordingsByRequest(req.params.requestId);
+      res.json(recordings);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch recordings" });
+    }
+  });
+
+  app.delete("/api/voice-recordings/:id", async (req, res) => {
+    try {
+      await storage.deleteVoiceRecording(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete recording" });
     }
   });
 
