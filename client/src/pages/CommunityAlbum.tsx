@@ -4,15 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useMockActivities, Activity } from '@/hooks/useMockActivities';
+import { useActivities, Activity } from '@/hooks/useActivities';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Plus, MessageCircle, Download, X, School, User, Images, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, MessageCircle, Download, X, School, User, Images, ChevronRight, Loader2 } from 'lucide-react';
 import { analytics } from '@/lib/analytics';
 
 export default function CommunityAlbum() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
-  const { activities, addComment, addReaction, removeReaction } = useMockActivities();
+  const { activities, isLoading, addComment, addReaction, removeReaction } = useActivities();
   const [expandedActivity, setExpandedActivity] = useState<string | null>(null);
   const [commentText, setCommentText] = useState('');
   const [userReactions, setUserReactions] = useState<Record<string, string>>({});
@@ -24,14 +24,15 @@ export default function CommunityAlbum() {
     return null;
   }
 
-  const allActivities = [...activities].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const allActivities = [...activities].sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   const miniAlbums = useMemo(() => {
     const albumMap: Record<string, { title: string; activities: Activity[]; totalPhotos: number; schools: Set<string> }> = {};
     
     allActivities.forEach(activity => {
       const keywords = activity.title.toLowerCase().split(' ').filter(w => w.length > 3);
-      const mainKeyword = keywords[0] || activity.title.toLowerCase().substring(0, 20);
       
       const matchingAlbum = Object.keys(albumMap).find(key => {
         const keyWords = key.toLowerCase().split(' ');
@@ -57,63 +58,86 @@ export default function CommunityAlbum() {
     return Object.values(albumMap).sort((a, b) => b.totalPhotos - a.totalPhotos);
   }, [allActivities]);
 
-  const handleAddComment = (activityId: string) => {
+  const handleAddComment = async (activityId: string) => {
     if (!commentText.trim()) return;
-    addComment(activityId, commentText, user.id, user.name, user.role);
-    analytics.album.commentAdded(activityId);
-    setCommentText('');
+    try {
+      await addComment({
+        albumId: activityId,
+        userId: user.id,
+        userName: user.name,
+        userRole: user.role,
+        comment: commentText,
+      });
+      analytics.album.commentAdded(activityId);
+      setCommentText('');
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    }
   };
 
-  const handleReaction = (activityId: string, type: 'like' | 'love' | 'clap' | 'celebrate') => {
+  const handleReaction = async (activityId: string, type: 'like' | 'love' | 'clap' | 'celebrate') => {
     const key = `${activityId}-${user.id}`;
-    if (userReactions[key] === type) {
-      removeReaction(activityId, user.id);
-      analytics.album.reactionRemoved(activityId, type);
-      setUserReactions((prev) => {
-        const newReactions = { ...prev };
-        delete newReactions[key];
-        return newReactions;
-      });
-    } else {
-      addReaction(activityId, type, user.id, user.name);
-      analytics.album.reactionAdded(activityId, type);
-      setUserReactions((prev) => ({ ...prev, [key]: type }));
+    try {
+      if (userReactions[key] === type) {
+        await removeReaction({ albumId: activityId, userId: user.id, reactionType: type });
+        analytics.album.reactionRemoved(activityId, type);
+        setUserReactions((prev) => {
+          const newReactions = { ...prev };
+          delete newReactions[key];
+          return newReactions;
+        });
+      } else {
+        await addReaction({ albumId: activityId, userId: user.id, userName: user.name, reactionType: type });
+        analytics.album.reactionAdded(activityId, type);
+        setUserReactions((prev) => ({ ...prev, [key]: type }));
+      }
+    } catch (error) {
+      console.error('Failed to handle reaction:', error);
     }
   };
 
   const downloadImage = (imageUrl: string, caption: string) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 800;
-    canvas.height = 600;
-    
-    if (ctx) {
-      const gradient = ctx.createLinearGradient(0, 0, 800, 600);
-      gradient.addColorStop(0, '#667eea');
-      gradient.addColorStop(1, '#764ba2');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, 800, 600);
+    if (imageUrl.startsWith('data:')) {
+      const a = document.createElement('a');
+      a.href = imageUrl;
+      a.download = `${caption?.replace(/[^a-z0-9]/gi, '_') || 'photo'}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 800;
+      canvas.height = 600;
       
-      ctx.fillStyle = 'white';
-      ctx.font = 'bold 24px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText(caption || 'TaleemHub Photo', 400, 300);
-      
-      ctx.font = '16px Arial';
-      ctx.fillText('TaleemHub Community Album', 400, 340);
-      
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${caption?.replace(/[^a-z0-9]/gi, '_') || 'photo'}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
-      }, 'image/png');
+      if (ctx) {
+        const gradient = ctx.createLinearGradient(0, 0, 800, 600);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 800, 600);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(caption || 'TaleemHub Photo', 400, 300);
+        
+        ctx.font = '16px Arial';
+        ctx.fillText('TaleemHub Community Album', 400, 340);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${caption?.replace(/[^a-z0-9]/gi, '_') || 'photo'}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }
+        }, 'image/png');
+      }
     }
   };
 
@@ -130,6 +154,17 @@ export default function CommunityAlbum() {
   };
 
   const selectedAlbumData = selectedMiniAlbum ? miniAlbums.find(a => a.title === selectedMiniAlbum) : null;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading community albums...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -244,12 +279,12 @@ export default function CommunityAlbum() {
                         </div>
                       )}
                       <p className="text-xs text-muted-foreground mt-1">
-                        {activity.createdAt.toLocaleDateString()} at {activity.createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(activity.createdAt).toLocaleDateString()} at {new Date(activity.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
                   <h2 className="text-xl font-bold text-foreground mt-4">{activity.title}</h2>
-                  <p className="text-foreground mt-2">{activity.description}</p>
+                  {activity.description && <p className="text-foreground mt-2">{activity.description}</p>}
                 </div>
 
                 {activity.photos.length > 0 && (
@@ -258,16 +293,24 @@ export default function CommunityAlbum() {
                       {activity.photos.map((photo) => (
                         <div 
                           key={photo.id} 
-                          className="bg-muted/20 rounded-lg p-4 text-center cursor-pointer hover:shadow-md transition-all duration-300 group"
-                          onClick={() => setSelectedImage({ url: photo.url, caption: photo.caption, activityTitle: activity.title })}
+                          className="bg-muted/20 rounded-lg overflow-hidden cursor-pointer hover:shadow-md transition-all duration-300 group"
+                          onClick={() => setSelectedImage({ url: photo.photoUrl, caption: photo.caption || activity.title, activityTitle: activity.title })}
                         >
-                          <div className="w-full h-32 bg-gradient-to-br from-blue-200 to-purple-200 rounded-md flex items-center justify-center mb-2 relative overflow-hidden">
-                            <span className="text-4xl">📸</span>
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="text-white text-sm font-medium">Click to view</span>
+                          {photo.photoUrl.startsWith('data:') ? (
+                            <img 
+                              src={photo.photoUrl} 
+                              alt={photo.caption || activity.title}
+                              className="w-full h-32 object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-32 bg-gradient-to-br from-blue-200 to-purple-200 flex items-center justify-center relative">
+                              <span className="text-4xl">📸</span>
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span className="text-white text-sm font-medium">Click to view</span>
+                              </div>
                             </div>
-                          </div>
-                          <p className="text-sm font-medium text-foreground">{photo.caption}</p>
+                          )}
+                          <p className="text-sm font-medium text-foreground p-2 text-center">{photo.caption || activity.title}</p>
                         </div>
                       ))}
                     </div>
@@ -288,8 +331,8 @@ export default function CommunityAlbum() {
                       {type === 'love' && '❤️'}
                       {type === 'clap' && '👏'}
                       {type === 'celebrate' && '🎉'}
-                      {activity.reactions.filter((r) => r.type === type).length > 0 && (
-                        <span className="ml-2 text-xs">{activity.reactions.filter((r) => r.type === type).length}</span>
+                      {activity.reactions.filter((r) => r.reactionType === type).length > 0 && (
+                        <span className="ml-2 text-xs">{activity.reactions.filter((r) => r.reactionType === type).length}</span>
                       )}
                     </Button>
                   ))}
@@ -301,14 +344,14 @@ export default function CommunityAlbum() {
                       <div key={comment.id} className="p-3 bg-muted/20 rounded-lg">
                         <div className="flex items-start justify-between mb-1">
                           <div className="flex items-center gap-2">
-                            <p className="font-medium text-sm text-foreground">{comment.authorName}</p>
-                            <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${getRoleBadgeColor(comment.authorRole)}`}>
-                              {comment.authorRole.replace(/_/g, ' ')}
+                            <p className="font-medium text-sm text-foreground">{comment.userName}</p>
+                            <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${getRoleBadgeColor(comment.userRole)}`}>
+                              {comment.userRole.replace(/_/g, ' ')}
                             </span>
                           </div>
-                          <p className="text-xs text-muted-foreground">{comment.timestamp.toLocaleDateString()}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</p>
                         </div>
-                        <p className="text-sm text-foreground">{comment.text}</p>
+                        <p className="text-sm text-foreground">{comment.comment}</p>
                       </div>
                     ))}
 
@@ -350,9 +393,17 @@ export default function CommunityAlbum() {
             <DialogTitle>{selectedImage?.caption}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="w-full h-64 bg-gradient-to-br from-blue-200 to-purple-200 rounded-lg flex items-center justify-center">
-              <span className="text-6xl">📸</span>
-            </div>
+            {selectedImage?.url.startsWith('data:') ? (
+              <img 
+                src={selectedImage.url} 
+                alt={selectedImage.caption}
+                className="w-full rounded-lg"
+              />
+            ) : (
+              <div className="w-full h-64 bg-gradient-to-br from-blue-200 to-purple-200 rounded-lg flex items-center justify-center">
+                <span className="text-6xl">📸</span>
+              </div>
+            )}
             <p className="text-sm text-muted-foreground text-center">From: {selectedImage?.activityTitle}</p>
             <div className="flex gap-2 justify-center">
               <Button
@@ -393,7 +444,7 @@ export default function CommunityAlbum() {
                     selectedAlbumData.activities.forEach((activity, actIdx) => {
                       activity.photos.forEach((photo, photoIdx) => {
                         setTimeout(() => {
-                          downloadImage(photo.url, `${selectedAlbumData.title}_${actIdx + 1}_${photo.caption}`);
+                          downloadImage(photo.photoUrl, `${selectedAlbumData.title}_${actIdx + 1}_${photo.caption || activity.title}`);
                         }, (actIdx * activity.photos.length + photoIdx) * 500);
                       });
                     });
@@ -410,16 +461,26 @@ export default function CommunityAlbum() {
                   activity.photos.map(photo => (
                     <div 
                       key={photo.id}
-                      className="aspect-square bg-gradient-to-br from-blue-200 to-purple-200 rounded-lg flex items-center justify-center cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 relative group"
+                      className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 relative group"
                       onClick={() => {
                         setSelectedMiniAlbum(null);
-                        setSelectedImage({ url: photo.url, caption: photo.caption, activityTitle: activity.title });
+                        setSelectedImage({ url: photo.photoUrl, caption: photo.caption || activity.title, activityTitle: activity.title });
                       }}
                     >
-                      <span className="text-3xl">📸</span>
+                      {photo.photoUrl.startsWith('data:') ? (
+                        <img 
+                          src={photo.photoUrl} 
+                          alt={photo.caption || activity.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-200 to-purple-200 flex items-center justify-center">
+                          <span className="text-3xl">📸</span>
+                        </div>
+                      )}
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex flex-col items-center justify-center p-2">
                         <Download className="w-4 h-4 text-white mb-1" />
-                        <span className="text-white text-xs text-center line-clamp-2">{photo.caption}</span>
+                        <span className="text-white text-xs text-center line-clamp-2">{photo.caption || activity.title}</span>
                         <span className="text-white/70 text-xs mt-1">{activity.schoolName.split(' ')[0]}</span>
                       </div>
                     </div>

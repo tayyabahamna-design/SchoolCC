@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { useMockActivities } from '@/hooks/useMockActivities';
+import { useActivities } from '@/hooks/useActivities';
 import { useLocation } from 'wouter';
 import { ArrowLeft, Plus, Trash2, School, Camera } from 'lucide-react';
 import { analytics } from '@/lib/analytics';
@@ -18,17 +18,16 @@ const SCHOOL_NAMES: Record<string, string> = realSchools.reduce((acc, school) =>
 export default function CreateActivity() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
-  const { createActivity } = useMockActivities();
+  const { createActivity, isCreating } = useActivities();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState('');
-  const [photos, setPhotos] = useState<{ id: string; url: string; caption: string; preview: string }[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [photos, setPhotos] = useState<{ id: string; url: string; fileName: string; caption: string; preview: string }[]>([]);
 
   if (!user) return null;
 
   const userSchoolId = user.schoolId || '';
-  const userSchoolName = SCHOOL_NAMES[userSchoolId] || user.schoolId || 'Your School';
+  const userSchoolName = SCHOOL_NAMES[userSchoolId] || user.schoolName || user.schoolId || 'Your School';
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -42,8 +41,9 @@ export default function CreateActivity() {
           ...prev,
           {
             id: `p-${Date.now()}-${Math.random()}`,
-            url: file.name,
-            caption: file.name,
+            url: preview,
+            fileName: file.name,
+            caption: title || file.name,
             preview,
           },
         ]);
@@ -64,32 +64,29 @@ export default function CreateActivity() {
     e.preventDefault();
     if (!userSchoolId || !title.trim() || photos.length === 0) return;
 
-    setLoading(true);
     try {
       const photosForActivity = photos.map((p) => ({
-        id: p.id,
         url: p.preview,
+        fileName: p.fileName,
         caption: title,
       }));
 
-      const newActivity = createActivity(
-        userSchoolId,
-        userSchoolName,
-        title,
-        title,
-        photosForActivity,
-        user.id,
-        user.name,
-        user.role
-      );
+      const newActivity = await createActivity({
+        schoolId: userSchoolId,
+        schoolName: userSchoolName,
+        title: title,
+        description: title,
+        photos: photosForActivity,
+        createdBy: user.id,
+        createdByName: user.name,
+        createdByRole: user.role,
+      });
       analytics.album.activityCreated(newActivity.id, userSchoolId, photos.length);
       toast.success('Activity posted to Community Album!');
       navigate('/community-album');
     } catch (error) {
       console.error('Error creating activity:', error);
       toast.error('Failed to create activity');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -197,10 +194,10 @@ export default function CreateActivity() {
           <div className="flex gap-2">
             <Button 
               type="submit" 
-              disabled={loading || !title.trim() || photos.length === 0} 
+              disabled={isCreating || !title.trim() || photos.length === 0} 
               data-testid="button-create-activity"
             >
-              {loading ? 'Posting...' : 'Post to Community'}
+              {isCreating ? 'Posting...' : 'Post to Community'}
             </Button>
             <Button
               type="button"

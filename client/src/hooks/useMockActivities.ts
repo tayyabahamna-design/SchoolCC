@@ -408,8 +408,36 @@ const mockActivities: Activity[] = [
   },
 ];
 
+const STORAGE_KEY = 'taleemhub_activities';
+
+function loadActivitiesFromStorage(): Activity[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return parsed.map((a: any) => ({
+        ...a,
+        createdAt: new Date(a.createdAt),
+        updatedAt: new Date(a.updatedAt),
+        comments: a.comments.map((c: any) => ({ ...c, timestamp: new Date(c.timestamp) })),
+      }));
+    }
+  } catch (e) {
+    console.error('Failed to load activities from storage:', e);
+  }
+  return mockActivities;
+}
+
+function saveActivitiesToStorage(activities: Activity[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
+  } catch (e) {
+    console.error('Failed to save activities to storage:', e);
+  }
+}
+
 export function useMockActivities() {
-  const [activities, setActivities] = useState<Activity[]>(mockActivities);
+  const [activities, setActivities] = useState<Activity[]>(() => loadActivitiesFromStorage());
 
   const getActivitiesForSchool = useCallback(
     (schoolId: string) => {
@@ -452,7 +480,11 @@ export function useMockActivities() {
         updatedAt: new Date(),
       };
 
-      setActivities((prev) => [newActivity, ...prev]);
+      setActivities((prev) => {
+        const updated = [newActivity, ...prev];
+        saveActivitiesToStorage(updated);
+        return updated;
+      });
       return newActivity;
     },
     []
@@ -460,8 +492,8 @@ export function useMockActivities() {
 
   const addComment = useCallback(
     (activityId: string, text: string, userId: string, userName: string, userRole: string) => {
-      setActivities((prev) =>
-        prev.map((a) =>
+      setActivities((prev) => {
+        const updated = prev.map((a) =>
           a.id === activityId
             ? {
                 ...a,
@@ -479,16 +511,18 @@ export function useMockActivities() {
                 updatedAt: new Date(),
               }
             : a
-        )
-      );
+        );
+        saveActivitiesToStorage(updated);
+        return updated;
+      });
     },
     []
   );
 
   const addReaction = useCallback(
     (activityId: string, type: 'like' | 'love' | 'clap' | 'celebrate', userId: string, userName: string) => {
-      setActivities((prev) =>
-        prev.map((a) => {
+      setActivities((prev) => {
+        const updated = prev.map((a) => {
           if (a.id === activityId) {
             const existingReaction = a.reactions.find((r) => r.userId === userId);
             if (existingReaction) {
@@ -506,15 +540,17 @@ export function useMockActivities() {
             }
           }
           return a;
-        })
-      );
+        });
+        saveActivitiesToStorage(updated);
+        return updated;
+      });
     },
     []
   );
 
   const removeReaction = useCallback((activityId: string, userId: string) => {
-    setActivities((prev) =>
-      prev.map((a) =>
+    setActivities((prev) => {
+      const updated = prev.map((a) =>
         a.id === activityId
           ? {
               ...a,
@@ -522,8 +558,10 @@ export function useMockActivities() {
               updatedAt: new Date(),
             }
           : a
-      )
-    );
+      );
+      saveActivitiesToStorage(updated);
+      return updated;
+    });
   }, []);
 
   return {

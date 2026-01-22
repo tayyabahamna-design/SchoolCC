@@ -1209,6 +1209,24 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/community-albums", async (req, res) => {
+    try {
+      const albums = await storage.getAllAlbums();
+      const albumsWithDetails = await Promise.all(
+        albums.map(async (album) => {
+          const photos = await storage.getAlbumPhotos(album.id);
+          const comments = await storage.getAlbumComments(album.id);
+          const reactions = await storage.getAlbumReactions(album.id);
+          return { ...album, photos, comments, reactions };
+        })
+      );
+      res.json(albumsWithDetails);
+    } catch (error) {
+      console.error('Failed to fetch community albums:', error);
+      res.status(500).json({ error: "Failed to fetch community albums" });
+    }
+  });
+
   app.delete("/api/albums/:id", async (req, res) => {
     try {
       await storage.deleteAlbum(req.params.id);

@@ -94,6 +94,7 @@ export interface IStorage {
   getAlbum(id: string): Promise<SchoolAlbum | undefined>;
   getAlbumsForSchool(schoolId: string): Promise<SchoolAlbum[]>;
   getAllGlobalBroadcasts(): Promise<SchoolAlbum[]>;
+  getAllAlbums(): Promise<SchoolAlbum[]>;
   deleteAlbum(id: string): Promise<void>;
 
   // Album Photo operations
@@ -620,6 +621,12 @@ export class DBStorage implements IStorage {
     return await db.select()
       .from(schoolAlbums)
       .where(eq(schoolAlbums.isGlobalBroadcast, true))
+      .orderBy(desc(schoolAlbums.createdAt));
+  }
+
+  async getAllAlbums(): Promise<SchoolAlbum[]> {
+    return await db.select()
+      .from(schoolAlbums)
       .orderBy(desc(schoolAlbums.createdAt));
   }
 
