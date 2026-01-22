@@ -539,6 +539,7 @@ export function HelpGuide() {
 
   const getGuide = useCallback((): ScreenGuide => {
     if (guides[location]) return guides[location];
+    if (location === '/' || location === '') return guides['/dashboard'] || defaultGuide;
     const pathParts = location.split('/');
     if (pathParts[1] === 'request') return guides['/data-requests'] || defaultGuide;
     if (pathParts[1] === 'visit') return guides['/school-visits'] || defaultGuide;
