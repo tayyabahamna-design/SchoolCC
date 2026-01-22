@@ -50,9 +50,10 @@ export default function FloatingHelpButton({
       {/* Pulse animation */}
       <span className="absolute inset-0 rounded-full bg-amber-400 animate-ping opacity-20" />
 
-      {/* Tooltip */}
-      <div className="absolute bottom-full mb-3 right-0 bg-gray-900 text-white text-xs font-medium py-2 px-3 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-        Need help? Tap here
+      {/* Bilingual Tooltip */}
+      <div className="absolute bottom-full mb-3 right-0 bg-gray-900 text-white text-xs font-medium py-2 px-3 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none text-center">
+        <div>Need help? Tap here</div>
+        <div dir="rtl">مدد کے لیے یہاں کلک کریں</div>
         <div className="absolute top-full right-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
       </div>
     </button>
