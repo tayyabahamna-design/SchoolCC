@@ -166,11 +166,45 @@ export default function Dashboard() {
         );
       
       case 'requests':
+        // Teaching quotes for teachers
+        const teachingQuotes = [
+          { text: "A teacher affects eternity; they can never tell where their influence stops.", author: "Henry Adams", gradient: "from-purple-500 to-pink-500" },
+          { text: "The art of teaching is the art of assisting discovery.", author: "Mark Van Doren", gradient: "from-blue-500 to-cyan-500" },
+          { text: "Education is not the filling of a pail, but the lighting of a fire.", author: "W.B. Yeats", gradient: "from-orange-500 to-red-500" },
+          { text: "Teaching is the greatest act of optimism.", author: "Colleen Wilcox", gradient: "from-emerald-500 to-teal-500" },
+          { text: "The best teachers teach from the heart, not from the book.", author: "Unknown", gradient: "from-rose-500 to-pink-500" },
+          { text: "Teachers plant seeds of knowledge that grow forever.", author: "Unknown", gradient: "from-violet-500 to-purple-500" },
+          { text: "A good teacher can inspire hope and ignite the imagination.", author: "Brad Henry", gradient: "from-amber-500 to-orange-500" },
+          { text: "Teaching kids to count is fine, but teaching them what counts is best.", author: "Bob Talbert", gradient: "from-indigo-500 to-blue-500" },
+          { text: "The influence of a good teacher can never be erased.", author: "Unknown", gradient: "from-pink-500 to-rose-500" },
+          { text: "Great teachers empathize with kids and inspire them to learn.", author: "Unknown", gradient: "from-teal-500 to-emerald-500" },
+        ];
+        
+        // Get a quote based on the current date (changes daily)
+        const today = new Date();
+        const quoteIndex = (today.getDate() + today.getMonth()) % teachingQuotes.length;
+        const dailyQuote = teachingQuotes[quoteIndex];
+        
+        if (user.role === 'TEACHER') {
+          return (
+            <div key="requests" data-testid="widget-quote">
+              <h2 className="text-2xl font-bold gradient-text mb-6">Today's Inspiration</h2>
+              <Card className="p-8 bg-white dark:bg-card border border-border shadow-xl overflow-hidden relative">
+                <div className="relative">
+                  <div className={`text-5xl mb-4 bg-gradient-to-r ${dailyQuote.gradient} bg-clip-text text-transparent`}>"</div>
+                  <p className={`text-xl md:text-2xl font-medium leading-relaxed mb-4 bg-gradient-to-r ${dailyQuote.gradient} bg-clip-text text-transparent`}>
+                    {dailyQuote.text}
+                  </p>
+                  <p className={`text-sm font-medium bg-gradient-to-r ${dailyQuote.gradient} bg-clip-text text-transparent`}>— {dailyQuote.author}</p>
+                </div>
+              </Card>
+            </div>
+          );
+        }
+        
         return (
           <div key="requests" data-testid="widget-requests">
-            <h2 className="text-2xl font-bold gradient-text mb-6">
-              {user.role === 'TEACHER' ? 'My Tasks' : 'Recent Activity'}
-            </h2>
+            <h2 className="text-2xl font-bold gradient-text mb-6">Recent Activity</h2>
             {userRequests.length === 0 ? (
               <Card className="p-12 text-center bg-card border border-border">
                 <p className="text-lg text-muted-foreground">No requests yet</p>
