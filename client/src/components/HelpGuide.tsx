@@ -21,34 +21,21 @@ interface ScreenGuide {
 
 const guides: Record<string, ScreenGuide> = {
   '/dashboard': {
-    screenName: { en: 'Dashboard', ur: 'ڈیش بورڈ' },
+    screenName: { en: 'Dashboard Guide', ur: 'ڈیش بورڈ گائیڈ' },
     introduction: {
       en: 'Welcome to your Dashboard! This is your control center where you can access all TaleemHub features. Let me show you each feature step by step.',
       ur: 'اپنے ڈیش بورڈ میں خوش آمدید! یہ آپ کا کنٹرول سینٹر ہے۔ آئیں میں آپ کو ہر خصوصیت قدم بہ قدم دکھاتا ہوں۔'
     },
     steps: [
       {
-        title: { en: 'Your Profile Section', ur: 'آپ کا پروفائل سیکشن' },
-        description: {
-          en: 'This shows your name and role. Tap here to go to your profile where you can: Update personal information, Add or change your profile picture, View your assigned school details.',
-          ur: 'یہ آپ کا نام اور کردار دکھاتا ہے۔ اپنے پروفائل پر جانے کے لیے یہاں ٹیپ کریں جہاں آپ: ذاتی معلومات اپڈیٹ کر سکتے ہیں، پروفائل تصویر شامل یا تبدیل کر سکتے ہیں، اپنے اسکول کی تفصیلات دیکھ سکتے ہیں۔'
-        },
-        tip: {
-          en: 'Add a profile picture to personalize your account!',
-          ur: 'اپنے اکاؤنٹ کو ذاتی بنانے کے لیے پروفائل تصویر شامل کریں!'
-        },
-        target: '[data-testid="user-profile-section"]',
-        position: 'right'
-      },
-      {
         title: { en: 'Task & Stats Cards', ur: 'کام اور اعدادوشمار کارڈز' },
         description: {
-          en: 'These cards show your task overview: My Tasks (pending work), Completed (finished tasks), and Lesson Plans (coming soon). Tap any card to learn more!',
-          ur: 'یہ کارڈز آپ کے کام کا جائزہ دکھاتے ہیں: میرے کام (زیر التوا کام)، مکمل (ختم شدہ کام)، اور سبق کے منصوبے (جلد آ رہے ہیں)۔ مزید جاننے کے لیے کسی بھی کارڈ پر ٹیپ کریں!'
+          en: 'At the top of your dashboard, you\'ll see 3 cards:\n\n• MY TASKS - Shows pending work assigned to you\n• COMPLETED - Shows tasks you\'ve finished\n• LESSON PLANS - Coming soon!\n\nThese cards give you a quick overview of your workload.',
+          ur: 'آپ کے ڈیش بورڈ کے اوپر 3 کارڈز نظر آئیں گے:\n\n• میرے کام - آپ کو دیے گئے زیر التوا کام\n• مکمل - آپ کے ختم شدہ کام\n• سبق کے منصوبے - جلد آ رہے ہیں!\n\nیہ کارڈز آپ کے کام کا فوری جائزہ دیتے ہیں۔'
         },
         tip: {
-          en: 'These features are coming soon!',
-          ur: 'یہ خصوصیات جلد آ رہی ہیں!'
+          en: 'Tap any card to see more details!',
+          ur: 'مزید تفصیلات کے لیے کسی بھی کارڈ پر ٹیپ کریں!'
         },
         target: '[data-testid="widget-stats"]',
         position: 'bottom'
@@ -80,66 +67,71 @@ const guides: Record<string, ScreenGuide> = {
         position: 'top'
       },
       {
-        title: { en: 'Leave Calendar Button', ur: 'چھٹی کیلنڈر بٹن' },
+        title: { en: 'Leave Calendar', ur: 'چھٹی کیلنڈر' },
         description: {
-          en: 'Tap here to open the Leave Calendar. You can: View all your approved leaves, Apply for new leave by tapping any date, See different leave types (Casual, Sick, Earned, Special). All leaves are automatically approved!',
-          ur: 'چھٹی کیلنڈر کھولنے کے لیے یہاں ٹیپ کریں۔ آپ: اپنی تمام منظور شدہ چھٹیاں دیکھ سکتے ہیں، کسی بھی تاریخ پر ٹیپ کرکے نئی چھٹی کے لیے درخواست دے سکتے ہیں، مختلف قسم کی چھٹیاں دیکھ سکتے ہیں۔ تمام چھٹیاں خودکار طور پر منظور ہو جاتی ہیں!'
+          en: 'The LEAVE CALENDAR lets you manage your time off:\n\n• Tap the "Calendar" button to open it\n• Select any date to apply for leave\n• Choose leave type: Casual, Sick, Earned, or Special\n• All leaves are AUTOMATICALLY APPROVED - no waiting!\n\nFind it in the sidebar menu or scroll down.',
+          ur: 'چھٹی کیلنڈر آپ کی چھٹیاں منظم کرنے دیتا ہے:\n\n• کھولنے کے لیے "کیلنڈر" بٹن ٹیپ کریں\n• چھٹی کے لیے کوئی بھی تاریخ منتخب کریں\n• چھٹی کی قسم چنیں: کیژول، بیمار، ارنڈ، یا خصوصی\n• تمام چھٹیاں خودکار منظور - کوئی انتظار نہیں!'
         },
         tip: {
-          en: 'All leaves are auto-approved - no waiting!',
-          ur: 'تمام چھٹیاں خودکار منظور - کوئی انتظار نہیں!'
+          en: 'All leaves are auto-approved instantly!',
+          ur: 'تمام چھٹیاں فوری طور پر خودکار منظور!'
         },
-        target: '[data-testid="button-view-calendar"]',
-        position: 'right'
+        target: '[data-testid="button-view-calendar-mobile"], [data-testid="button-view-calendar"]',
+        position: 'bottom'
       },
       {
-        title: { en: 'Community Album Button', ur: 'کمیونٹی البم بٹن' },
+        title: { en: 'Community Album', ur: 'کمیونٹی البم' },
         description: {
-          en: 'Tap here to view the Community Album! Here you can: See photos and activities from ALL schools, Post your own classroom activities with photos, Like and comment on other teachers\' posts, Share your teaching achievements with the community.',
-          ur: 'کمیونٹی البم دیکھنے کے لیے یہاں ٹیپ کریں! یہاں آپ: تمام اسکولوں کی تصاویر اور سرگرمیاں دیکھ سکتے ہیں، اپنی کلاس روم سرگرمیاں تصاویر کے ساتھ پوسٹ کر سکتے ہیں، دوسرے اساتذہ کی پوسٹس کو لائک اور کمنٹ کر سکتے ہیں۔'
+          en: 'The COMMUNITY ALBUM is where you share your teaching moments:\n\n• See photos from ALL schools in the district\n• Post your classroom activities with up to 10 photos\n• React with Like, Love, Clap, or Celebrate\n• Comment and engage with other teachers\n• Get notified when someone reacts to your posts!',
+          ur: 'کمیونٹی البم وہ جگہ ہے جہاں آپ اپنے تدریسی لمحات شیئر کرتے ہیں:\n\n• ضلع کے تمام اسکولوں کی تصاویر دیکھیں\n• 10 تصاویر تک اپنی کلاس روم سرگرمیاں پوسٹ کریں\n• لائک، لو، تالی یا جشن سے ری ایکٹ کریں\n• دوسرے اساتذہ کے ساتھ تبصرے کریں!'
         },
         tip: {
           en: 'Share your best classroom moments with everyone!',
           ur: 'اپنے بہترین کلاس روم لمحات سب کے ساتھ شیئر کریں!'
         },
         target: '[data-testid="button-community-album"]',
-        position: 'right'
+        position: 'bottom'
       },
       {
-        title: { en: 'Queries Button', ur: 'سوالات بٹن' },
+        title: { en: 'Queries & Help', ur: 'سوالات اور مدد' },
         description: {
-          en: 'Tap here to submit queries or questions to your supervisors. You can: Ask questions about policies or procedures, Report issues or concerns, Get responses from Head Teacher or AEO.',
-          ur: 'اپنے سپروائزرز کو سوالات یا استفسارات بھیجنے کے لیے یہاں ٹیپ کریں۔ آپ: پالیسیوں یا طریقہ کار کے بارے میں سوالات پوچھ سکتے ہیں، مسائل یا خدشات رپورٹ کر سکتے ہیں، ہیڈ ٹیچر یا AEO سے جوابات حاصل کر سکتے ہیں۔'
+          en: 'Need help? Use the QUERIES section to:\n\n• Ask questions to your Head Teacher or AEO\n• Report issues or concerns\n• Track responses to your queries\n• Get help with policies and procedures\n\nYour supervisors will respond to your queries.',
+          ur: 'مدد چاہیے؟ سوالات کا سیکشن استعمال کریں:\n\n• اپنے ہیڈ ٹیچر یا AEO سے سوالات پوچھیں\n• مسائل یا خدشات رپورٹ کریں\n• اپنے سوالات کے جوابات ٹریک کریں\n• پالیسیوں اور طریقہ کار میں مدد لیں'
         },
         target: '[data-testid="button-view-queries"]',
-        position: 'right'
+        position: 'bottom'
       },
       {
-        title: { en: 'Theme Toggle (Light/Dark Mode)', ur: 'تھیم ٹوگل (لائٹ/ڈارک موڈ)' },
+        title: { en: 'Quick Actions Bar (Mobile)', ur: 'فوری ایکشن بار (موبائل)' },
         description: {
-          en: 'Tap this button to switch between light and dark mode. Dark mode is easier on the eyes at night and saves battery on some devices.',
-          ur: 'لائٹ اور ڈارک موڈ کے درمیان سوئچ کرنے کے لیے یہ بٹن ٹیپ کریں۔ ڈارک موڈ رات میں آنکھوں کے لیے آسان ہے اور کچھ ڈیوائسز پر بیٹری بچاتا ہے۔'
+          en: 'On mobile, scroll the TOP BAR horizontally to see quick action buttons:\n\n• Requests - View data requests\n• Calendar - Open leave calendar\n• Schools - See school inventory\n• Lesson Plans - Coming soon\n• Help - Open this guide again\n\nSwipe left/right to see all options!',
+          ur: 'موبائل پر، فوری ایکشن بٹن دیکھنے کے لیے اوپری بار کو افقی طور پر سکرول کریں:\n\n• درخواستیں - ڈیٹا کی درخواستیں دیکھیں\n• کیلنڈر - چھٹی کیلنڈر کھولیں\n• اسکول - اسکول انوینٹری دیکھیں\n• سبق کے منصوبے - جلد آ رہے ہیں\n• مدد - یہ گائیڈ دوبارہ کھولیں'
         },
-        target: '[data-testid="button-theme-toggle"]',
-        position: 'left'
+        tip: {
+          en: 'Swipe the bar to see all options!',
+          ur: 'تمام آپشنز دیکھنے کے لیے بار سوائپ کریں!'
+        },
+        position: 'center'
       },
       {
-        title: { en: 'Notifications Bell', ur: 'نوٹیفیکیشن گھنٹی' },
+        title: { en: 'Sidebar Menu (Desktop)', ur: 'سائڈبار مینو (ڈیسک ٹاپ)' },
         description: {
-          en: 'Tap the bell icon to see your notifications. You will be notified when: Someone reacts to your Community Album posts, You receive new tasks or requests, Important announcements are made.',
-          ur: 'اپنی نوٹیفیکیشنز دیکھنے کے لیے گھنٹی کا آئیکن ٹیپ کریں۔ آپ کو مطلع کیا جائے گا جب: کوئی آپ کی کمیونٹی البم پوسٹس پر ری ایکٹ کرے، آپ کو نئے کام یا درخواستیں ملیں، اہم اعلانات کیے جائیں۔'
+          en: 'On larger screens, the LEFT SIDEBAR gives you quick access to:\n\n• Your profile at the top\n• Quick action buttons\n• Navigation menu with all features\n• Logout button at the bottom\n\nUse the sidebar for easy navigation!',
+          ur: 'بڑی سکرینوں پر، بائیں سائڈبار آپ کو فوری رسائی دیتا ہے:\n\n• اوپر آپ کا پروفائل\n• فوری ایکشن بٹن\n• تمام خصوصیات کے ساتھ نیویگیشن مینو\n• نیچے لاگ آؤٹ بٹن'
         },
-        target: '[data-testid="button-notifications"]',
-        position: 'left'
+        position: 'center'
       },
       {
-        title: { en: 'Logout Button', ur: 'لاگ آؤٹ بٹن' },
+        title: { en: 'That\'s it!', ur: 'بس!' },
         description: {
-          en: 'Tap here to safely logout from your account. Always logout when using a shared device to keep your account secure.',
-          ur: 'اپنے اکاؤنٹ سے محفوظ طریقے سے لاگ آؤٹ کرنے کے لیے یہاں ٹیپ کریں۔ مشترکہ ڈیوائس استعمال کرتے وقت ہمیشہ لاگ آؤٹ کریں تاکہ آپ کا اکاؤنٹ محفوظ رہے۔'
+          en: 'You now know all the features of TaleemHub Dashboard!\n\n• Task cards show your work overview\n• Quotes and tips keep you inspired\n• Leave Calendar for time-off management\n• Community Album for sharing activities\n• Queries for getting help\n\nTap "Done" to close this guide. You can open it anytime from the Help button!',
+          ur: 'اب آپ TaleemHub ڈیش بورڈ کی تمام خصوصیات جان گئے!\n\n• ٹاسک کارڈز آپ کے کام کا جائزہ دکھاتے ہیں\n• اقتباسات اور تجاویز آپ کو متحرک رکھتے ہیں\n• چھٹی کیلنڈر وقت کے انتظام کے لیے\n• کمیونٹی البم سرگرمیاں شیئر کرنے کے لیے\n• سوالات مدد کے لیے\n\nگائیڈ بند کرنے کے لیے "مکمل" ٹیپ کریں۔ آپ اسے کسی بھی وقت Help بٹن سے کھول سکتے ہیں!'
         },
-        target: '[data-testid="button-logout"]',
-        position: 'right'
+        tip: {
+          en: 'Tap the Help button anytime to reopen this guide!',
+          ur: 'یہ گائیڈ دوبارہ کھولنے کے لیے کسی بھی وقت Help بٹن ٹیپ کریں!'
+        },
+        position: 'center'
       },
     ],
   },
