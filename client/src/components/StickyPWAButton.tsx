@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Download, X } from "lucide-react";
+import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -79,19 +79,12 @@ export default function StickyPWAButton() {
     }
   };
 
-  const handleDismiss = () => {
-    console.log('[Sticky PWA] User dismissed sticky button');
-    setShowButton(false);
-    // Temporarily dismiss - show again after page reload
-    localStorage.setItem("pwa-sticky-dismissed", "session");
-  };
-
   if (!showButton || isPermanentlyDismissed) {
     return null;
   }
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 z-[50] sm:left-auto sm:right-4 sm:w-auto animate-in slide-in-from-bottom-5 duration-500">
+    <div className="fixed top-4 left-4 right-4 z-[50] sm:top-auto sm:bottom-20 sm:left-auto sm:right-4 sm:w-auto animate-in slide-in-from-top-5 sm:slide-in-from-bottom-5 duration-500">
       <div className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-2xl px-4 py-3 sm:px-5 sm:py-3">
         <div className="flex-shrink-0">
           <div className="rounded-full bg-white/20 p-2">
@@ -111,14 +104,6 @@ export default function StickyPWAButton() {
         >
           انسٹال Install
         </Button>
-
-        <button
-          onClick={handleDismiss}
-          className="flex-shrink-0 p-2 hover:bg-white/20 rounded-full transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
-          aria-label="Dismiss"
-        >
-          <X className="h-5 w-5" />
-        </button>
       </div>
     </div>
   );
