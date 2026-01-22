@@ -201,109 +201,14 @@ export default function Calendar() {
           </div>
           
           {canAddLeave && (
-            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-blue-600 to-purple-600" data-testid="button-add-leave">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {isTeacher ? 'Request Leave' : 'Add Leave'}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>{isTeacher ? 'Request Leave' : 'Add Teacher Leave'}</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 mt-4">
-                  {!isTeacher && (
-                    <div className="space-y-2">
-                      <Label htmlFor="teacherName">Teacher Name *</Label>
-                      <Input
-                        id="teacherName"
-                        value={newLeave.teacherName}
-                        onChange={(e) => setNewLeave(prev => ({ ...prev, teacherName: e.target.value }))}
-                        placeholder="Enter teacher name"
-                        data-testid="input-teacher-name"
-                      />
-                    </div>
-                  )}
-                  <div className="space-y-2">
-                    <Label htmlFor="leaveType">Leave Type</Label>
-                    <Select
-                      value={newLeave.leaveType}
-                      onValueChange={(value) => setNewLeave(prev => ({ ...prev, leaveType: value as any }))}
-                    >
-                      <SelectTrigger data-testid="select-leave-type">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="casual">Casual Leave</SelectItem>
-                        <SelectItem value="sick">Sick Leave</SelectItem>
-                        <SelectItem value="earned">Earned Leave</SelectItem>
-                        <SelectItem value="special">Special Leave</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="startDate">Start Date *</Label>
-                      <Input
-                        id="startDate"
-                        type="date"
-                        value={newLeave.startDate}
-                        onChange={(e) => setNewLeave(prev => ({ 
-                          ...prev, 
-                          startDate: e.target.value,
-                          numberOfDays: calculateDays(e.target.value, prev.endDate)
-                        }))}
-                        data-testid="input-start-date"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="endDate">End Date *</Label>
-                      <Input
-                        id="endDate"
-                        type="date"
-                        value={newLeave.endDate}
-                        onChange={(e) => setNewLeave(prev => ({ 
-                          ...prev, 
-                          endDate: e.target.value,
-                          numberOfDays: calculateDays(prev.startDate, e.target.value)
-                        }))}
-                        data-testid="input-end-date"
-                      />
-                    </div>
-                  </div>
-                  {newLeave.startDate && newLeave.endDate && (
-                    <p className="text-sm text-muted-foreground">
-                      Total Days: <span className="font-semibold">{calculateDays(newLeave.startDate, newLeave.endDate)}</span>
-                    </p>
-                  )}
-                  <div className="space-y-2">
-                    <Label htmlFor="reason">Reason *</Label>
-                    <Textarea
-                      id="reason"
-                      value={newLeave.reason}
-                      onChange={(e) => setNewLeave(prev => ({ ...prev, reason: e.target.value }))}
-                      placeholder="Enter reason for leave"
-                      rows={3}
-                      data-testid="input-reason"
-                    />
-                  </div>
-                  {isTeacher && (
-                    <p className="text-sm text-amber-600 bg-amber-50 p-2 rounded">
-                      Your leave request will be submitted for approval by your Head Teacher.
-                    </p>
-                  )}
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button variant="outline" onClick={() => setShowCreateDialog(false)} data-testid="button-cancel-leave">
-                      Cancel
-                    </Button>
-                    <Button onClick={handleCreateLeave} data-testid="button-save-leave">
-                      {isTeacher ? 'Submit Request' : 'Add Leave'}
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <Button 
+              className="bg-gradient-to-r from-blue-600 to-purple-600" 
+              data-testid="button-add-leave"
+              onClick={() => setShowCreateDialog(true)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {isTeacher ? 'Request Leave' : 'Add Leave'}
+            </Button>
           )}
         </div>
       </div>
@@ -482,6 +387,105 @@ export default function Calendar() {
           </div>
         </div>
       </div>
+
+      {/* Create Leave Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{isTeacher ? 'Request Leave' : 'Add Teacher Leave'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {!isTeacher && (
+              <div className="space-y-2">
+                <Label htmlFor="teacherName">Teacher Name *</Label>
+                <Input
+                  id="teacherName"
+                  value={newLeave.teacherName}
+                  onChange={(e) => setNewLeave(prev => ({ ...prev, teacherName: e.target.value }))}
+                  placeholder="Enter teacher name"
+                  data-testid="input-teacher-name"
+                />
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="leaveType">Leave Type</Label>
+              <Select
+                value={newLeave.leaveType}
+                onValueChange={(value) => setNewLeave(prev => ({ ...prev, leaveType: value as any }))}
+              >
+                <SelectTrigger data-testid="select-leave-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="casual">Casual Leave</SelectItem>
+                  <SelectItem value="sick">Sick Leave</SelectItem>
+                  <SelectItem value="earned">Earned Leave</SelectItem>
+                  <SelectItem value="special">Special Leave</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Start Date *</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={newLeave.startDate}
+                  onChange={(e) => setNewLeave(prev => ({ 
+                    ...prev, 
+                    startDate: e.target.value,
+                    numberOfDays: calculateDays(e.target.value, prev.endDate)
+                  }))}
+                  data-testid="input-start-date"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endDate">End Date *</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={newLeave.endDate}
+                  onChange={(e) => setNewLeave(prev => ({ 
+                    ...prev, 
+                    endDate: e.target.value,
+                    numberOfDays: calculateDays(prev.startDate, e.target.value)
+                  }))}
+                  data-testid="input-end-date"
+                />
+              </div>
+            </div>
+            {newLeave.startDate && newLeave.endDate && (
+              <p className="text-sm text-muted-foreground">
+                Total Days: <span className="font-semibold">{calculateDays(newLeave.startDate, newLeave.endDate)}</span>
+              </p>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="reason">Reason *</Label>
+              <Textarea
+                id="reason"
+                value={newLeave.reason}
+                onChange={(e) => setNewLeave(prev => ({ ...prev, reason: e.target.value }))}
+                placeholder="Enter reason for leave"
+                rows={3}
+                data-testid="input-reason"
+              />
+            </div>
+            {isTeacher && (
+              <p className="text-sm text-amber-600 bg-amber-50 p-2 rounded">
+                Your leave request will be submitted for approval by your Head Teacher.
+              </p>
+            )}
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setShowCreateDialog(false)} data-testid="button-cancel-leave">
+                Cancel
+              </Button>
+              <Button onClick={handleCreateLeave} data-testid="button-save-leave">
+                {isTeacher ? 'Submit Request' : 'Add Leave'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
         <DialogContent className="max-w-md">
