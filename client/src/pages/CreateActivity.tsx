@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useMockActivities } from '@/hooks/useMockActivities';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Plus, Trash2, School } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, School, Camera } from 'lucide-react';
 import { analytics } from '@/lib/analytics';
 import { toast } from 'sonner';
 import { realSchools } from '@/data/realData';
@@ -19,11 +19,10 @@ export default function CreateActivity() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const { createActivity } = useMockActivities();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [photos, setPhotos] = useState<{ id: string; url: string; caption: string }[]>([]);
-  const [currentCaption, setCurrentCaption] = useState('');
+  const [photos, setPhotos] = useState<{ id: string; url: string; caption: string; preview: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
   if (!user) return null;
@@ -31,17 +30,30 @@ export default function CreateActivity() {
   const userSchoolId = user.schoolId || '';
   const userSchoolName = SCHOOL_NAMES[userSchoolId] || user.schoolId || 'Your School';
 
-  const handleAddPhoto = () => {
-    if (!currentCaption.trim()) return;
-    setPhotos([
-      ...photos,
-      {
-        id: `p-${Date.now()}`,
-        url: `photo_${Date.now()}.jpg`,
-        caption: currentCaption,
-      },
-    ]);
-    setCurrentCaption('');
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const preview = event.target?.result as string;
+        setPhotos((prev) => [
+          ...prev,
+          {
+            id: `p-${Date.now()}-${Math.random()}`,
+            url: file.name,
+            caption: file.name,
+            preview,
+          },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleRemovePhoto = (id: string) => {
@@ -54,12 +66,18 @@ export default function CreateActivity() {
 
     setLoading(true);
     try {
+      const photosForActivity = photos.map((p) => ({
+        id: p.id,
+        url: p.preview,
+        caption: title,
+      }));
+
       const newActivity = createActivity(
         userSchoolId,
         userSchoolName,
         title,
-        description,
-        photos,
+        title,
+        photosForActivity,
         user.id,
         user.name,
         user.role
@@ -106,76 +124,71 @@ export default function CreateActivity() {
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Activity Details</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Activity Title *
-                </label>
-                <Input
-                  placeholder="e.g., Science Fair, Sports Day, Field Trip"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                  data-testid="input-title"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Tip: Use the same title as other schools (e.g., "Science Fair") to group posts into a mini album
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Description
-                </label>
-                <textarea
-                  placeholder="Describe the activity, what students learned, achievements..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary min-h-24"
-                  data-testid="textarea-description"
-                />
-              </div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Caption</h2>
+            <div>
+              <Input
+                placeholder="e.g., Science Fair, Sports Day, Field Trip..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                data-testid="input-title"
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                Tip: Use the same caption as other schools (e.g., "Science Fair") to group posts into a mini album
+              </p>
             </div>
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Add Photos</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Photos</h2>
             <div className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Photo caption (e.g., Group photo, Science experiment)"
-                  value={currentCaption}
-                  onChange={(e) => setCurrentCaption(e.target.value)}
-                  data-testid="input-photo-caption"
-                />
-                <Button onClick={handleAddPhoto} type="button" variant="outline" data-testid="button-add-photo">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Photo
-                </Button>
-              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                multiple
+                onChange={handleFileSelect}
+                className="hidden"
+                data-testid="input-file"
+              />
+              
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-24 border-dashed border-2 hover:bg-muted/50"
+                onClick={() => fileInputRef.current?.click()}
+                data-testid="button-add-photo"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <Camera className="w-8 h-8 text-muted-foreground" />
+                  <span className="text-muted-foreground">Tap to add photos from gallery</span>
+                </div>
+              </Button>
 
               {photos.length > 0 && (
-                <div className="space-y-2 border-t border-border pt-4">
-                  <p className="text-sm font-medium text-foreground">Photos Added: {photos.length}</p>
-                  {photos.map((photo) => (
-                    <div key={photo.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-200 to-purple-200 rounded-md flex items-center justify-center">
-                          <span className="text-lg">📸</span>
-                        </div>
-                        <p className="text-sm font-medium text-foreground">{photo.caption}</p>
+                <div className="space-y-3 border-t border-border pt-4">
+                  <p className="text-sm font-medium text-foreground">{photos.length} photo{photos.length > 1 ? 's' : ''} selected</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {photos.map((photo) => (
+                      <div key={photo.id} className="relative group">
+                        <img
+                          src={photo.preview}
+                          alt="Preview"
+                          className="w-full h-24 object-cover rounded-lg"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute top-1 right-1 w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleRemovePhoto(photo.id)}
+                          data-testid={`button-remove-photo-${photo.id}`}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
                       </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemovePhoto(photo.id)}
-                        data-testid={`button-remove-photo-${photo.id}`}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
