@@ -127,7 +127,7 @@ export default function PersistentHelpBanner({
   // Expanded state - full help content
   return (
     <div
-      className={`fixed left-0 right-0 ${positionClasses} z-[45] bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/95 dark:to-orange-900/95 shadow-2xl transition-transform duration-500 ease-out ${transformClass}`}
+      className={`fixed left-0 right-0 ${positionClasses} z-[45] bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/95 dark:to-indigo-900/95 shadow-2xl transition-transform duration-500 ease-out ${transformClass}`}
       style={{
         maxHeight: position === 'bottom' ? '45vh' : '40vh',
       }}
@@ -135,7 +135,7 @@ export default function PersistentHelpBanner({
       {/* Handle bar for visual affordance */}
       {position === 'bottom' && (
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-12 h-1.5 bg-amber-300 dark:bg-amber-600 rounded-full" />
+          <div className="w-12 h-1.5 bg-blue-300 dark:bg-blue-600 rounded-full" />
         </div>
       )}
 
@@ -143,8 +143,8 @@ export default function PersistentHelpBanner({
         {/* Header with minimize/close */}
         <div className="flex items-center justify-between mb-3 pt-2">
           <div className="flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-amber-700 dark:text-amber-300" />
-            <span className="text-sm font-bold text-amber-900 dark:text-amber-100">
+            <HelpCircle className="w-5 h-5 text-blue-700 dark:text-blue-300" />
+            <span className="text-sm font-bold text-blue-900 dark:text-blue-100">
               فوری رہنما | Quick Start Guide
             </span>
           </div>
@@ -152,13 +152,13 @@ export default function PersistentHelpBanner({
             {allowMinimize && (
               <button
                 onClick={handleMinimize}
-                className="p-2 hover:bg-amber-200 dark:hover:bg-amber-800 rounded-full transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+                className="p-2 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
                 aria-label="Minimize help"
               >
                 {position === 'bottom' ? (
-                  <ChevronDown className="w-5 h-5 text-amber-700 dark:text-amber-300" />
+                  <ChevronDown className="w-5 h-5 text-blue-700 dark:text-blue-300" />
                 ) : (
-                  <ChevronUp className="w-5 h-5 text-amber-700 dark:text-amber-300" />
+                  <ChevronUp className="w-5 h-5 text-blue-700 dark:text-blue-300" />
                 )}
               </button>
             )}
@@ -173,15 +173,15 @@ export default function PersistentHelpBanner({
                 key={idx}
                 className={`h-1.5 rounded-full transition-all ${
                   idx === currentStep
-                    ? 'flex-1 bg-amber-600 dark:bg-amber-400'
+                    ? 'flex-1 bg-blue-600 dark:bg-blue-400'
                     : idx < currentStep
-                    ? 'w-4 bg-amber-400 dark:bg-amber-500'
-                    : 'w-4 bg-amber-200 dark:bg-amber-700'
+                    ? 'w-4 bg-blue-400 dark:bg-blue-500'
+                    : 'w-4 bg-blue-200 dark:bg-blue-700'
                 }`}
               />
             ))}
           </div>
-          <span className="text-xs font-medium text-amber-700 dark:text-amber-300 ml-3 whitespace-nowrap">
+          <span className="text-xs font-medium text-blue-700 dark:text-blue-300 ml-3 whitespace-nowrap">
             {currentStep + 1}/{steps.length}
           </span>
         </div>
@@ -207,19 +207,19 @@ export default function PersistentHelpBanner({
             </p>
           )}
           {step.action && (
-            <div className="flex items-start gap-2 p-3 bg-amber-100 dark:bg-amber-800/50 rounded-lg border border-amber-200 dark:border-amber-700">
-              <div className="w-2 h-2 rounded-full bg-amber-600 dark:bg-amber-400 mt-1.5 flex-shrink-0" />
+            <div className="flex items-start gap-2 p-3 bg-blue-100 dark:bg-blue-800/50 rounded-lg border border-blue-200 dark:border-blue-700">
+              <div className="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400 mt-1.5 flex-shrink-0" />
               {step.action.includes('|') ? (
                 <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium text-amber-900 dark:text-amber-100 text-left" dir="ltr">
+                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100 text-left" dir="ltr">
                     {step.action.split('|')[0].trim()}
                   </p>
-                  <p className="text-sm font-medium text-amber-900 dark:text-amber-100 text-right" dir="rtl">
+                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100 text-right" dir="rtl">
                     {step.action.split('|')[1].trim()}
                   </p>
                 </div>
               ) : (
-                <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
+                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
                   {step.action}
                 </p>
               )}
@@ -228,18 +228,18 @@ export default function PersistentHelpBanner({
         </div>
 
         {/* Navigation buttons */}
-        <div className="flex items-center gap-3 mt-5 pt-4 border-t border-amber-200 dark:border-amber-700">
+        <div className="flex items-center gap-3 mt-5 pt-4 border-t border-blue-200 dark:border-blue-700">
           <Button
             onClick={handlePrev}
             disabled={currentStep === 0}
             variant="outline"
-            className="flex-1 h-11 bg-white dark:bg-amber-900 border-amber-300 dark:border-amber-600 hover:bg-amber-50 dark:hover:bg-amber-800 disabled:opacity-30"
+            className="flex-1 h-11 bg-white dark:bg-blue-900 border-blue-300 dark:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-800 disabled:opacity-30"
           >
             Previous پچھلا
           </Button>
           <Button
             onClick={handleNext}
-            className="flex-1 h-11 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold shadow-lg"
+            className="flex-1 h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg"
           >
             {currentStep === steps.length - 1 ? 'Got it! سمجھ گیا' : 'Next اگلا'}
           </Button>
@@ -250,7 +250,7 @@ export default function PersistentHelpBanner({
       {/* Handle bar at bottom if top position */}
       {position === 'top' && (
         <div className="flex justify-center py-2">
-          <div className="w-12 h-1.5 bg-amber-300 dark:bg-amber-600 rounded-full" />
+          <div className="w-12 h-1.5 bg-blue-300 dark:bg-blue-600 rounded-full" />
         </div>
       )}
     </div>
@@ -300,7 +300,7 @@ export function PersistentHelpButton({
   return (
     <button
       onClick={onClick}
-      className={`fixed ${positionClasses} z-[40] flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+      className={`fixed ${positionClasses} z-[40] flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
       data-testid="help-guide-button"
     >
       <HelpCircle className="w-5 h-5" />
