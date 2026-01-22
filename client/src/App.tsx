@@ -36,7 +36,6 @@ import SchoolManagement from "@/pages/SchoolManagement";
 import NotFound from "@/pages/not-found";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
-import StickyPWAButton from "@/components/StickyPWAButton";
 import PWAInstallBanner from "@/components/PWAInstallBanner";
 
 function DashboardRoute() {
@@ -105,7 +104,6 @@ function App() {
                 <Toaster />
                 <PWAInstallBanner />
                 <PWAInstallPrompt />
-                <StickyPWAButton />
                 <Router />
               </ActivitiesProvider>
             </VisitSessionProvider>
