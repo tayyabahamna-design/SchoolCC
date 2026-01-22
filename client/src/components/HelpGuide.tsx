@@ -182,14 +182,14 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'School Management', ur: 'اسکول کا انتظام' },
         description: {
-          en: 'Tap "SCHOOL MANAGEMENT" to manage your school\'s data:\n\n• Basic Info - School details, EMIS code, contact info\n• Attendance - Daily student and teacher attendance\n• Infrastructure - Classrooms, facilities, utilities\n• Inventory - Furniture, equipment, supplies\n\n⚠️ Remember to update attendance daily before 10:00 AM!',
-          ur: 'اپنے اسکول کا ڈیٹا منظم کرنے کے لیے "اسکول کا انتظام" پر ٹیپ کریں:\n\n• بنیادی معلومات - اسکول کی تفصیلات، EMIS کوڈ، رابطہ معلومات\n• حاضری - روزانہ طلباء اور اساتذہ کی حاضری\n• انفراسٹرکچر - کلاس رومز، سہولیات\n• انوینٹری - فرنیچر، سامان\n\n⚠️ یاد رکھیں روزانہ صبح 10 بجے سے پہلے حاضری اپ ڈیٹ کریں!'
+          en: 'Tap "EDIT SCHOOL" to manage your school\'s data:\n\n• Basic Info - School details, EMIS code, contact info\n• Attendance - Daily student and teacher attendance\n• Infrastructure - Classrooms, facilities, utilities\n• Inventory - Furniture, equipment, supplies\n\n⚠️ Remember to update attendance daily before 10:00 AM!',
+          ur: 'اپنے اسکول کا ڈیٹا منظم کرنے کے لیے "اسکول ایڈٹ" پر ٹیپ کریں:\n\n• بنیادی معلومات - اسکول کی تفصیلات، EMIS کوڈ، رابطہ معلومات\n• حاضری - روزانہ طلباء اور اساتذہ کی حاضری\n• انفراسٹرکچر - کلاس رومز، سہولیات\n• انوینٹری - فرنیچر، سامان\n\n⚠️ یاد رکھیں روزانہ صبح 10 بجے سے پہلے حاضری اپ ڈیٹ کریں!'
         },
         tip: {
           en: 'Update attendance daily before 10:00 AM!',
           ur: 'روزانہ صبح 10 بجے سے پہلے حاضری اپ ڈیٹ کریں!'
         },
-        target: '[data-testid="button-school-management"]',
+        target: '[data-testid="button-edit-school"]',
         position: 'bottom'
       },
       {
@@ -725,13 +725,24 @@ export function HelpGuide() {
       const selectors = currentStepData.target!.split(',').map(s => s.trim());
       for (const selector of selectors) {
         try {
-          const element = document.querySelector(selector);
-          if (element) {
+          // Find all matching elements and pick the visible one
+          const elements = document.querySelectorAll(selector);
+          for (const element of elements) {
             const rect = element.getBoundingClientRect();
+            // Check if element is visible (has dimensions and is in viewport or scrollable area)
             if (rect.width > 0 && rect.height > 0) {
-              setTargetRect(rect);
-              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              return;
+              // Check if element is actually visible (not hidden by CSS)
+              const style = window.getComputedStyle(element);
+              if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+                setTargetRect(rect);
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Update rect after scroll
+                setTimeout(() => {
+                  const newRect = element.getBoundingClientRect();
+                  setTargetRect(newRect);
+                }, 400);
+                return;
+              }
             }
           }
         } catch (e) {
@@ -846,43 +857,42 @@ export function HelpGuide() {
 
       {isOpen && (
         <>
-          {/* Spotlight overlay */}
+          {/* Spotlight overlay with highlighted element */}
           {targetRect && !showIntro && (
-            <div className="fixed inset-0 z-[69] pointer-events-none">
-              <svg className="w-full h-full">
-                <defs>
-                  <mask id="spotlight-mask">
-                    <rect x="0" y="0" width="100%" height="100%" fill="white" />
-                    <rect
-                      x={targetRect.left - 8}
-                      y={targetRect.top - 8}
-                      width={targetRect.width + 16}
-                      height={targetRect.height + 16}
-                      rx="8"
-                      fill="black"
-                    />
-                  </mask>
-                </defs>
-                <rect
-                  x="0"
-                  y="0"
-                  width="100%"
-                  height="100%"
-                  fill="rgba(0,0,0,0.6)"
-                  mask="url(#spotlight-mask)"
-                />
-              </svg>
-              {/* Highlight border */}
-              <div
-                className="absolute border-2 border-blue-400 rounded-lg animate-pulse pointer-events-none"
+            <>
+              {/* Dark overlay background */}
+              <div 
+                className="fixed inset-0 z-[69] bg-black/70"
                 style={{
-                  left: targetRect.left - 8,
-                  top: targetRect.top - 8,
-                  width: targetRect.width + 16,
-                  height: targetRect.height + 16,
+                  clipPath: `polygon(
+                    0% 0%, 
+                    0% 100%, 
+                    ${targetRect.left - 12}px 100%, 
+                    ${targetRect.left - 12}px ${targetRect.top - 12}px, 
+                    ${targetRect.left + targetRect.width + 12}px ${targetRect.top - 12}px, 
+                    ${targetRect.left + targetRect.width + 12}px ${targetRect.top + targetRect.height + 12}px, 
+                    ${targetRect.left - 12}px ${targetRect.top + targetRect.height + 12}px, 
+                    ${targetRect.left - 12}px 100%, 
+                    100% 100%, 
+                    100% 0%
+                  )`
                 }}
               />
-            </div>
+              {/* Highlight border around target */}
+              <div
+                className="fixed z-[69] border-4 border-blue-500 rounded-xl pointer-events-none shadow-[0_0_0_4px_rgba(59,130,246,0.5),0_0_30px_rgba(59,130,246,0.8)]"
+                style={{
+                  left: targetRect.left - 12,
+                  top: targetRect.top - 12,
+                  width: targetRect.width + 24,
+                  height: targetRect.height + 24,
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }}
+              >
+                {/* Pulsing glow effect */}
+                <div className="absolute inset-0 rounded-xl border-4 border-blue-400 animate-ping opacity-50" />
+              </div>
+            </>
           )}
 
           {/* Dark overlay for intro or when no target */}
