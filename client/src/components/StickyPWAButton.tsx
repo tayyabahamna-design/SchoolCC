@@ -30,17 +30,17 @@ export default function StickyPWAButton() {
       return;
     }
 
+    // Always show button after 3 seconds (don't wait for beforeinstallprompt)
+    setTimeout(() => {
+      setShowButton(true);
+      console.log('[Sticky PWA] Showing sticky install button');
+    }, 3000);
+
     // Listen for beforeinstallprompt event (Android/Desktop Chrome)
     const handler = (e: Event) => {
       console.log('[Sticky PWA] beforeinstallprompt event fired!');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-
-      // Show button after 3 seconds
-      setTimeout(() => {
-        setShowButton(true);
-        console.log('[Sticky PWA] Showing sticky install button');
-      }, 3000);
     };
 
     window.addEventListener("beforeinstallprompt", handler);
