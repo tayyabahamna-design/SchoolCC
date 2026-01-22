@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, Languages, BookOpen, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
+import { useAuth } from '@/contexts/auth';
 
 type Language = 'en' | 'ur';
 
@@ -127,6 +128,132 @@ const guides: Record<string, ScreenGuide> = {
         description: {
           en: 'You now know all the features of TaleemHub Dashboard!\n\n• Task cards show your work overview\n• Quotes and tips keep you inspired\n• Leave Calendar for time-off management\n• Community Album for sharing activities\n• Queries for getting help\n\nTap "Done" to close this guide. You can open it anytime from the Help button!',
           ur: 'اب آپ TaleemHub ڈیش بورڈ کی تمام خصوصیات جان گئے!\n\n• ٹاسک کارڈز آپ کے کام کا جائزہ دکھاتے ہیں\n• اقتباسات اور تجاویز آپ کو متحرک رکھتے ہیں\n• چھٹی کیلنڈر وقت کے انتظام کے لیے\n• کمیونٹی البم سرگرمیاں شیئر کرنے کے لیے\n• سوالات مدد کے لیے\n\nگائیڈ بند کرنے کے لیے "مکمل" ٹیپ کریں۔ آپ اسے کسی بھی وقت Help بٹن سے کھول سکتے ہیں!'
+        },
+        tip: {
+          en: 'Tap the Help button anytime to reopen this guide!',
+          ur: 'یہ گائیڈ دوبارہ کھولنے کے لیے کسی بھی وقت Help بٹن ٹیپ کریں!'
+        },
+        position: 'center'
+      },
+    ],
+  },
+  '/dashboard-head-teacher': {
+    screenName: { en: 'Head Teacher Dashboard Guide', ur: 'ہیڈ ٹیچر ڈیش بورڈ گائیڈ' },
+    introduction: {
+      en: 'Welcome to your Head Teacher Dashboard! This is your control center for managing your school, staff, and data requests. Let me show you each feature step by step.',
+      ur: 'اپنے ہیڈ ٹیچر ڈیش بورڈ میں خوش آمدید! یہ آپ کا اسکول، عملے اور ڈیٹا کی درخواستوں کے انتظام کا مرکز ہے۔ آئیں میں آپ کو ہر خصوصیت قدم بہ قدم دکھاتا ہوں۔'
+    },
+    steps: [
+      {
+        title: { en: 'Task & Stats Cards', ur: 'کام اور اعدادوشمار کارڈز' },
+        description: {
+          en: 'At the top of your dashboard, you\'ll see 3 cards:\n\n• PENDING TASKS - Data requests you need to respond to\n• COMPLETED - Tasks you\'ve finished\n• LESSON PLANS - View lesson plans from your teachers (coming soon!)\n\nThese cards give you a quick overview of your workload.',
+          ur: 'آپ کے ڈیش بورڈ کے اوپر 3 کارڈز نظر آئیں گے:\n\n• زیر التوا کام - ڈیٹا کی درخواستیں جن کا آپ کو جواب دینا ہے\n• مکمل - آپ کے ختم شدہ کام\n• سبق کے منصوبے - اپنے اساتذہ کے سبق کے منصوبے دیکھیں (جلد آ رہا ہے!)\n\nیہ کارڈز آپ کے کام کا فوری جائزہ دیتے ہیں۔'
+        },
+        tip: {
+          en: 'Tap any card to see more details!',
+          ur: 'مزید تفصیلات کے لیے کسی بھی کارڈ پر ٹیپ کریں!'
+        },
+        target: '[data-testid="widget-stats"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'My School Staff', ur: 'میرے اسکول کا عملہ' },
+        description: {
+          en: 'This section shows your school\'s staff statistics:\n\n• Total number of teachers\n• Present teachers today\n• Teachers on leave\n\nThis helps you track daily attendance at a glance.',
+          ur: 'یہ سیکشن آپ کے اسکول کے عملے کے اعداد و شمار دکھاتا ہے:\n\n• اساتذہ کی کل تعداد\n• آج موجود اساتذہ\n• چھٹی پر اساتذہ\n\nیہ آپ کو روزانہ حاضری کا فوری جائزہ لینے میں مدد کرتا ہے۔'
+        },
+        target: '[data-testid="widget-staff"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'Manage Teachers', ur: 'اساتذہ کا انتظام' },
+        description: {
+          en: 'Tap "MANAGE TEACHERS" to:\n\n• View all teachers in your school\n• See their details and contact info\n• Monitor their work status\n• Approve new teacher registrations',
+          ur: '"اساتذہ کا انتظام" پر ٹیپ کریں:\n\n• اپنے اسکول کے تمام اساتذہ دیکھیں\n• ان کی تفصیلات اور رابطہ معلومات دیکھیں\n• ان کی کام کی حیثیت کی نگرانی کریں\n• نئے اساتذہ کی رجسٹریشن منظور کریں'
+        },
+        tip: {
+          en: 'You can approve pending teacher registrations here!',
+          ur: 'آپ یہاں زیر التوا اساتذہ کی رجسٹریشن منظور کر سکتے ہیں!'
+        },
+        target: '[data-testid="button-manage-teachers"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'School Management', ur: 'اسکول کا انتظام' },
+        description: {
+          en: 'Tap "SCHOOL MANAGEMENT" to manage your school\'s data:\n\n• Basic Info - School details, EMIS code, contact info\n• Attendance - Daily student and teacher attendance\n• Infrastructure - Classrooms, facilities, utilities\n• Inventory - Furniture, equipment, supplies\n\n⚠️ Remember to update attendance daily before 10:00 AM!',
+          ur: 'اپنے اسکول کا ڈیٹا منظم کرنے کے لیے "اسکول کا انتظام" پر ٹیپ کریں:\n\n• بنیادی معلومات - اسکول کی تفصیلات، EMIS کوڈ، رابطہ معلومات\n• حاضری - روزانہ طلباء اور اساتذہ کی حاضری\n• انفراسٹرکچر - کلاس رومز، سہولیات\n• انوینٹری - فرنیچر، سامان\n\n⚠️ یاد رکھیں روزانہ صبح 10 بجے سے پہلے حاضری اپ ڈیٹ کریں!'
+        },
+        tip: {
+          en: 'Update attendance daily before 10:00 AM!',
+          ur: 'روزانہ صبح 10 بجے سے پہلے حاضری اپ ڈیٹ کریں!'
+        },
+        target: '[data-testid="button-school-management"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'Data Requests', ur: 'ڈیٹا کی درخواستیں' },
+        description: {
+          en: 'Use "DATA REQUESTS" to:\n\n• View requests from AEO, DEO, or CEO\n• Create new data requests for your teachers\n• Track responses and submissions\n• Export data to Excel for reporting',
+          ur: '"ڈیٹا کی درخواستیں" استعمال کریں:\n\n• AEO، DEO یا CEO کی درخواستیں دیکھیں\n• اپنے اساتذہ کے لیے نئی ڈیٹا کی درخواستیں بنائیں\n• جوابات اور جمع کرائیں ٹریک کریں\n• رپورٹنگ کے لیے ڈیٹا Excel میں ایکسپورٹ کریں'
+        },
+        target: '[data-testid="button-data-requests"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'Leave Calendar', ur: 'چھٹی کیلنڈر' },
+        description: {
+          en: 'The LEAVE CALENDAR helps you manage staff leave:\n\n• View all teachers\' approved leaves\n• Add new leave entries for teachers\n• Track leave types: Casual, Sick, Earned, Special\n• Plan staffing based on upcoming leaves',
+          ur: 'چھٹی کیلنڈر آپ کو عملے کی چھٹی کا انتظام کرنے میں مدد کرتا ہے:\n\n• تمام اساتذہ کی منظور شدہ چھٹیاں دیکھیں\n• اساتذہ کے لیے نئے چھٹی کے اندراج شامل کریں\n• چھٹی کی اقسام ٹریک کریں\n• آنے والی چھٹیوں کی بنیاد پر عملے کی منصوبہ بندی کریں'
+        },
+        tip: {
+          en: 'Keep track of all teacher leaves in one place!',
+          ur: 'تمام اساتذہ کی چھٹیوں کا ایک جگہ ریکارڈ رکھیں!'
+        },
+        target: '[data-testid="button-view-calendar"], [data-testid="button-view-calendar-mobile"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'Community Album', ur: 'کمیونٹی البم' },
+        description: {
+          en: 'The COMMUNITY ALBUM shows activities from all schools:\n\n• See what teachers are posting from your school\n• View activities from other schools for inspiration\n• You can delete inappropriate posts from your school\n• React and comment to encourage teachers',
+          ur: 'کمیونٹی البم تمام اسکولوں کی سرگرمیاں دکھاتا ہے:\n\n• دیکھیں کہ آپ کے اسکول سے اساتذہ کیا پوسٹ کر رہے ہیں\n• تحریک کے لیے دوسرے اسکولوں کی سرگرمیاں دیکھیں\n• آپ اپنے اسکول کی نامناسب پوسٹس حذف کر سکتے ہیں\n• اساتذہ کی حوصلہ افزائی کے لیے ری ایکٹ کریں اور تبصرہ کریں'
+        },
+        target: '[data-testid="button-community-album"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'Quick Coaching Tips', ur: 'فوری کوچنگ تجاویز' },
+        description: {
+          en: 'The COACHING TIPS section helps you guide your teachers:\n\n• Get 3 random coaching tips each time you visit\n• Use these tips during teacher observations\n• Share tips with teachers during mentoring sessions\n• Tips cover teaching techniques, classroom management, and student engagement',
+          ur: 'کوچنگ تجاویز کا سیکشن آپ کو اپنے اساتذہ کی رہنمائی میں مدد کرتا ہے:\n\n• ہر بار جب آپ آئیں تو 3 تصادفی کوچنگ تجاویز حاصل کریں\n• اساتذہ کے مشاہدے کے دوران ان تجاویز کا استعمال کریں\n• مینٹورنگ سیشنز کے دوران اساتذہ کے ساتھ تجاویز شیئر کریں\n• تجاویز میں تدریسی تکنیک، کلاس روم کا انتظام، اور طلباء کی مشغولیت شامل ہے'
+        },
+        tip: {
+          en: 'Use these tips during your classroom observations!',
+          ur: 'کلاس روم مشاہدے کے دوران ان تجاویز کا استعمال کریں!'
+        },
+        target: '[data-testid="widget-coaching-tips"]',
+        position: 'bottom'
+      },
+      {
+        title: { en: 'Menu Button (Mobile)', ur: 'مینو بٹن (موبائل)' },
+        description: {
+          en: 'On mobile, tap the ☰ MENU BUTTON (three lines) to open the sidebar menu with all options:\n\n• School Management\n• Manage Teachers\n• Data Requests\n• Leave Calendar\n• Community Album\n• My Profile & Settings\n• Help Guide & Logout',
+          ur: 'موبائل پر، تمام آپشنز کے ساتھ سائڈبار مینو کھولنے کے لیے ☰ مینو بٹن پر ٹیپ کریں:\n\n• اسکول کا انتظام\n• اساتذہ کا انتظام\n• ڈیٹا کی درخواستیں\n• چھٹی کیلنڈر\n• کمیونٹی البم\n• میرا پروفائل اور ترتیبات\n• ہیلپ گائیڈ اور لاگ آؤٹ'
+        },
+        tip: {
+          en: 'Tap outside the menu or the X button to close it!',
+          ur: 'مینو بند کرنے کے لیے باہر ٹیپ کریں یا X بٹن دبائیں!'
+        },
+        target: '[data-testid="button-open-menu"]',
+        position: 'right'
+      },
+      {
+        title: { en: 'That\'s it!', ur: 'بس!' },
+        description: {
+          en: 'You now know all the features of your Head Teacher Dashboard!\n\n• Task cards show your work overview\n• Staff section shows teacher attendance\n• School Management for all school data\n• Data Requests for collecting information\n• Leave Calendar for tracking leaves\n\nTap "Done" to close this guide. You can open it anytime from the Help button!',
+          ur: 'اب آپ اپنے ہیڈ ٹیچر ڈیش بورڈ کی تمام خصوصیات جان گئے!\n\n• ٹاسک کارڈز آپ کے کام کا جائزہ دکھاتے ہیں\n• عملے کا سیکشن اساتذہ کی حاضری دکھاتا ہے\n• تمام اسکول ڈیٹا کے لیے اسکول کا انتظام\n• معلومات جمع کرنے کے لیے ڈیٹا کی درخواستیں\n• چھٹیوں کو ٹریک کرنے کے لیے چھٹی کیلنڈر\n\nگائیڈ بند کرنے کے لیے "مکمل" ٹیپ کریں!'
         },
         tip: {
           en: 'Tap the Help button anytime to reopen this guide!',
@@ -528,6 +655,7 @@ export function HelpGuide() {
   const [showMenu, setShowMenu] = useState(false);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [location] = useLocation();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleOpenGuide = () => {
@@ -540,8 +668,14 @@ export function HelpGuide() {
   }, []);
 
   const getGuide = useCallback((): ScreenGuide => {
+    // Check for role-specific dashboard guides
+    if (location === '/dashboard' || location === '/' || location === '') {
+      if (user?.role === 'HEAD_TEACHER') {
+        return guides['/dashboard-head-teacher'] || guides['/dashboard'] || defaultGuide;
+      }
+      return guides['/dashboard'] || defaultGuide;
+    }
     if (guides[location]) return guides[location];
-    if (location === '/' || location === '') return guides['/dashboard'] || defaultGuide;
     const pathParts = location.split('/');
     if (pathParts[1] === 'request') return guides['/data-requests'] || defaultGuide;
     if (pathParts[1] === 'visit') return guides['/school-visits'] || defaultGuide;
@@ -549,7 +683,7 @@ export function HelpGuide() {
     if (pathParts[1] === 'album') return guides['/school-data'] || defaultGuide;
     if (pathParts[1] === 'collaborative-form') return defaultGuide;
     return defaultGuide;
-  }, [location]);
+  }, [location, user?.role]);
 
   const currentGuide = getGuide();
   const steps = currentGuide.steps;

@@ -17,6 +17,7 @@ import OtherActivityForm from '@/pages/OtherActivityForm';
 import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { MetricCard, TeacherDetailsDialog, CustomizeDashboardModal } from '@/components/dashboard';
+import { TeacherExportDialog } from '@/components/TeacherExportDialog';
 import { analytics } from '@/lib/analytics';
 
 export default function Dashboard() {
@@ -34,6 +35,7 @@ export default function Dashboard() {
   const [teacherDialogType, setTeacherDialogType] = useState<'total' | 'present' | 'onLeave' | 'absent'>('total');
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const [showTeacherExportDialog, setShowTeacherExportDialog] = useState(false);
   const [staffStats, setStaffStats] = useState({
     aeos: { total: 0, present: 0, onLeave: 0, absent: 0 },
     headTeachers: { total: 0, present: 0, onLeave: 0, absent: 0 },
@@ -323,18 +325,24 @@ export default function Dashboard() {
             <div key="staff" data-testid="widget-staff">
               <h2 className="text-2xl font-bold gradient-text mb-6">My School Staff</h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger-children">
-                <MetricCard
-                  value={staffStats.teachers.total}
-                  label="Teachers"
-                  icon={Users}
-                  iconGradient="from-blue-500 to-blue-600"
-                  size="lg"
-                  breakdown={[
-                    { label: 'Present', value: staffStats.teachers.present, valueColor: 'text-emerald-600', showAsBadge: false },
-                    { label: 'On Leave', value: staffStats.teachers.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
-                  ]}
-                  className="hover-lift card-shine"
-                />
+                <div 
+                  onClick={() => setShowTeacherExportDialog(true)}
+                  className="cursor-pointer"
+                  data-testid="card-teachers-clickable"
+                >
+                  <MetricCard
+                    value={staffStats.teachers.total}
+                    label="Teachers (Tap to export)"
+                    icon={Users}
+                    iconGradient="from-blue-500 to-blue-600"
+                    size="lg"
+                    breakdown={[
+                      { label: 'Present', value: staffStats.teachers.present, valueColor: 'text-emerald-600', showAsBadge: false },
+                      { label: 'On Leave', value: staffStats.teachers.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
+                    ]}
+                    className="hover-lift card-shine ring-2 ring-blue-200 dark:ring-blue-800"
+                  />
+                </div>
               </div>
             </div>
           );
@@ -593,6 +601,16 @@ export default function Dashboard() {
                       <Users className="w-5 h-5 text-white" />
                     </div>
                     <span className="font-medium text-foreground">Manage Teachers</span>
+                  </button>
+                  <button
+                    onClick={() => { navigate('/school-management'); setShowMobileSidebar(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group"
+                    data-testid="mobile-button-school-management"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md">
+                      <School className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="font-medium text-foreground">My School</span>
                   </button>
                 </>
               )}
@@ -1233,6 +1251,13 @@ export default function Dashboard() {
         onToggleWidget={toggleWidget}
         onMoveWidget={moveWidget}
         onResetToDefault={resetToDefault}
+      />
+
+      {/* Teacher Export Dialog for Head Teachers */}
+      <TeacherExportDialog
+        isOpen={showTeacherExportDialog}
+        onClose={() => setShowTeacherExportDialog(false)}
+        userId={user?.id || ''}
       />
     </div>
   );
