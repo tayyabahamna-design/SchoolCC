@@ -188,9 +188,46 @@ export default function Dashboard() {
           { text: "Great teachers empathize with kids and inspire them to learn.", author: "Unknown", gradient: "from-teal-500 to-emerald-500" },
         ];
         
-        // Shuffle and pick a random quote on each page visit (like tips)
+        // Coaching tips for Head Teachers to enhance learning gains
+        const coachingTips = [
+          { text: "Observe lessons weekly and give specific, actionable feedback within 24 hours.", category: "Classroom Observation", gradient: "from-indigo-500 to-purple-500" },
+          { text: "Model effective teaching strategies by co-teaching challenging lessons with your staff.", category: "Lead by Example", gradient: "from-emerald-500 to-teal-500" },
+          { text: "Set clear learning goals with each teacher and track student progress together monthly.", category: "Goal Setting", gradient: "from-amber-500 to-orange-500" },
+          { text: "Create peer learning groups where teachers share successful strategies with each other.", category: "Collaboration", gradient: "from-blue-500 to-cyan-500" },
+          { text: "Celebrate small wins publicly - recognition motivates teachers to keep improving.", category: "Recognition", gradient: "from-pink-500 to-rose-500" },
+          { text: "Ask teachers: 'What support do you need?' - then remove obstacles for them.", category: "Support", gradient: "from-violet-500 to-purple-500" },
+          { text: "Focus feedback on student learning outcomes, not just teaching techniques.", category: "Student-Centered", gradient: "from-teal-500 to-emerald-500" },
+          { text: "Encourage teachers to visit each other's classrooms and share best practices.", category: "Peer Observation", gradient: "from-rose-500 to-pink-500" },
+          { text: "Use data from assessments to guide coaching conversations with teachers.", category: "Data-Driven", gradient: "from-cyan-500 to-blue-500" },
+          { text: "Build trust first - teachers improve faster when they feel supported, not judged.", category: "Trust Building", gradient: "from-orange-500 to-amber-500" },
+        ];
+        
+        // Shuffle and pick a random quote/tip on each page visit
         const shuffledQuotes = [...teachingQuotes].sort(() => Math.random() - 0.5);
+        const shuffledTips = [...coachingTips].sort(() => Math.random() - 0.5);
         const dailyQuote = shuffledQuotes[0];
+        const dailyTip = shuffledTips[0];
+        
+        if (user.role === 'HEAD_TEACHER') {
+          return (
+            <div key="requests" data-testid="widget-coaching-tip">
+              <h2 className="text-2xl font-bold gradient-text mb-6">Coaching Tip of the Day</h2>
+              <Card className="p-8 bg-white dark:bg-card border border-border shadow-xl overflow-hidden relative">
+                <div className="relative">
+                  <div className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-gradient-to-r ${dailyTip.gradient} text-white`}>
+                    {dailyTip.category}
+                  </div>
+                  <p className={`text-xl md:text-2xl font-medium leading-relaxed mb-4 bg-gradient-to-r ${dailyTip.gradient} bg-clip-text text-transparent`}>
+                    {dailyTip.text}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-4">
+                    💡 Tip: Great coaching leads to better teaching and improved student learning!
+                  </p>
+                </div>
+              </Card>
+            </div>
+          );
+        }
         
         if (user.role === 'TEACHER') {
           return (
@@ -366,8 +403,8 @@ export default function Dashboard() {
         ];
         
         // Shuffle and pick 3 random tips on each render
-        const shuffledTips = [...allTeachingTips].sort(() => Math.random() - 0.5);
-        const randomTips = shuffledTips.slice(0, 3);
+        const shuffledTeachingTips = [...allTeachingTips].sort(() => Math.random() - 0.5);
+        const randomTips = shuffledTeachingTips.slice(0, 3);
         
         if (user.role === 'TEACHER') {
           return (
