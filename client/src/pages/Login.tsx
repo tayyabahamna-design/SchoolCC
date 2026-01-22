@@ -24,18 +24,18 @@ const LOGIN_HELP_KEY = 'taleemhub_login_help';
 
 const loginHelpSteps: HelpStep[] = [
   {
-    title: 'Welcome to TaleemHub! 🎓',
-    content: 'Your education command center for Rawalpindi District. Let\'s get you started!',
+    title: 'ٹیلیم ہب میں خوش آمدید! 🎓 Welcome to TaleemHub!',
+    content: 'راولپنڈی ضلع کے لیے آپ کا تعلیمی کمانڈ سینٹر۔ آئیں شروع کریں!\n\nYour education command center for Rawalpindi District. Let\'s get you started!',
   },
   {
-    title: 'New User? Create Account',
-    content: 'Teachers and Head Teachers can create accounts instantly. Just tap "Create Account" at the bottom of the login form.',
-    action: 'Look for "Don\'t have an account? Create Account" link',
+    title: 'نئے صارف؟ اکاؤنٹ بنائیں | New User? Create Account',
+    content: 'اساتذہ اور ہیڈ ٹیچرز فوری طور پر اکاؤنٹ بنا سکتے ہیں۔ لاگ ان فارم کے نیچے "Create Account" پر ٹیپ کریں۔\n\nTeachers and Head Teachers can create accounts instantly. Just tap "Create Account" at the bottom of the login form.',
+    action: '"Don\'t have an account? Create Account" لنک تلاش کریں | Look for "Don\'t have an account? Create Account" link',
   },
   {
-    title: 'Login Methods',
-    content: 'Admin roles (CEO, DEO, etc.) use phone + password. School staff (Teachers, Head Teachers) use phone number only.',
-    action: 'Switch between tabs: "Admin Login" or "School Staff Login"',
+    title: 'لاگ ان کے طریقے | Login Methods',
+    content: 'ایڈمن رولز (CEO, DEO وغیرہ) فون + پاس ورڈ استعمال کرتے ہیں۔ سکول سٹاف (اساتذہ، ہیڈ ٹیچرز) صرف فون نمبر استعمال کرتے ہیں۔\n\nAdmin roles (CEO, DEO, etc.) use phone + password. School staff (Teachers, Head Teachers) use phone number only.',
+    action: 'ٹیبز کے درمیان سوئچ کریں: "Admin Login" یا "School Staff Login" | Switch between tabs',
   },
 ];
 

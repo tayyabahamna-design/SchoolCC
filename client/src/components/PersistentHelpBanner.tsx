@@ -145,7 +145,7 @@ export default function PersistentHelpBanner({
           <div className="flex items-center gap-2">
             <HelpCircle className="w-5 h-5 text-amber-700 dark:text-amber-300" />
             <span className="text-sm font-bold text-amber-900 dark:text-amber-100">
-              Quick Start Guide
+              فوری رہنما | Quick Start Guide
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -191,7 +191,7 @@ export default function PersistentHelpBanner({
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
             {step.title}
           </h3>
-          <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
+          <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-line">
             {step.content}
           </p>
           {step.action && (
@@ -212,13 +212,13 @@ export default function PersistentHelpBanner({
             variant="outline"
             className="flex-1 h-11 bg-white dark:bg-amber-900 border-amber-300 dark:border-amber-600 hover:bg-amber-50 dark:hover:bg-amber-800 disabled:opacity-30"
           >
-            Previous
+            پچھلا Previous
           </Button>
           <Button
             onClick={handleNext}
             className="flex-1 h-11 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold shadow-lg"
           >
-            {currentStep === steps.length - 1 ? 'Got it!' : 'Next'}
+            {currentStep === steps.length - 1 ? 'سمجھ گیا Got it!' : 'اگلا Next'}
           </Button>
         </div>
 
