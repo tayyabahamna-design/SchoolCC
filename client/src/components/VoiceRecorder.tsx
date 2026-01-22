@@ -305,24 +305,49 @@ export function VoiceRecorder({ onTranscriptionComplete, disabled }: VoiceRecord
         </div>
       )}
 
-      {(isRecording || audioBlob) && transcribedText && (
+      {isRecording && (
         <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
           <p className="text-xs font-medium text-muted-foreground">
-            {isRecording ? 'Live Transcription:' : 'Transcription:'}
+            Live Transcription / براہ راست نقل:
           </p>
-          <p className="text-sm text-foreground whitespace-pre-wrap" dir={language === 'ur-PK' ? 'rtl' : 'ltr'}>
-            {transcribedText}
+          {transcribedText ? (
+            <p className="text-sm text-foreground whitespace-pre-wrap" dir={language === 'ur-PK' ? 'rtl' : 'ltr'}>
+              {transcribedText}
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">
+              Speak clearly... / واضح بولیں...
+            </p>
+          )}
+        </div>
+      )}
+
+      {audioBlob && !isRecording && (
+        <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
+          <p className="text-xs font-medium text-muted-foreground">
+            Transcription / نقل:
           </p>
-          {!isRecording && (
-            <Button
-              type="button"
-              size="sm"
-              onClick={useTranscription}
-              className="w-full mt-2"
-              data-testid="button-use-transcription"
-            >
-              Use This Text in Description
-            </Button>
+          {transcribedText ? (
+            <>
+              <p className="text-sm text-foreground whitespace-pre-wrap" dir={language === 'ur-PK' ? 'rtl' : 'ltr'}>
+                {transcribedText}
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                onClick={useTranscription}
+                className="w-full mt-2"
+                data-testid="button-use-transcription"
+              >
+                Use This Text in Description / یہ متن استعمال کریں
+              </Button>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">
+              No speech detected. Try recording again with clearer speech.
+              <br />
+              کوئی تقریر نہیں ملی۔ واضح تقریر کے ساتھ دوبارہ ریکارڈ کریں۔
+            </p>
           )}
         </div>
       )}
