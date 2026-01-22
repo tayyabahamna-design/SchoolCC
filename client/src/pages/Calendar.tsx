@@ -154,7 +154,6 @@ export default function Calendar() {
   };
 
   const handleDateClick = (day: Date) => {
-    if (!canAddLeave) return;
     const year = day.getFullYear();
     const month = String(day.getMonth() + 1).padStart(2, '0');
     const dayOfMonth = String(day.getDate()).padStart(2, '0');
@@ -266,14 +265,21 @@ export default function Calendar() {
                 return (
                   <div
                     key={idx}
+                    role={canAddLeave && isCurrentMonth ? "button" : undefined}
+                    tabIndex={canAddLeave && isCurrentMonth ? 0 : undefined}
                     className={`relative p-2 rounded-lg min-h-24 border-2 transition-all ${
                       isCurrentMonth
                         ? isToday
                           ? 'border-primary bg-primary/10'
                           : 'border-border bg-card hover:border-primary/30'
                         : 'border-transparent bg-muted/20 text-muted-foreground'
-                    } ${canAddLeave && isCurrentMonth ? 'cursor-pointer' : ''}`}
-                    onClick={() => isCurrentMonth && handleDateClick(day)}
+                    } ${canAddLeave && isCurrentMonth ? 'cursor-pointer hover:bg-muted/50' : ''}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (isCurrentMonth && canAddLeave) {
+                        handleDateClick(day);
+                      }
+                    }}
                     data-testid={`calendar-day-${day.getDate()}`}
                   >
                     <div className="text-sm font-semibold text-foreground text-center">{day.getDate()}</div>
