@@ -260,6 +260,28 @@ export default function Dashboard() {
       
       case 'staff':
         if (user.role === 'TEACHER') return null;
+        // Head Teacher only sees their school's teachers
+        if (user.role === 'HEAD_TEACHER') {
+          return (
+            <div key="staff" data-testid="widget-staff">
+              <h2 className="text-2xl font-bold gradient-text mb-6">My School Staff</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 stagger-children">
+                <MetricCard
+                  value={staffStats.teachers.total}
+                  label="Teachers"
+                  icon={Users}
+                  iconGradient="from-blue-500 to-blue-600"
+                  size="lg"
+                  breakdown={[
+                    { label: 'Present', value: staffStats.teachers.present, valueColor: 'text-emerald-600', showAsBadge: false },
+                    { label: 'On Leave', value: staffStats.teachers.onLeave, valueColor: 'text-amber-600', showAsBadge: false },
+                  ]}
+                  className="hover-lift card-shine"
+                />
+              </div>
+            </div>
+          );
+        }
         return (
           <div key="staff" data-testid="widget-staff">
             <h2 className="text-2xl font-bold gradient-text mb-6">Staff Overview</h2>
