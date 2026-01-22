@@ -384,6 +384,7 @@ export async function registerRoutes(
       console.log(`Login successful for ${user.role}: ${user.name}`);
       res.json({ ...user, password: undefined });
     } catch (error) {
+      console.error("Login error:", error);
       res.status(500).json({ error: "Login failed" });
     }
   });
