@@ -156,8 +156,30 @@ export default function MentoringVisitForm({ onClose }: Props) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch (e) {}
+        recognitionRef.current = null;
+      }
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      Object.values(audioElementsRef.current).forEach(audio => {
+        if (audio) audio.pause();
+      });
+    };
+  }, []);
+
   const startRecording = async (fieldId: string) => {
     try {
+      // Stop any existing speech recognition first
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch (e) {}
+        recognitionRef.current = null;
+      }
+      
       // Clean up any existing voice note for this field before recording new one
       if (voiceNotes[fieldId]) {
         if (voiceNotes[fieldId].url) {
@@ -217,23 +239,27 @@ export default function MentoringVisitForm({ onClose }: Props) {
         const recognition = new SpeechRecognition();
         recognitionRef.current = recognition;
         recognition.continuous = true;
-        recognition.interimResults = true;
+        recognition.interimResults = false;
         recognition.lang = 'en-US';
         
         recognition.onresult = (event: any) => {
           let finalTranscript = '';
-          for (let i = event.resultIndex; i < event.results.length; i++) {
+          for (let i = 0; i < event.results.length; i++) {
             if (event.results[i].isFinal) {
               finalTranscript += event.results[i][0].transcript + ' ';
             }
           }
           if (finalTranscript) {
-            transcriptRef.current += finalTranscript;
+            transcriptRef.current = finalTranscript.trim();
           }
         };
         
         recognition.onerror = (event: any) => {
           console.error('Speech recognition error:', event.error);
+        };
+        
+        recognition.onend = () => {
+          recognitionRef.current = null;
         };
         
         recognition.start();
@@ -247,6 +273,14 @@ export default function MentoringVisitForm({ onClose }: Props) {
   };
 
   const stopRecording = () => {
+    // Stop speech recognition first and forcefully
+    if (recognitionRef.current) {
+      try { 
+        recognitionRef.current.abort(); // Use abort() for immediate stop
+      } catch (e) {}
+      recognitionRef.current = null;
+    }
+    
     if (mediaRecorderRef.current && recordingField) {
       mediaRecorderRef.current.stop();
       setRecordingField(null);
@@ -254,10 +288,6 @@ export default function MentoringVisitForm({ onClose }: Props) {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
-      }
-      
-      if (recognitionRef.current) {
-        try { recognitionRef.current.stop(); } catch (e) {}
       }
     }
   };
