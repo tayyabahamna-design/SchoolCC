@@ -37,6 +37,12 @@ import AEOUserManagement from "@/pages/AEOUserManagement";
 import HeadTeacherUserManagement from "@/pages/HeadTeacherUserManagement";
 import SchoolManagement from "@/pages/SchoolManagement";
 import DataExport from "@/pages/DataExport";
+import AEOActivityHub from "@/pages/AEOActivityHub";
+import AEOActivityLogs from "@/pages/AEOActivityLogs";
+import MonitoringVisitForm from "@/pages/MonitoringVisitForm";
+import MentoringVisitForm from "@/pages/MentoringVisitForm";
+import OfficeVisitForm from "@/pages/OfficeVisitForm";
+import OtherActivityForm from "@/pages/OtherActivityForm";
 import NotFound from "@/pages/not-found";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
@@ -96,6 +102,12 @@ function Router() {
         <Route path="/headteacher-user-management" component={HeadTeacherUserManagement} />
         <Route path="/school-management" component={SchoolManagement} />
         <Route path="/data-export" component={DataExport} />
+        <Route path="/aeo-activity" component={AEOActivityHub} />
+        <Route path="/aeo-activity/logs" component={AEOActivityLogs} />
+        <Route path="/aeo-activity/monitoring" component={MonitoringVisitForm} />
+        <Route path="/aeo-activity/mentoring" component={MentoringVisitForm} />
+        <Route path="/aeo-activity/office" component={OfficeVisitForm} />
+        <Route path="/aeo-activity/other-activity" component={OtherActivityForm} />
         {/* Fallback to 404 */}
         <Route component={NotFound} />
       </Switch>
