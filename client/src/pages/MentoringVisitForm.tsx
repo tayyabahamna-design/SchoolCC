@@ -1,13 +1,20 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, ArrowRight, Check, Upload, Trash2, CheckCircle2, Mic, Square, Play, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Upload, Trash2, CheckCircle2, Mic, Square, Play, Pause, X, Loader2 } from 'lucide-react';
 import { useActivities, MentoringVisitData, MENTORING_AREAS } from '@/contexts/activities';
 import { toast } from 'sonner';
 import { realSchools } from '@/data/realData';
 import { analytics } from '@/lib/analytics';
+
+interface VoiceNoteData {
+  blob: Blob;
+  url: string;
+  duration: number;
+  transcription?: string;
+}
 
 const getAllSchools = () => realSchools.map(school => `${school.name.toUpperCase()} (${school.emisNumber})`);
 
@@ -72,7 +79,29 @@ export default function MentoringVisitForm({ onClose }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
   const [recordingField, setRecordingField] = useState<string | null>(null);
-  const [recordedVoiceNotes, setRecordedVoiceNotes] = useState<Record<string, string>>({});
+  const [voiceNotes, setVoiceNotes] = useState<Record<string, VoiceNoteData>>({});
+  const [playingField, setPlayingField] = useState<string | null>(null);
+  const [isTranscribing, setIsTranscribing] = useState<string | null>(null);
+  const [recordingTime, setRecordingTime] = useState(0);
+  
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioElementsRef = useRef<Record<string, HTMLAudioElement>>({});
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const recognitionRef = useRef<any>(null);
+  const transcriptRef = useRef<string>('');
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch (e) {}
+      }
+      Object.values(voiceNotes).forEach(note => {
+        if (note.url) URL.revokeObjectURL(note.url);
+      });
+    };
+  }, []);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -121,25 +150,218 @@ export default function MentoringVisitForm({ onClose }: Props) {
     });
   };
 
-  const toggleVoiceRecording = (fieldId: string) => {
-    if (recordingField === fieldId) {
-      setRecordingField(null);
-      setRecordedVoiceNotes((prev) => ({
-        ...prev,
-        [fieldId]: `voice_${Date.now()}`,
-      }));
-    } else {
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const startRecording = async (fieldId: string) => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      transcriptRef.current = '';
+      setRecordingTime(0);
+      
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+      
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        
+        setVoiceNotes(prev => ({
+          ...prev,
+          [fieldId]: {
+            blob,
+            url,
+            duration: recordingTime,
+            transcription: transcriptRef.current || undefined,
+          }
+        }));
+        
+        stream.getTracks().forEach(track => track.stop());
+        toast.success('Voice note recorded');
+      };
+      
+      mediaRecorder.start();
       setRecordingField(fieldId);
+      
+      timerRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+      
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognitionRef.current = recognition;
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        
+        recognition.onresult = (event: any) => {
+          let finalTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript + ' ';
+            }
+          }
+          if (finalTranscript) {
+            transcriptRef.current += finalTranscript;
+          }
+        };
+        
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+        };
+        
+        recognition.start();
+      }
+      
+      toast.success('Recording started - speak now');
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      toast.error('Could not access microphone. Please check permissions.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && recordingField) {
+      mediaRecorderRef.current.stop();
+      setRecordingField(null);
+      
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch (e) {}
+      }
+    }
+  };
+
+  const toggleVoiceRecording = async (fieldId: string) => {
+    if (recordingField === fieldId) {
+      stopRecording();
+    } else {
+      if (recordingField) {
+        stopRecording();
+      }
+      await startRecording(fieldId);
+    }
+  };
+
+  const playVoiceNote = (fieldId: string) => {
+    const voiceNote = voiceNotes[fieldId];
+    if (!voiceNote) return;
+    
+    if (playingField === fieldId && audioElementsRef.current[fieldId]) {
+      audioElementsRef.current[fieldId].pause();
+      setPlayingField(null);
+    } else {
+      Object.keys(audioElementsRef.current).forEach(key => {
+        if (audioElementsRef.current[key]) {
+          audioElementsRef.current[key].pause();
+        }
+      });
+      
+      if (!audioElementsRef.current[fieldId]) {
+        audioElementsRef.current[fieldId] = new Audio(voiceNote.url);
+        audioElementsRef.current[fieldId].onended = () => setPlayingField(null);
+      }
+      
+      audioElementsRef.current[fieldId].play();
+      setPlayingField(fieldId);
+    }
+  };
+
+  const transcribeVoiceNote = async (fieldId: string) => {
+    const voiceNote = voiceNotes[fieldId];
+    if (!voiceNote || voiceNote.transcription) return;
+    
+    setIsTranscribing(fieldId);
+    
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      toast.info('Transcription was captured during recording. Playing audio to re-transcribe...');
+      
+      const audioContext = new AudioContext();
+      const arrayBuffer = await voiceNote.blob.arrayBuffer();
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      
+      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      let transcript = '';
+      recognition.onresult = (event: any) => {
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            transcript += event.results[i][0].transcript + ' ';
+          }
+        }
+      };
+      
+      recognition.onend = () => {
+        setVoiceNotes(prev => ({
+          ...prev,
+          [fieldId]: { ...prev[fieldId], transcription: transcript.trim() || 'Could not transcribe audio' }
+        }));
+        setIsTranscribing(null);
+        if (transcript.trim()) {
+          toast.success('Transcription complete');
+        }
+      };
+      
+      recognition.onerror = () => {
+        setIsTranscribing(null);
+        toast.error('Transcription failed');
+      };
+      
+      setTimeout(() => {
+        recognition.stop();
+      }, (audioBuffer.duration * 1000) + 2000);
+      
+      recognition.start();
+    } else {
+      setIsTranscribing(null);
+      toast.error('Speech recognition not supported in this browser. Use Chrome or Edge.');
+    }
+  };
+
+  const useTranscription = (fieldId: string, targetField: string) => {
+    const voiceNote = voiceNotes[fieldId];
+    if (voiceNote?.transcription) {
+      const currentValue = formData[targetField as keyof typeof formData] || '';
+      handleInputChange(targetField, currentValue ? `${currentValue}\n${voiceNote.transcription}` : voiceNote.transcription);
+      toast.success('Transcription added to text field');
     }
   };
 
   const deleteVoiceNote = (fieldId: string) => {
-    setRecordedVoiceNotes((prev) => {
+    const voiceNote = voiceNotes[fieldId];
+    if (voiceNote?.url) {
+      URL.revokeObjectURL(voiceNote.url);
+    }
+    if (audioElementsRef.current[fieldId]) {
+      audioElementsRef.current[fieldId].pause();
+      delete audioElementsRef.current[fieldId];
+    }
+    setVoiceNotes(prev => {
       const updated = { ...prev };
       delete updated[fieldId];
       return updated;
     });
     setRecordingField(null);
+    setPlayingField(null);
+    toast.info('Voice note deleted');
   };
 
   const validateCurrentStep = (): boolean => {
@@ -506,17 +728,17 @@ export default function MentoringVisitForm({ onClose }: Props) {
                   <Mic className="w-4 h-4" />
                 )}
               </Button>
-              {recordedVoiceNotes['strengths'] && (
+              {voiceNotes['strengths'] && (
                 <>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    disabled
+                    onClick={() => playVoiceNote('strengths')}
                     data-testid="button-play-strengths"
-                    title="Voice note recorded"
+                    title={playingField === 'strengths' ? 'Pause' : 'Play voice note'}
                   >
-                    <Play className="w-4 h-4" />
+                    {playingField === 'strengths' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                   </Button>
                   <Button
                     type="button"
@@ -536,11 +758,41 @@ export default function MentoringVisitForm({ onClose }: Props) {
           {recordingField === 'strengths' && (
             <div className="flex items-center gap-2 mt-2 px-2 py-1 bg-red-100 dark:bg-red-900/50 rounded w-fit text-xs">
               <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-              <span className="text-red-700 dark:text-red-400 font-medium">Recording...</span>
+              <span className="text-red-700 dark:text-red-400 font-medium">Recording... {formatTime(recordingTime)}</span>
             </div>
           )}
-          {recordedVoiceNotes['strengths'] && recordingField !== 'strengths' && (
-            <div className="text-xs text-green-600 font-medium mt-2">✓ Voice note recorded</div>
+          {voiceNotes['strengths'] && recordingField !== 'strengths' && (
+            <div className="mt-2 p-3 bg-muted/50 rounded-lg border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-green-600 font-medium">✓ Voice note recorded ({formatTime(voiceNotes['strengths'].duration)})</span>
+                {!voiceNotes['strengths'].transcription && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => transcribeVoiceNote('strengths')}
+                    disabled={isTranscribing === 'strengths'}
+                    className="text-xs h-7"
+                  >
+                    {isTranscribing === 'strengths' ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+                    Transcribe
+                  </Button>
+                )}
+              </div>
+              {voiceNotes['strengths'].transcription && (
+                <div className="space-y-2">
+                  <p className="text-sm text-foreground bg-background p-2 rounded border">{voiceNotes['strengths'].transcription}</p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => useTranscription('strengths', 'strengthsObserved')}
+                    className="text-xs h-7"
+                  >
+                    Use in Text Field
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -572,17 +824,17 @@ export default function MentoringVisitForm({ onClose }: Props) {
                   <Mic className="w-4 h-4" />
                 )}
               </Button>
-              {recordedVoiceNotes['improvements'] && (
+              {voiceNotes['improvements'] && (
                 <>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    disabled
+                    onClick={() => playVoiceNote('improvements')}
                     data-testid="button-play-improvements"
-                    title="Voice note recorded"
+                    title={playingField === 'improvements' ? 'Pause' : 'Play voice note'}
                   >
-                    <Play className="w-4 h-4" />
+                    {playingField === 'improvements' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                   </Button>
                   <Button
                     type="button"
@@ -602,11 +854,26 @@ export default function MentoringVisitForm({ onClose }: Props) {
           {recordingField === 'improvements' && (
             <div className="flex items-center gap-2 mt-2 px-2 py-1 bg-red-100 dark:bg-red-900/50 rounded w-fit text-xs">
               <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-              <span className="text-red-700 dark:text-red-400 font-medium">Recording...</span>
+              <span className="text-red-700 dark:text-red-400 font-medium">Recording... {formatTime(recordingTime)}</span>
             </div>
           )}
-          {recordedVoiceNotes['improvements'] && recordingField !== 'improvements' && (
-            <div className="text-xs text-green-600 font-medium mt-2">✓ Voice note recorded</div>
+          {voiceNotes['improvements'] && recordingField !== 'improvements' && (
+            <div className="mt-2 p-3 bg-muted/50 rounded-lg border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-green-600 font-medium">✓ Voice note recorded ({formatTime(voiceNotes['improvements'].duration)})</span>
+                {!voiceNotes['improvements'].transcription && (
+                  <Button type="button" variant="outline" size="sm" onClick={() => transcribeVoiceNote('improvements')} disabled={isTranscribing === 'improvements'} className="text-xs h-7">
+                    {isTranscribing === 'improvements' ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}Transcribe
+                  </Button>
+                )}
+              </div>
+              {voiceNotes['improvements'].transcription && (
+                <div className="space-y-2">
+                  <p className="text-sm text-foreground bg-background p-2 rounded border">{voiceNotes['improvements'].transcription}</p>
+                  <Button type="button" size="sm" onClick={() => useTranscription('improvements', 'areasForImprovement')} className="text-xs h-7">Use in Text Field</Button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -638,17 +905,17 @@ export default function MentoringVisitForm({ onClose }: Props) {
                   <Mic className="w-4 h-4" />
                 )}
               </Button>
-              {recordedVoiceNotes['actions'] && (
+              {voiceNotes['actions'] && (
                 <>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    disabled
+                    onClick={() => playVoiceNote('actions')}
                     data-testid="button-play-actions"
-                    title="Voice note recorded"
+                    title={playingField === 'actions' ? 'Pause' : 'Play voice note'}
                   >
-                    <Play className="w-4 h-4" />
+                    {playingField === 'actions' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                   </Button>
                   <Button
                     type="button"
@@ -668,11 +935,26 @@ export default function MentoringVisitForm({ onClose }: Props) {
           {recordingField === 'actions' && (
             <div className="flex items-center gap-2 mt-2 px-2 py-1 bg-red-100 dark:bg-red-900/50 rounded w-fit text-xs">
               <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-              <span className="text-red-700 dark:text-red-400 font-medium">Recording...</span>
+              <span className="text-red-700 dark:text-red-400 font-medium">Recording... {formatTime(recordingTime)}</span>
             </div>
           )}
-          {recordedVoiceNotes['actions'] && recordingField !== 'actions' && (
-            <div className="text-xs text-green-600 font-medium mt-2">✓ Voice note recorded</div>
+          {voiceNotes['actions'] && recordingField !== 'actions' && (
+            <div className="mt-2 p-3 bg-muted/50 rounded-lg border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-green-600 font-medium">✓ Voice note recorded ({formatTime(voiceNotes['actions'].duration)})</span>
+                {!voiceNotes['actions'].transcription && (
+                  <Button type="button" variant="outline" size="sm" onClick={() => transcribeVoiceNote('actions')} disabled={isTranscribing === 'actions'} className="text-xs h-7">
+                    {isTranscribing === 'actions' ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}Transcribe
+                  </Button>
+                )}
+              </div>
+              {voiceNotes['actions'].transcription && (
+                <div className="space-y-2">
+                  <p className="text-sm text-foreground bg-background p-2 rounded border">{voiceNotes['actions'].transcription}</p>
+                  <Button type="button" size="sm" onClick={() => useTranscription('actions', 'actionItems')} className="text-xs h-7">Use in Text Field</Button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -704,17 +986,17 @@ export default function MentoringVisitForm({ onClose }: Props) {
                   <Mic className="w-4 h-4" />
                 )}
               </Button>
-              {recordedVoiceNotes['feedback'] && (
+              {voiceNotes['feedback'] && (
                 <>
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    disabled
+                    onClick={() => playVoiceNote('feedback')}
                     data-testid="button-play-feedback"
-                    title="Voice note recorded"
+                    title={playingField === 'feedback' ? 'Pause' : 'Play voice note'}
                   >
-                    <Play className="w-4 h-4" />
+                    {playingField === 'feedback' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                   </Button>
                   <Button
                     type="button"
@@ -734,11 +1016,26 @@ export default function MentoringVisitForm({ onClose }: Props) {
           {recordingField === 'feedback' && (
             <div className="flex items-center gap-2 mt-2 px-2 py-1 bg-red-100 dark:bg-red-900/50 rounded w-fit text-xs">
               <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-              <span className="text-red-700 dark:text-red-400 font-medium">Recording...</span>
+              <span className="text-red-700 dark:text-red-400 font-medium">Recording... {formatTime(recordingTime)}</span>
             </div>
           )}
-          {recordedVoiceNotes['feedback'] && recordingField !== 'feedback' && (
-            <div className="text-xs text-green-600 font-medium mt-2">✓ Voice note recorded</div>
+          {voiceNotes['feedback'] && recordingField !== 'feedback' && (
+            <div className="mt-2 p-3 bg-muted/50 rounded-lg border border-border">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-green-600 font-medium">✓ Voice note recorded ({formatTime(voiceNotes['feedback'].duration)})</span>
+                {!voiceNotes['feedback'].transcription && (
+                  <Button type="button" variant="outline" size="sm" onClick={() => transcribeVoiceNote('feedback')} disabled={isTranscribing === 'feedback'} className="text-xs h-7">
+                    {isTranscribing === 'feedback' ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}Transcribe
+                  </Button>
+                )}
+              </div>
+              {voiceNotes['feedback'].transcription && (
+                <div className="space-y-2">
+                  <p className="text-sm text-foreground bg-background p-2 rounded border">{voiceNotes['feedback'].transcription}</p>
+                  <Button type="button" size="sm" onClick={() => useTranscription('feedback', 'generalFeedback')} className="text-xs h-7">Use in Text Field</Button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
