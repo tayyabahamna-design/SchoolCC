@@ -23,6 +23,7 @@ export default function CreateActivity() {
 
   const [title, setTitle] = useState('');
   const [photos, setPhotos] = useState<{ id: string; url: string; fileName: string; caption: string; preview: string }[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!user) return null;
 
@@ -70,8 +71,10 @@ export default function CreateActivity() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!userSchoolId || !title.trim() || photos.length === 0) return;
 
+    setIsSubmitting(true);
     try {
       const photosForActivity = photos.map((p) => ({
         url: p.preview,
@@ -95,6 +98,8 @@ export default function CreateActivity() {
     } catch (error) {
       console.error('Error creating activity:', error);
       toast.error('Failed to create activity');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -202,10 +207,10 @@ export default function CreateActivity() {
           <div className="flex gap-2">
             <Button 
               type="submit" 
-              disabled={isCreating || !title.trim() || photos.length === 0} 
+              disabled={isCreating || isSubmitting || !title.trim() || photos.length === 0} 
               data-testid="button-create-activity"
             >
-              {isCreating ? 'Posting...' : 'Post to Community'}
+              {isCreating || isSubmitting ? 'Creating...' : 'Create Activity'}
             </Button>
             <Button
               type="button"

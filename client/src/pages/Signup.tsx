@@ -114,6 +114,7 @@ const SCHOOL_NAMES = ALL_SCHOOLS.map(s => s.name);
 export default function Signup() {
   const [, navigate] = useLocation();
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -157,6 +158,7 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setError('');
     setLoading(true);
 
@@ -201,6 +203,7 @@ export default function Signup() {
     }
 
     try {
+      setIsSubmitting(true);
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -232,6 +235,7 @@ export default function Signup() {
       setError(err.message || 'Failed to create account');
       analytics.error.formValidationError('signup', ['submission']);
     } finally {
+      setIsSubmitting(false);
       setLoading(false);
     }
   };
@@ -574,11 +578,11 @@ export default function Signup() {
             <div data-guide="submit-button">
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || isSubmitting}
                 className="w-full"
                 data-testid="button-submit"
               >
-                {loading ? 'Submitting...' : 'Submit Account Request'}
+                {isSubmitting ? 'Signing Up...' : 'Create Account'}
               </Button>
             </div>
           </form>

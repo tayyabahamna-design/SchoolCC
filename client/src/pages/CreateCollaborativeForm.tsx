@@ -20,6 +20,7 @@ export default function CreateCollaborativeForm() {
   const [description, setDescription] = useState('');
   const [fields, setFields] = useState<Array<{ id: string; name: string; type: string; required: boolean }>>([]);
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!user) return null;
 
@@ -45,13 +46,20 @@ export default function CreateCollaborativeForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!title.trim() || fields.length === 0) return;
 
     setLoading(true);
-    setTimeout(() => {
-      createForm(userSchool.id, userSchool.name, title, description, fields as any, user.id, user.name);
-      navigate('/collaborative-forms');
-    }, 500);
+    setIsSubmitting(true);
+    try {
+      setTimeout(() => {
+        createForm(userSchool.id, userSchool.name, title, description, fields as any, user.id, user.name);
+        navigate('/collaborative-forms');
+      }, 500);
+    } finally {
+      setLoading(false);
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -186,10 +194,10 @@ export default function CreateCollaborativeForm() {
             </Button>
             <Button
               type="submit"
-              disabled={!title.trim() || fields.length === 0 || loading}
+              disabled={!title.trim() || fields.length === 0 || loading || isSubmitting}
               data-testid="button-create"
             >
-              {loading ? 'Creating...' : 'Create Form'}
+              {loading || isSubmitting ? 'Creating...' : 'Create Form'}
             </Button>
           </div>
         </form>

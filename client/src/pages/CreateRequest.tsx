@@ -45,6 +45,7 @@ export default function CreateRequest() {
   const [recordedVoiceNotes, setRecordedVoiceNotes] = useState<Record<string, boolean>>({});
   const [allUsers, setAllUsers] = useState<UserOption[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch all users from the database
   useEffect(() => {
@@ -154,10 +155,11 @@ export default function CreateRequest() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || fields.length === 0 || selectedAssignees.length === 0) {
+    if (!title.trim() || fields.length === 0 || selectedAssignees.length === 0 || isSubmitting) {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       // Get description voice note data if it exists
       const descriptionVoice = recordedVoiceNotes['description'] && hasRecording('description');
@@ -228,6 +230,8 @@ export default function CreateRequest() {
       navigate('/data-requests');
     } catch (error) {
       console.error('Error creating request:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -527,10 +531,10 @@ export default function CreateRequest() {
             </Button>
             <Button
               type="submit"
-              disabled={!title.trim() || fields.length === 0 || selectedAssignees.length === 0}
+              disabled={!title.trim() || fields.length === 0 || selectedAssignees.length === 0 || isSubmitting}
               data-testid="button-create"
             >
-              Create Request
+              {isSubmitting ? 'Creating...' : 'Create Request'}
             </Button>
           </div>
         </form>

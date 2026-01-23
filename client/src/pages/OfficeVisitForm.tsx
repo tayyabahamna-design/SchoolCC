@@ -48,6 +48,7 @@ export default function OfficeVisitForm({ onClose }: Props) {
 
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -116,7 +117,9 @@ export default function OfficeVisitForm({ onClose }: Props) {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     setLoading(true);
+    setIsSubmitting(true);
     try {
       const { id: _, ...dataWithoutId } = formData;
       const evidence = uploadedFiles.map((f) => ({
@@ -148,6 +151,7 @@ export default function OfficeVisitForm({ onClose }: Props) {
       console.error('Error submitting office visit:', error);
     } finally {
       setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -438,14 +442,14 @@ export default function OfficeVisitForm({ onClose }: Props) {
         {isLastStep ? (
           <Button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || isSubmitting}
             className="flex-1 bg-emerald-600 hover:bg-emerald-700"
             data-testid="button-submit"
           >
-            {loading ? 'Submitting...' : (
+            {loading || isSubmitting ? 'Submitting...' : (
               <>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                Submit
+                Submit Visit
               </>
             )}
           </Button>

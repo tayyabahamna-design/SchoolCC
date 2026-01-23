@@ -79,6 +79,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
 
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [voiceNoteTranscription, setVoiceNoteTranscription] = useState<string>('');
   const [voiceNoteBlob, setVoiceNoteBlob] = useState<Blob | null>(null);
 
@@ -150,8 +151,10 @@ export default function MonitoringVisitForm({ onClose }: Props) {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     setLoading(true);
     try {
+      setIsSubmitting(true);
       const { id: _, ...dataWithoutId } = formData;
       const evidence = uploadedFiles.map((f) => ({
         id: f.id,
@@ -185,6 +188,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
     } catch (error) {
       console.error('Error submitting monitoring visit:', error);
     } finally {
+      setIsSubmitting(false);
       setLoading(false);
     }
   };
@@ -791,14 +795,14 @@ export default function MonitoringVisitForm({ onClose }: Props) {
         ) : (
           <Button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || isSubmitting}
             className="flex-1 bg-green-600 hover:bg-green-700"
             data-testid="button-submit"
           >
-            {loading ? 'Submitting...' : (
+            {isSubmitting ? 'Submitting...' : (
               <>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                Submit Monitoring Visit
+                Submit
               </>
             )}
           </Button>

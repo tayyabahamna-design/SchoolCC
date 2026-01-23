@@ -24,6 +24,7 @@ export default function CreateVisit() {
   const [classesToObserve, setClassesToObserve] = useState<string[]>([]);
   const [currentClass, setCurrentClass] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!user) return null;
 
@@ -46,23 +47,28 @@ export default function CreateVisit() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedSchool || !objectives.trim()) return;
+    if (!selectedSchool || !objectives.trim() || isSubmitting) return;
 
     setLoading(true);
+    setIsSubmitting(true);
     setTimeout(() => {
-      const school = SCHOOLS.find((s) => s.id === selectedSchool);
-      if (school) {
-        const newVisit = createVisit(
-          selectedSchool,
-          school.name,
-          visitType,
-          objectives,
-          visitType === 'mentoring' ? classesToObserve : undefined,
-          user.id,
-          user.name,
-          user.role
-        );
-        navigate(`/visit/${newVisit.id}`);
+      try {
+        const school = SCHOOLS.find((s) => s.id === selectedSchool);
+        if (school) {
+          const newVisit = createVisit(
+            selectedSchool,
+            school.name,
+            visitType,
+            objectives,
+            visitType === 'mentoring' ? classesToObserve : undefined,
+            user.id,
+            user.name,
+            user.role
+          );
+          navigate(`/visit/${newVisit.id}`);
+        }
+      } finally {
+        setIsSubmitting(false);
       }
     }, 500);
   };
@@ -232,10 +238,10 @@ export default function CreateVisit() {
             </Button>
             <Button
               type="submit"
-              disabled={!selectedSchool || !objectives.trim() || loading}
+              disabled={!selectedSchool || !objectives.trim() || loading || isSubmitting}
               data-testid="button-start-visit"
             >
-              {loading ? 'Starting...' : 'Plan Visit'}
+              {isSubmitting ? 'Creating...' : 'Start Visit'}
             </Button>
           </div>
         </form>

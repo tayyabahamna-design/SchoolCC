@@ -69,6 +69,7 @@ export default function MentoringVisitForm({ onClose }: Props) {
 
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [recordingField, setRecordingField] = useState<string | null>(null);
   const [recordedVoiceNotes, setRecordedVoiceNotes] = useState<Record<string, string>>({});
 
@@ -160,8 +161,10 @@ export default function MentoringVisitForm({ onClose }: Props) {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     setLoading(true);
     try {
+      setIsSubmitting(true);
       const evidence = uploadedFiles.map((f) => ({
         id: f.id,
         name: f.name,
@@ -199,6 +202,7 @@ export default function MentoringVisitForm({ onClose }: Props) {
     } catch (error) {
       console.error('Error submitting mentoring visit:', error);
     } finally {
+      setIsSubmitting(false);
       setLoading(false);
     }
   };
@@ -836,11 +840,11 @@ export default function MentoringVisitForm({ onClose }: Props) {
         {isLastStep ? (
           <Button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || isSubmitting}
             className="flex-1 bg-purple-600 hover:bg-purple-700"
             data-testid="button-submit"
           >
-            {loading ? 'Submitting...' : (
+            {isSubmitting ? 'Submitting...' : (
               <>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
                 Submit
