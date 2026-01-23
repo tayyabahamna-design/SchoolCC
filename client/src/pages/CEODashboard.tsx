@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, ChevronRight, Download, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User, Menu, BarChart3, Settings, Home, ImageIcon, MapPin } from 'lucide-react';
+import { LogOut, ChevronRight, Download, Users, Building2, AlertCircle, TrendingUp, CheckCircle, Clock, Plus, FileText, User, Menu, BarChart3, Settings, Home, ImageIcon, MapPin, X, Calendar, MessageSquare, HelpCircle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -59,6 +59,7 @@ export default function CEODashboard() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [selectedExportFormat, setSelectedExportFormat] = useState<'sheets' | 'docs' | ''>('');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
   if (!user || user.role !== 'CEO') {
     navigate('/');
@@ -347,9 +348,164 @@ export default function CEODashboard() {
   }, [getAllSchools]);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-card border-r border-border transition-all duration-300 flex flex-col`}>
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Mobile Sidebar Overlay */}
+      {showMobileSidebar && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowMobileSidebar(false)}
+          />
+          <aside className="absolute left-0 top-0 h-full w-72 bg-card/95 dark:bg-card backdrop-blur-xl border-r border-border animate-slideInLeft overflow-y-auto flex flex-col">
+            {/* Mobile Sidebar Header */}
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-12 h-12" />
+                <div>
+                  <h1 className="text-lg font-bold gradient-text-gold">TaleemHub</h1>
+                  <p className="text-xs text-muted-foreground">CEO</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowMobileSidebar(false)}
+                className="rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            {/* User Profile Section */}
+            <div className="p-4 border-b border-border/50">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center ring-2 ring-primary/30 ring-offset-2 ring-offset-background shadow-lg">
+                    <span className="text-lg font-bold text-primary-foreground">
+                      {user.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground text-sm truncate">{user.name}</h3>
+                  <p className="text-xs text-muted-foreground">CEO</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Sidebar Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Quick Actions</p>
+              <nav className="space-y-2">
+                <button
+                  onClick={() => { navigate('/data-requests'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-violet-100/80 dark:hover:bg-violet-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-400 to-violet-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Data Requests</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/user-management'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-orange-100/80 dark:hover:bg-orange-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">User Management</span>
+                </button>
+                
+                <div className="pt-4 pb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Navigate</p>
+                </div>
+                
+                <button
+                  onClick={() => { navigate('/calendar'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <Calendar className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Leave Calendar</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/community-album'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-pink-100/80 dark:hover:bg-pink-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <ImageIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Community Album</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/school-data'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <Building2 className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">School Inventory</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/school-visits'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-rose-100/80 dark:hover:bg-rose-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-rose-400 to-rose-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <MapPin className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">School Visits</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/queries'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-purple-100/80 dark:hover:bg-purple-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <MessageSquare className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Queries</span>
+                </button>
+                
+                <div className="pt-4 pb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Support</p>
+                </div>
+                
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('openHelpGuide'));
+                    setShowMobileSidebar(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300 animate-pulse">
+                    <HelpCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Help Guide</span>
+                </button>
+              </nav>
+            </div>
+
+            {/* Mobile Sidebar Footer */}
+            <div className="p-4 border-t border-border">
+              <Button
+                variant="outline"
+                className="w-full justify-start rounded-xl hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-600 hover:border-red-200 dark:hover:border-red-800 transition-all duration-300"
+                onClick={() => {
+                  logout();
+                  navigate('/');
+                }}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </Button>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* Desktop Sidebar */}
+      <div className={`hidden lg:flex ${sidebarOpen ? 'w-64' : 'w-20'} bg-card border-r border-border transition-all duration-300 flex-col`}>
         <div className="p-6 border-b border-slate-200">
           <div className="flex items-center justify-between">
             {sidebarOpen && <h2 className="font-bold text-xl gradient-text">SchoolCC</h2>}
@@ -448,8 +604,32 @@ export default function CEODashboard() {
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        {/* Header */}
-        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-slate-200">
+        {/* Mobile Header */}
+        <div className="lg:hidden bg-card/95 dark:bg-card backdrop-blur-xl border-b border-border sticky top-0 z-40">
+          <div className="px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowMobileSidebar(true)}
+                className="rounded-full"
+              >
+                <Menu className="w-6 h-6" />
+              </Button>
+              <div>
+                <h1 className="text-lg font-bold gradient-text-gold">TaleemHub</h1>
+                <p className="text-xs text-muted-foreground">{user.name}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <ThemeToggle />
+              <NotificationBell />
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Header */}
+        <div className="hidden lg:block sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-gray-700">
           <div className="px-8 py-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-12 h-12" />

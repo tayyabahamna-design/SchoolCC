@@ -528,155 +528,160 @@ export default function DEODashboard() {
 
       {/* Menu Sidebar Overlay */}
       {showMenuSidebar && (
-        <>
+        <div className="fixed inset-0 z-50">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-in fade-in duration-300"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowMenuSidebar(false)}
           />
 
           {/* Sidebar */}
-          <div className="fixed left-0 top-0 h-full w-80 bg-white dark:bg-gray-800 shadow-2xl z-50 overflow-y-auto animate-in slide-in-from-left duration-300">
+          <aside className="absolute left-0 top-0 h-full w-72 bg-card/95 dark:bg-card backdrop-blur-xl border-r border-border animate-slideInLeft overflow-y-auto flex flex-col">
             {/* Sidebar Header */}
-            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 z-10">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Quick Access Menu</h2>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowMenuSidebar(false)}
-                  className="rounded-full"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
+            <div className="p-4 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-12 h-12" />
+                <div>
+                  <h1 className="text-lg font-bold gradient-text-gold">TaleemHub</h1>
+                  <p className="text-xs text-muted-foreground">{user?.role?.replace(/_/g, ' ')}</p>
+                </div>
               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowMenuSidebar(false)}
+                className="rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
 
-              {/* Search Bar */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search features..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-full"
-                />
+            {/* User Profile Section */}
+            <div className="p-4 border-b border-border/50">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center ring-2 ring-primary/30 ring-offset-2 ring-offset-background shadow-lg">
+                    <span className="text-lg font-bold text-primary-foreground">
+                      {user?.name?.charAt(0).toUpperCase() || 'D'}
+                    </span>
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground text-sm truncate">{user?.name || 'DEO'}</h3>
+                  <p className="text-xs text-muted-foreground">{user?.role?.replace(/_/g, ' ')}</p>
+                </div>
               </div>
             </div>
 
-            {/* Menu Items - Grouped */}
-            <div className="p-4 space-y-4">
-              {searchQuery ? (
-                filteredMenuItems.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p>No features found</p>
-                    <p className="text-sm mt-1">Try a different search term</p>
+            {/* Sidebar Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Quick Actions</p>
+              <nav className="space-y-2">
+                <button
+                  onClick={() => { navigate('/data-requests'); setShowMenuSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-violet-100/80 dark:hover:bg-violet-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-400 to-violet-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <FileText className="w-5 h-5 text-white" />
                   </div>
-                ) : (
-                  <div className="space-y-2">
-                    {filteredMenuItems.map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <button
-                          key={item.id}
-                          onClick={item.action}
-                          className="w-full flex items-start gap-3 p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 group text-left"
-                        >
-                          <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center shadow-md flex-shrink-0 group-hover:scale-110 transition-transform duration-200`}>
-                            <Icon className="w-5 h-5 text-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="font-semibold text-gray-900 dark:text-white text-sm">{item.label}</p>
-                              {item.badge !== undefined && (
-                                <Badge className="text-xs">{String(item.badge)}</Badge>
-                              )}
-                              {item.live && (
-                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                              )}
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </button>
-                      );
-                    })}
+                  <span className="font-medium text-foreground">Data Requests</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/user-management'); setShowMenuSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-orange-100/80 dark:hover:bg-orange-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <Users className="w-5 h-5 text-white" />
                   </div>
-                )
-              ) : (
-                menuCategories.map((category) => {
-                  const CategoryIcon = category.icon;
-                  const isExpanded = expandedCategories.includes(category.category);
-                  return (
-                    <div key={category.category} className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-                      <button
-                        onClick={() => toggleCategory(category.category)}
-                        className={`w-full flex items-center gap-3 p-3 bg-gradient-to-r ${category.color} text-white hover:opacity-90 transition-all duration-200`}
-                      >
-                        <CategoryIcon className="w-5 h-5" />
-                        <span className="font-semibold flex-1 text-left">{category.category}</span>
-                        <Badge className="bg-white/20 text-white">{category.items.length}</Badge>
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-0' : '-rotate-90'}`} />
-                      </button>
-                      {isExpanded && (
-                        <div className="p-2 space-y-1 bg-gray-50 dark:bg-gray-800/50">
-                          {category.items.map((item) => {
-                            const Icon = item.icon;
-                            return (
-                              <button
-                                key={item.id}
-                                onClick={item.action}
-                                className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-white dark:hover:bg-gray-700 transition-all duration-200 group text-left"
-                              >
-                                <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${item.color} flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-110 transition-transform duration-200`}>
-                                  <Icon className="w-4 h-4 text-white" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2">
-                                    <p className="font-medium text-gray-900 dark:text-white text-sm">{item.label}</p>
-                                    {item.badge !== undefined && (
-                                      <Badge variant="secondary" className="text-xs h-5">{item.badge}</Badge>
-                                    )}
-                                    {item.live && (
-                                      <div className="flex items-center gap-1">
-                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-xs text-green-600 font-medium">Live</span>
-                                      </div>
-                                    )}
-                                    {item.alert && (
-                                      <AlertCircle className="w-4 h-4 text-red-500" />
-                                    )}
-                                  </div>
-                                  <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
-                                </div>
-                                <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
+                  <span className="font-medium text-foreground">User Management</span>
+                </button>
+                
+                <div className="pt-4 pb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Navigate</p>
+                </div>
+                
+                <button
+                  onClick={() => { navigate('/calendar'); setShowMenuSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <Calendar className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Leave Calendar</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/community-album'); setShowMenuSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-pink-100/80 dark:hover:bg-pink-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <Image className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Community Album</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/school-data'); setShowMenuSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <Building2 className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">School Inventory</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/school-visits'); setShowMenuSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-rose-100/80 dark:hover:bg-rose-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-rose-400 to-rose-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <MapPin className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">School Visits</span>
+                </button>
+                <button
+                  onClick={() => { navigate('/queries'); setShowMenuSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-purple-100/80 dark:hover:bg-purple-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <MessageSquare className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Queries</span>
+                </button>
+                
+                <div className="pt-4 pb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Support</p>
+                </div>
+                
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('openHelpGuide'));
+                    setShowMenuSidebar(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300 animate-pulse">
+                    <AlertCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Help Guide</span>
+                </button>
+              </nav>
             </div>
 
             {/* Sidebar Footer */}
-            <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
+            <div className="p-4 border-t border-border">
               <Button
                 variant="outline"
-                className="w-full justify-start rounded-xl hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300"
+                className="w-full justify-start rounded-xl hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-600 hover:border-red-200 dark:hover:border-red-800 transition-all duration-300"
                 onClick={() => {
                   logout();
                   navigate('/');
                 }}
               >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
               </Button>
             </div>
-          </div>
-        </>
+          </aside>
+        </div>
       )}
 
       {/* Main Content */}
