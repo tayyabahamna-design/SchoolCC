@@ -949,10 +949,11 @@ export async function registerRoutes(
         filteredUsers = allPendingUsers.filter(u => {
           if (u.role !== 'HEAD_TEACHER' && u.role !== 'TEACHER') return false;
 
-          // Check if user is in AEO's cluster or assigned schools
+          // Check if user is in AEO's cluster or assigned schools (case-insensitive)
           const inCluster = u.clusterId && u.clusterId === user.clusterId;
-          const inAssignedSchool = u.schoolName && user.assignedSchools &&
-                                   user.assignedSchools.includes(u.schoolName);
+          const userSchoolNameLower = u.schoolName?.toLowerCase() || '';
+          const inAssignedSchool = userSchoolNameLower && user.assignedSchools &&
+                                   user.assignedSchools.some((s: string) => s.toLowerCase() === userSchoolNameLower);
 
           return inCluster || inAssignedSchool;
         });
