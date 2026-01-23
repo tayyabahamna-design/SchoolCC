@@ -345,6 +345,7 @@ export default function MentoringVisitForm({ onClose }: Props) {
             value={formData.arrivalTime || ''}
             onChange={(e) => handleInputChange('arrivalTime', e.target.value)}
             data-testid="input-arrival-time"
+            className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
         </div>
         <div>
@@ -354,6 +355,7 @@ export default function MentoringVisitForm({ onClose }: Props) {
             value={formData.departureTime || ''}
             onChange={(e) => handleInputChange('departureTime', e.target.value)}
             data-testid="input-departure-time"
+            className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
         </div>
         <div>

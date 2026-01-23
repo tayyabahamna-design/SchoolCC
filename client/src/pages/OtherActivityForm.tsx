@@ -277,6 +277,7 @@ export default function OtherActivityForm({ onClose }: Props) {
             value={formData.startTime || ''}
             onChange={(e) => handleInputChange('startTime', e.target.value)}
             data-testid="input-start-time"
+            className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
         </div>
 
@@ -287,6 +288,7 @@ export default function OtherActivityForm({ onClose }: Props) {
             value={formData.endTime || ''}
             onChange={(e) => handleInputChange('endTime', e.target.value)}
             data-testid="input-end-time"
+            className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
         </div>
       </div>
