@@ -1,5 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { ROLE_HIERARCHY, UserRole } from '@/contexts/auth';
+
+// Module-level flag to prevent duplicate submissions across all hook instances
+let isCreatingRequest = false;
 
 export interface DataField {
   id: string;
@@ -230,6 +233,15 @@ export function useMockDataRequests() {
       descriptionVoiceUrl?: string,
       descriptionVoiceFileName?: string
     ) => {
+      // Module-level protection against duplicate submissions
+      if (isCreatingRequest) {
+        console.log('[useMockDataRequests] Blocked duplicate request creation - already in progress');
+        return null;
+      }
+      
+      isCreatingRequest = true;
+      console.log('[useMockDataRequests] Starting request creation');
+      
       try {
         // Create the data request object
         const requestData = {
@@ -343,6 +355,10 @@ export function useMockDataRequests() {
           return updated;
         });
         return newRequest;
+      } finally {
+        // Always reset the flag
+        isCreatingRequest = false;
+        console.log('[useMockDataRequests] Request creation completed, flag reset');
       }
     },
     []
