@@ -764,23 +764,35 @@ export async function registerRoutes(
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
-      // For teachers and headmasters: phone number only (no password required)
-      // For other roles: phone number + password required
-      const isStaffRole = user.role === 'TEACHER' || user.role === 'HEAD_TEACHER';
-
-      if (!isStaffRole) {
-        // Admin roles require password
-        if (!password) {
-          return res.status(400).json({ error: "Password is required for admin accounts" });
-        }
-
-        if (user.password !== password) {
-          console.log("Login failed - password mismatch for user:", user.name);
-          return res.status(401).json({ error: "Invalid credentials" });
-        }
+      // Check if user account is pending approval
+      if (user.status === 'pending') {
+        console.log("Login failed - account pending approval for:", user.name);
+        return res.status(403).json({ 
+          error: "Your account is pending approval. Please wait for your supervisor to approve your registration.",
+          status: "pending"
+        });
       }
 
-      console.log(`Login successful for ${user.role}: ${user.name}`);
+      // Check if user account is restricted
+      if (user.status === 'restricted') {
+        console.log("Login failed - account restricted for:", user.name);
+        return res.status(403).json({ 
+          error: "Your account has been restricted. Please contact your supervisor.",
+          status: "restricted"
+        });
+      }
+
+      // All roles require password
+      if (!password) {
+        return res.status(400).json({ error: "Password is required" });
+      }
+
+      if (user.password !== password) {
+        console.log("Login failed - password mismatch for user:", user.name);
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      console.log(`Login successful for ${user.role}: ${user.name} (status: ${user.status})`);
       res.json({ ...user, password: undefined });
     } catch (error) {
       console.error("Login error:", error);

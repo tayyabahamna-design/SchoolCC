@@ -85,9 +85,10 @@ export default function Login() {
       // All users now use Phone + Password
       await login(phoneNumber, '' as UserRole, password);
       navigate('/dashboard');
-    } catch (err) {
-      setError('Invalid phone number or password. Please try again.');
-      analytics.auth.loginFailed('Invalid credentials', 'admin');
+    } catch (err: any) {
+      const errorMessage = err?.message || 'Invalid phone number or password. Please try again.';
+      setError(errorMessage);
+      analytics.auth.loginFailed(errorMessage, 'admin');
     } finally {
       setLoading(false);
     }
