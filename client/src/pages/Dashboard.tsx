@@ -563,169 +563,204 @@ export default function Dashboard() {
               </Button>
             </div>
 
+            {/* User Profile Section */}
+            <div className="p-4 border-b border-border/50">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center ring-2 ring-primary/30 ring-offset-2 ring-offset-background shadow-lg">
+                    <span className="text-lg font-bold text-primary-foreground">
+                      {user.name.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground text-sm truncate">{user.name}</h3>
+                  <p className="text-xs text-muted-foreground">{user.role.replace(/_/g, ' ')}</p>
+                </div>
+              </div>
+            </div>
+
             {/* Mobile Sidebar Content */}
-            <div className="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+            <div className="flex-1 overflow-y-auto p-4">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Quick Actions</p>
-              
-              {user.role === 'TEACHER' && (
+              <nav className="space-y-2">
+                {user.role === 'AEO' && (
+                  <>
+                    <button
+                      onClick={() => { setActiveActivityForm('visit-selector'); setShowMobileSidebar(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-amber-100/80 dark:hover:bg-amber-900/30 transition-all duration-300 group press-effect"
+                      data-testid="mobile-button-plan-visit"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                        <ClipboardList className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="font-medium text-foreground">Plan a Visit</span>
+                    </button>
+                    <button
+                      onClick={() => { setActiveActivityForm('other-activity'); setShowMobileSidebar(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-emerald-100/80 dark:hover:bg-emerald-900/30 transition-all duration-300 group press-effect"
+                      data-testid="mobile-button-log-activity"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                        <CheckSquare className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="font-medium text-foreground">Log Activity</span>
+                    </button>
+                    <button
+                      onClick={() => { navigate('/aeo-user-management'); setShowMobileSidebar(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-indigo-100/80 dark:hover:bg-indigo-900/30 transition-all duration-300 group press-effect"
+                      data-testid="mobile-button-manage-staff"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="font-medium text-foreground">Manage Staff</span>
+                    </button>
+                  </>
+                )}
+                {user.role === 'HEAD_TEACHER' && (
+                  <>
+                    <button
+                      onClick={() => { navigate('/school-data'); setShowMobileSidebar(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group press-effect"
+                      data-testid="mobile-button-school-management"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                        <School className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="font-medium text-foreground">School Management</span>
+                    </button>
+                    <button
+                      onClick={() => { navigate('/headteacher-user-management'); setShowMobileSidebar(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-indigo-100/80 dark:hover:bg-indigo-900/30 transition-all duration-300 group press-effect"
+                      data-testid="mobile-button-manage-teachers"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="font-medium text-foreground">Manage Teachers</span>
+                    </button>
+                  </>
+                )}
+                {(user.role === 'AEO' || user.role === 'HEAD_TEACHER' || user.role === 'DDEO' || user.role === 'DEO') && (
+                  <button
+                    onClick={() => { navigate('/data-requests'); setShowMobileSidebar(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-violet-100/80 dark:hover:bg-violet-900/30 transition-all duration-300 group press-effect"
+                    data-testid="mobile-button-data-requests"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-400 to-violet-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                      <FileText className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="font-medium text-foreground">Data Requests</span>
+                  </button>
+                )}
+                
+                <div className="pt-4 pb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Navigate</p>
+                </div>
+                
                 <button
-                  onClick={() => { navigate('/leave-calendar'); setShowMobileSidebar(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-cyan-100/80 dark:hover:bg-cyan-900/30 transition-all duration-300 group"
+                  onClick={() => { navigate('/calendar'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
                   data-testid="mobile-button-leave-calendar"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-500 flex items-center justify-center shadow-md">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
                     <Calendar className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-medium text-foreground">Leave Calendar</span>
                 </button>
-              )}
-              
-              {user.role === 'HEAD_TEACHER' && (
-                <>
+                <button
+                  onClick={() => { navigate('/community-album'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-pink-100/80 dark:hover:bg-pink-900/30 transition-all duration-300 group press-effect"
+                  data-testid="mobile-button-community-album"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <BookOpen className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-foreground">Community Album</span>
+                </button>
+                {user.role !== 'TEACHER' && user.role !== 'HEAD_TEACHER' && (
                   <button
-                    onClick={() => { navigate('/staff-leave-calendar'); setShowMobileSidebar(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-cyan-100/80 dark:hover:bg-cyan-900/30 transition-all duration-300 group"
-                    data-testid="mobile-button-staff-leave"
+                    onClick={() => { navigate('/school-data'); setShowMobileSidebar(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group press-effect"
+                    data-testid="mobile-button-school-inventory"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-500 flex items-center justify-center shadow-md">
-                      <Calendar className="w-5 h-5 text-white" />
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                      <Building2 className="w-5 h-5 text-white" />
                     </div>
-                    <span className="font-medium text-foreground">Staff Leave Calendar</span>
+                    <span className="font-medium text-foreground">School Inventory</span>
                   </button>
+                )}
+                {(user.role === 'AEO' || user.role === 'DDEO') && (
                   <button
-                    onClick={() => { navigate('/headteacher-user-management'); setShowMobileSidebar(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-indigo-100/80 dark:hover:bg-indigo-900/30 transition-all duration-300 group"
-                    data-testid="mobile-button-manage-teachers"
+                    onClick={() => { navigate('/school-visits'); setShowMobileSidebar(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-rose-100/80 dark:hover:bg-rose-900/30 transition-all duration-300 group press-effect"
+                    data-testid="mobile-button-school-visits"
                   >
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-500 flex items-center justify-center shadow-md">
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-rose-400 to-rose-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                      <MapPin className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="font-medium text-foreground">School Visits</span>
+                  </button>
+                )}
+                {user.role === 'DDEO' && (
+                  <button
+                    onClick={() => { navigate('/user-management'); setShowMobileSidebar(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-orange-100/80 dark:hover:bg-orange-900/30 transition-all duration-300 group press-effect"
+                    data-testid="mobile-button-user-management"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
                       <Users className="w-5 h-5 text-white" />
                     </div>
-                    <span className="font-medium text-foreground">Manage Teachers</span>
+                    <span className="font-medium text-foreground">User Management</span>
                   </button>
-                  <button
-                    onClick={() => { navigate('/school-management'); setShowMobileSidebar(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group"
-                    data-testid="mobile-button-school-management"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md">
-                      <School className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="font-medium text-foreground">My School</span>
-                  </button>
-                </>
-              )}
-              
-                            
-              <div className="pt-4 pb-2">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Navigate</p>
-              </div>
-              
-              <button
-                onClick={() => { navigate('/data-requests'); setShowMobileSidebar(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-amber-100/80 dark:hover:bg-amber-900/30 transition-all duration-300 group"
-                data-testid="mobile-button-data-requests"
-              >
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-md">
-                  <FileText className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium text-foreground">Data Requests</span>
-              </button>
-              
-              <button
-                onClick={() => { navigate('/community-album'); setShowMobileSidebar(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-pink-100/80 dark:hover:bg-pink-900/30 transition-all duration-300 group"
-                data-testid="mobile-button-community-album"
-              >
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-pink-400 to-pink-500 flex items-center justify-center shadow-md">
-                  <BookOpen className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium text-foreground">Community Album</span>
-              </button>
-              {user.role !== 'TEACHER' && user.role !== 'HEAD_TEACHER' && (
+                )}
                 <button
-                  onClick={() => { navigate('/school-data'); setShowMobileSidebar(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-teal-100/80 dark:hover:bg-teal-900/30 transition-all duration-300 group"
-                  data-testid="mobile-button-school-inventory"
+                  onClick={() => { navigate('/queries'); setShowMobileSidebar(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-purple-100/80 dark:hover:bg-purple-900/30 transition-all duration-300 group press-effect"
+                  data-testid="mobile-button-queries"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-500 flex items-center justify-center shadow-md">
-                    <Building2 className="w-5 h-5 text-white" />
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <MessageSquare className="w-5 h-5 text-white" />
                   </div>
-                  <span className="font-medium text-foreground">School Inventory</span>
+                  <span className="font-medium text-foreground">Queries</span>
                 </button>
-              )}
-              
-              {(user.role === 'AEO' || user.role === 'DDEO') && (
                 <button
-                  onClick={() => { navigate('/school-visits'); setShowMobileSidebar(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-rose-100/80 dark:hover:bg-rose-900/30 transition-all duration-300 group"
-                  data-testid="mobile-button-school-visits"
+                  onClick={() => {
+                    toast({
+                      title: "Coming Soon!",
+                      description: "Lesson Plans feature is under development and will be available soon.",
+                    });
+                    setShowMobileSidebar(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-indigo-100/80 dark:hover:bg-indigo-900/30 transition-all duration-300 group press-effect"
+                  data-testid="mobile-button-lesson-plans"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-rose-400 to-rose-500 flex items-center justify-center shadow-md">
-                    <MapPin className="w-5 h-5 text-white" />
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                    <BookOpen className="w-5 h-5 text-white" />
                   </div>
-                  <span className="font-medium text-foreground">School Visits</span>
+                  <span className="font-medium text-foreground">Lesson Plans</span>
                 </button>
-              )}
-              
-              {user.role === 'DDEO' && (
+                
+                <div className="pt-4 pb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">Support</p>
+                </div>
+                
                 <button
-                  onClick={() => { navigate('/user-management'); setShowMobileSidebar(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-orange-100/80 dark:hover:bg-orange-900/30 transition-all duration-300 group"
-                  data-testid="mobile-button-user-management"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('openHelpGuide'));
+                    setShowMobileSidebar(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-blue-100/80 dark:hover:bg-blue-900/30 transition-all duration-300 group press-effect"
+                  data-testid="mobile-button-help-guide"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center shadow-md">
-                    <Users className="w-5 h-5 text-white" />
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300 animate-pulse">
+                    <HelpCircle className="w-5 h-5 text-white" />
                   </div>
-                  <span className="font-medium text-foreground">User Management</span>
+                  <span className="font-medium text-foreground">Help Guide</span>
                 </button>
-              )}
-              
-              <button
-                onClick={() => { navigate('/data-export'); setShowMobileSidebar(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-emerald-100/80 dark:hover:bg-emerald-900/30 transition-all duration-300 group"
-                data-testid="mobile-button-data-export"
-              >
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center shadow-md">
-                  <FileSpreadsheet className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium text-foreground">Data Export</span>
-              </button>
-              
-              <button
-                onClick={() => { navigate('/queries'); setShowMobileSidebar(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-purple-100/80 dark:hover:bg-purple-900/30 transition-all duration-300 group"
-                data-testid="mobile-button-queries"
-              >
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center shadow-md">
-                  <MessageSquare className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium text-foreground">Queries</span>
-              </button>
-              
-              <button
-                onClick={() => { navigate('/user-profile'); setShowMobileSidebar(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-emerald-100/80 dark:hover:bg-emerald-900/30 transition-all duration-300 group"
-                data-testid="mobile-button-profile"
-              >
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center shadow-md">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium text-foreground">My Profile</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('openHelpGuide'));
-                  setShowMobileSidebar(false);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-sky-100/80 dark:hover:bg-sky-900/30 transition-all duration-300 group"
-                data-testid="mobile-button-help-guide"
-              >
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center shadow-md">
-                  <HelpCircle className="w-5 h-5 text-white" />
-                </div>
-                <span className="font-medium text-foreground">Help Guide</span>
-              </button>
+              </nav>
             </div>
 
             {/* Mobile Sidebar Footer */}
