@@ -335,6 +335,7 @@ export default function MentoringVisitForm({ onClose }: Props) {
             value={formData.visitDate || ''}
             onChange={(e) => handleInputChange('visitDate', e.target.value)}
             data-testid="input-visit-date"
+            className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
         </div>
         <div>

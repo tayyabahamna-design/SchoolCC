@@ -362,6 +362,7 @@ export default function UserProfile() {
                     type="date"
                     value={editedProfile.dateOfBirth || ""}
                     onChange={(e) => handleChange("dateOfBirth", e.target.value)}
+                    className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                   />
                 ) : (
                   <p className="mt-1 text-sm">
@@ -379,6 +380,7 @@ export default function UserProfile() {
                     type="date"
                     value={editedProfile.dateOfJoining || ""}
                     onChange={(e) => handleChange("dateOfJoining", e.target.value)}
+                    className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                   />
                 ) : (
                   <p className="mt-1 text-sm">

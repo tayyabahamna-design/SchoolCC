@@ -266,6 +266,7 @@ export default function OtherActivityForm({ onClose }: Props) {
             onChange={(e) => handleInputChange('activityDate', e.target.value)}
             required
             data-testid="input-activity-date"
+            className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
           />
         </div>
 

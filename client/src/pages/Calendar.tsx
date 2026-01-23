@@ -455,6 +455,7 @@ export default function Calendar() {
                     numberOfDays: calculateDays(e.target.value, prev.endDate)
                   }))}
                   data-testid="input-start-date"
+                  className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                 />
               </div>
               <div className="space-y-2">
@@ -469,6 +470,7 @@ export default function Calendar() {
                     numberOfDays: calculateDays(prev.startDate, e.target.value)
                   }))}
                   data-testid="input-end-date"
+                  className="cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                 />
               </div>
             </div>
