@@ -30,6 +30,7 @@ export default function Dashboard() {
 
   const { toast } = useToast();
   const [activeActivityForm, setActiveActivityForm] = useState<string | null>(null);
+  const [viewActivityList, setViewActivityList] = useState<'monitoring' | 'mentoring' | 'office' | 'other' | null>(null);
   const [userRequests, setUserRequests] = useState<any[]>([]);
   const [teacherDialogOpen, setTeacherDialogOpen] = useState(false);
   const [teacherDialogType, setTeacherDialogType] = useState<'total' | 'present' | 'onLeave' | 'absent'>('total');
@@ -158,7 +159,7 @@ export default function Dashboard() {
                 icon={FileText}
                 iconGradient="from-blue-400 to-blue-600"
                 size="xl"
-                onClick={() => setActiveActivityForm('monitoring')}
+                onClick={() => setViewActivityList('monitoring')}
                 className="hover-lift card-shine border-blue-200/50 dark:border-blue-800/50"
                 data-testid="card-monitoring-activity"
               />
@@ -168,7 +169,7 @@ export default function Dashboard() {
                 icon={Award}
                 iconGradient="from-purple-400 to-purple-600"
                 size="xl"
-                onClick={() => setActiveActivityForm('mentoring')}
+                onClick={() => setViewActivityList('mentoring')}
                 className="hover-lift card-shine border-purple-200/50 dark:border-purple-800/50"
                 data-testid="card-mentoring-activity"
               />
@@ -178,7 +179,7 @@ export default function Dashboard() {
                 icon={Building2}
                 iconGradient="from-emerald-400 to-emerald-600"
                 size="xl"
-                onClick={() => setActiveActivityForm('office')}
+                onClick={() => setViewActivityList('office')}
                 className="hover-lift card-shine border-emerald-200/50 dark:border-emerald-800/50"
                 data-testid="card-office-activity"
               />
@@ -188,7 +189,7 @@ export default function Dashboard() {
                 icon={CheckSquare}
                 iconGradient="from-slate-400 to-slate-600"
                 size="xl"
-                onClick={() => setActiveActivityForm('other-activity')}
+                onClick={() => setViewActivityList('other')}
                 className="hover-lift card-shine border-slate-200/50 dark:border-slate-700/50"
                 data-testid="card-other-activity"
               />
@@ -1271,6 +1272,109 @@ export default function Dashboard() {
           <div className="w-full max-w-5xl my-8 animate-slideUp">
             <div className="bg-card rounded-2xl shadow-2xl">
               <OtherActivityForm onClose={() => setActiveActivityForm(null)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Activity List Modal */}
+      {viewActivityList && activities && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto animate-fadeIn">
+          <div className="w-full max-w-2xl my-8 animate-slideUp">
+            <div className="bg-card rounded-2xl shadow-2xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-foreground">
+                  {viewActivityList === 'monitoring' && 'Monitoring Visits'}
+                  {viewActivityList === 'mentoring' && 'Mentoring Visits'}
+                  {viewActivityList === 'office' && 'Office Visits'}
+                  {viewActivityList === 'other' && 'Other Activities'}
+                </h2>
+                <Button variant="ghost" size="icon" onClick={() => setViewActivityList(null)} data-testid="button-close-activity-list">
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+              
+              {(() => {
+                const items = viewActivityList === 'monitoring' ? activities.monitoring
+                  : viewActivityList === 'mentoring' ? activities.mentoring
+                  : viewActivityList === 'office' ? activities.office
+                  : activities.other;
+                
+                if (items.length === 0) {
+                  return (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                        <FileText className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                      <p className="text-muted-foreground">No {viewActivityList} activities yet</p>
+                      <Button 
+                        className="mt-4" 
+                        onClick={() => {
+                          setViewActivityList(null);
+                          setActiveActivityForm(viewActivityList === 'other' ? 'other-activity' : viewActivityList);
+                        }}
+                        data-testid="button-add-first-activity"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Your First {viewActivityList === 'monitoring' ? 'Monitoring Visit' : viewActivityList === 'mentoring' ? 'Mentoring Visit' : viewActivityList === 'office' ? 'Office Visit' : 'Activity'}
+                      </Button>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {items.map((item: any, index: number) => (
+                      <div key={index} className="p-4 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                item.status === 'Completed' || item.status === 'completed' 
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                  : item.status === 'Pending' || item.status === 'pending'
+                                  ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                  : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                              }`}>
+                                {item.status}
+                              </span>
+                            </div>
+                            {viewActivityList !== 'other' && viewActivityList !== 'office' && (
+                              <p className="font-medium text-foreground">{item.schoolName || 'School Visit'}</p>
+                            )}
+                            {viewActivityList === 'other' && (
+                              <p className="font-medium text-foreground">{item.activityType || 'Activity'}</p>
+                            )}
+                            {viewActivityList === 'office' && (
+                              <p className="font-medium text-foreground">{item.purpose || 'Office Visit'}</p>
+                            )}
+                            <p className="text-sm text-muted-foreground">
+                              <Calendar className="w-3 h-3 inline mr-1" />
+                              {item.visitDate || item.activityDate}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+              
+              <div className="mt-6 pt-4 border-t border-border flex justify-between">
+                <Button variant="outline" onClick={() => setViewActivityList(null)} data-testid="button-close-list">
+                  Close
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setViewActivityList(null);
+                    setActiveActivityForm(viewActivityList === 'other' ? 'other-activity' : viewActivityList);
+                  }}
+                  data-testid="button-add-new-activity"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add New
+                </Button>
+              </div>
             </div>
           </div>
         </div>
