@@ -119,12 +119,19 @@ export default function OfficeVisitForm({ onClose }: Props) {
 
   const handleSubmit = async () => {
     if (isSubmittingRef.current) {
+      console.log('[OfficeVisitForm] Blocked duplicate submission - ref already true');
       return;
     }
-    if (isSubmitting) return;
-    setLoading(true);
-    setIsSubmitting(true);
+    if (isSubmitting) {
+      console.log('[OfficeVisitForm] Blocked duplicate submission - state already true');
+      return;
+    }
+    
+    // Set ref FIRST (synchronous) to block subsequent clicks before any async operation
     isSubmittingRef.current = true;
+    setIsSubmitting(true);
+    setLoading(true);
+    
     try {
       const { id: _, ...dataWithoutId } = formData;
       const evidence = uploadedFiles.map((f) => ({
@@ -447,10 +454,18 @@ export default function OfficeVisitForm({ onClose }: Props) {
 
         {isLastStep ? (
           <Button
-            onClick={handleSubmit}
+            onClick={(e) => {
+              if (isSubmittingRef.current || isSubmitting) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+              }
+              handleSubmit();
+            }}
             disabled={loading || isSubmitting}
             className="flex-1 bg-emerald-600 hover:bg-emerald-700"
             data-testid="button-submit"
+            style={isSubmitting ? { pointerEvents: 'none', opacity: 0.7 } : undefined}
           >
             {loading || isSubmitting ? 'Submitting...' : (
               <>

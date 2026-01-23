@@ -153,13 +153,20 @@ export default function MonitoringVisitForm({ onClose }: Props) {
 
   const handleSubmit = async () => {
     if (isSubmittingRef.current) {
+      console.log('[MonitoringVisitForm] Blocked duplicate submission - ref already true');
       return;
     }
-    if (isSubmitting) return;
+    if (isSubmitting) {
+      console.log('[MonitoringVisitForm] Blocked duplicate submission - state already true');
+      return;
+    }
+    
+    // Set ref FIRST (synchronous) to block subsequent clicks before any async operation
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
     setLoading(true);
+    
     try {
-      setIsSubmitting(true);
-      isSubmittingRef.current = true;
       const { id: _, ...dataWithoutId } = formData;
       const evidence = uploadedFiles.map((f) => ({
         id: f.id,
@@ -800,10 +807,18 @@ export default function MonitoringVisitForm({ onClose }: Props) {
           </Button>
         ) : (
           <Button
-            onClick={handleSubmit}
+            onClick={(e) => {
+              if (isSubmittingRef.current || isSubmitting) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+              }
+              handleSubmit();
+            }}
             disabled={loading || isSubmitting}
             className="flex-1 bg-green-600 hover:bg-green-700"
             data-testid="button-submit"
+            style={isSubmitting ? { pointerEvents: 'none', opacity: 0.7 } : undefined}
           >
             {isSubmitting ? 'Submitting...' : (
               <>

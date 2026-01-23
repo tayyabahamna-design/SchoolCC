@@ -156,10 +156,17 @@ export default function CreateRequest() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
     // Use ref for synchronous check to prevent rapid double-clicks
     if (isSubmittingRef.current) {
       console.log('[CreateRequest] Blocked duplicate submission - ref already true');
+      return;
+    }
+    
+    // Check state as backup
+    if (isSubmitting) {
+      console.log('[CreateRequest] Blocked duplicate submission - state already true');
       return;
     }
     
@@ -545,7 +552,15 @@ export default function CreateRequest() {
               type="submit"
               disabled={!title.trim() || fields.length === 0 || selectedAssignees.length === 0 || isSubmitting}
               data-testid="button-create"
-              style={isSubmitting ? { pointerEvents: 'none' } : undefined}
+              style={isSubmitting ? { pointerEvents: 'none', opacity: 0.7 } : undefined}
+              onClick={(e) => {
+                if (isSubmittingRef.current || isSubmitting) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('[CreateRequest] Button click blocked - already submitting');
+                  return false;
+                }
+              }}
             >
               {isSubmitting ? 'Creating...' : 'Create Request'}
             </Button>
