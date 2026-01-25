@@ -729,10 +729,7 @@ export default function Dashboard() {
                 </button>
                 <button
                   onClick={() => {
-                    toast({
-                      title: "Coming Soon!",
-                      description: "Lesson Plans feature is under development and will be available soon.",
-                    });
+                    navigate('/lesson-plans');
                     setShowMobileSidebar(false);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-indigo-100/80 dark:hover:bg-indigo-900/30 transition-all duration-300 group press-effect"
@@ -943,10 +940,7 @@ export default function Dashboard() {
               <span className="font-medium text-foreground">Queries</span>
             </button>
             <button
-              onClick={() => toast({
-                title: "Coming Soon!",
-                description: "Lesson Plans feature is under development and will be available soon.",
-              })}
+              onClick={() => navigate('/lesson-plans')}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-indigo-100/80 dark:hover:bg-indigo-900/30 transition-all duration-300 group press-effect"
               data-testid="button-lesson-plans"
             >
@@ -1085,10 +1079,7 @@ export default function Dashboard() {
                 Schools
               </Button>
               <Button
-                onClick={() => toast({
-                  title: "Coming Soon!",
-                  description: "Lesson Plans feature is under development.",
-                })}
+                onClick={() => navigate('/lesson-plans')}
                 size="sm"
                 className="rounded-full bg-gradient-to-r from-indigo-400 to-indigo-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0"
                 data-testid="button-lesson-plans-mobile"
