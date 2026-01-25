@@ -55,6 +55,18 @@ export default function Dashboard() {
     handleDragOver,
   } = useDashboardWidgets(user?.id || 'guest', user?.role || 'TEACHER');
 
+  // Listen for guide sidebar events
+  useEffect(() => {
+    const handleOpenSidebar = () => setShowSidebar(true);
+    const handleCloseSidebar = () => setShowSidebar(false);
+    window.addEventListener('openSidebarForGuide', handleOpenSidebar);
+    window.addEventListener('closeSidebarForGuide', handleCloseSidebar);
+    return () => {
+      window.removeEventListener('openSidebarForGuide', handleOpenSidebar);
+      window.removeEventListener('closeSidebarForGuide', handleCloseSidebar);
+    };
+  }, []);
+
   // Handle redirects in useEffect to avoid updating state during render
   useEffect(() => {
     if (!user) {
