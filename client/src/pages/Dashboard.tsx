@@ -420,18 +420,18 @@ export default function Dashboard() {
         
         // Teaching tips for teachers
         const allTeachingTips = [
-          { tip: "Start each class with a quick review of the previous lesson to refresh students' memory.", tipUr: "ہر کلاس کا آغاز پچھلے سبق کے مختصر جائزے سے کریں۔", icon: "🔄", color: "from-blue-500 to-cyan-500", lang: "en" },
-          { tip: "بچوں کو مشکل موضوعات سمجھانے کے لیے تصویریں اور نقشے استعمال کریں۔", tipUr: "بچوں کو مشکل موضوعات سمجھانے کے لیے تصویریں اور نقشے استعمال کریں۔", icon: "📊", color: "from-purple-500 to-pink-500", lang: "ur" },
-          { tip: "Encourage students to ask questions - there are no silly questions!", tipUr: "طلباء کو سوالات پوچھنے کی ترغیب دیں - کوئی سوال احمقانہ نہیں ہوتا!", icon: "❓", color: "from-emerald-500 to-teal-500", lang: "en" },
-          { tip: "بچوں کی حوصلہ افزائی کریں تاکہ ان کا اعتماد بڑھے۔", tipUr: "بچوں کی حوصلہ افزائی کریں تاکہ ان کا اعتماد بڑھے۔", icon: "⭐", color: "from-amber-500 to-orange-500", lang: "ur" },
-          { tip: "Break down large tasks into smaller, manageable steps for students.", tipUr: "بڑے کاموں کو چھوٹے آسان حصوں میں تقسیم کریں۔", icon: "📝", color: "from-rose-500 to-red-500", lang: "en" },
-          { tip: "روزمرہ زندگی کی مثالیں دے کر سبق دلچسپ بنائیں۔", tipUr: "روزمرہ زندگی کی مثالیں دے کر سبق دلچسپ بنائیں۔", icon: "🌍", color: "from-indigo-500 to-blue-500", lang: "ur" },
-          { tip: "Create a safe learning environment where mistakes are seen as opportunities.", tipUr: "ایسا ماحول بنائیں جہاں غلطیاں سیکھنے کا موقع ہوں۔", icon: "🛡️", color: "from-teal-500 to-emerald-500", lang: "en" },
-          { tip: "گروپ سرگرمیوں سے ٹیم ورک اور بات چیت کی مہارت بڑھائیں۔", tipUr: "گروپ سرگرمیوں سے ٹیم ورک اور بات چیت کی مہارت بڑھائیں۔", icon: "👥", color: "from-violet-500 to-purple-500", lang: "ur" },
-          { tip: "Take short breaks during long lessons to maintain student attention.", tipUr: "لمبے اسباق میں چھوٹے وقفے لیں تاکہ بچوں کی توجہ قائم رہے۔", icon: "⏸️", color: "from-pink-500 to-rose-500", lang: "en" },
-          { tip: "ہر سبق کے آخر میں اہم نکات کا خلاصہ بیان کریں۔", tipUr: "ہر سبق کے آخر میں اہم نکات کا خلاصہ بیان کریں۔", icon: "📌", color: "from-cyan-500 to-blue-500", lang: "ur" },
-          { tip: "Celebrate small achievements to keep students motivated.", tipUr: "چھوٹی کامیابیوں کو بھی مناکر بچوں کی حوصلہ افزائی کریں۔", icon: "🎉", color: "from-orange-500 to-amber-500", lang: "en" },
-          { tip: "کہانی سنا کر سبق یادگار اور دلچسپ بنائیں۔", tipUr: "کہانی سنا کر سبق یادگار اور دلچسپ بنائیں۔", icon: "📖", color: "from-red-500 to-rose-500", lang: "ur" },
+          { tip: "Start each class with a quick review of the previous lesson.", tipUr: "ہر کلاس کا آغاز پچھلے سبق کے مختصر جائزے سے کریں۔", icon: "🔄", color: "from-blue-500 to-cyan-500" },
+          { tip: "Use visual aids like charts and diagrams to explain concepts.", tipUr: "تصویریں اور نقشے استعمال کر کے تصورات سمجھائیں۔", icon: "📊", color: "from-purple-500 to-pink-500" },
+          { tip: "Encourage students to ask questions freely.", tipUr: "طلباء کو آزادانہ سوالات پوچھنے کی ترغیب دیں۔", icon: "❓", color: "from-emerald-500 to-teal-500" },
+          { tip: "Give positive feedback to boost student confidence.", tipUr: "بچوں کی حوصلہ افزائی کریں تاکہ ان کا اعتماد بڑھے۔", icon: "⭐", color: "from-amber-500 to-orange-500" },
+          { tip: "Break down large tasks into smaller steps.", tipUr: "بڑے کاموں کو چھوٹے آسان حصوں میں تقسیم کریں۔", icon: "📝", color: "from-rose-500 to-red-500" },
+          { tip: "Use real-life examples to make lessons engaging.", tipUr: "روزمرہ زندگی کی مثالیں دے کر سبق دلچسپ بنائیں۔", icon: "🌍", color: "from-indigo-500 to-blue-500" },
+          { tip: "Create a safe environment where mistakes are learning opportunities.", tipUr: "ایسا ماحول بنائیں جہاں غلطیاں سیکھنے کا موقع ہوں۔", icon: "🛡️", color: "from-teal-500 to-emerald-500" },
+          { tip: "Include group activities to develop teamwork skills.", tipUr: "گروپ سرگرمیوں سے ٹیم ورک کی مہارت بڑھائیں۔", icon: "👥", color: "from-violet-500 to-purple-500" },
+          { tip: "Take short breaks during long lessons.", tipUr: "لمبے اسباق میں چھوٹے وقفے لیں۔", icon: "⏸️", color: "from-pink-500 to-rose-500" },
+          { tip: "End each lesson with a summary of key points.", tipUr: "ہر سبق کے آخر میں اہم نکات کا خلاصہ بیان کریں۔", icon: "📌", color: "from-cyan-500 to-blue-500" },
+          { tip: "Celebrate small achievements to keep students motivated.", tipUr: "چھوٹی کامیابیوں کو مناکر بچوں کی حوصلہ افزائی کریں۔", icon: "🎉", color: "from-orange-500 to-amber-500" },
+          { tip: "Use storytelling to make lessons memorable.", tipUr: "کہانی سنا کر سبق یادگار بنائیں۔", icon: "📖", color: "from-red-500 to-rose-500" },
         ];
         
         // Shuffle and pick 3 random tips on each render
@@ -450,14 +450,12 @@ export default function Dashboard() {
                     <div className="flex items-start gap-2 sm:gap-3">
                       <div className="text-2xl sm:text-3xl">{item.icon}</div>
                       <div className="flex-1">
-                        <p className={`text-xs sm:text-sm font-medium bg-gradient-to-r ${item.color} bg-clip-text text-transparent leading-relaxed`} dir={item.lang === 'ur' ? 'rtl' : 'ltr'}>
+                        <p className={`text-xs sm:text-sm font-medium bg-gradient-to-r ${item.color} bg-clip-text text-transparent leading-relaxed`}>
                           {item.tip}
                         </p>
-                        {item.lang === 'en' && item.tipUr && (
-                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed" dir="rtl">
-                            {item.tipUr}
-                          </p>
-                        )}
+                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed" dir="rtl">
+                          {item.tipUr}
+                        </p>
                       </div>
                     </div>
                   </Card>
