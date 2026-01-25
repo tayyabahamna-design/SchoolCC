@@ -83,12 +83,38 @@ export function usePushNotifications() {
   const subscribe = useCallback(async (featureType: string): Promise<boolean> => {
     setState(prev => ({ ...prev, isLoading: true }));
     
+    // If push notifications aren't supported, use localStorage fallback silently
+    if (!state.isSupported) {
+      const localSubs = JSON.parse(localStorage.getItem('notifyMe') || '[]');
+      if (!localSubs.includes(featureType)) {
+        localSubs.push(featureType);
+        localStorage.setItem('notifyMe', JSON.stringify(localSubs));
+      }
+      
+      setState(prev => ({ ...prev, isSubscribed: true, isLoading: false }));
+      toast({
+        title: "Subscribed!",
+        description: "You'll be notified when this feature is ready."
+      });
+      return true;
+    }
+    
     try {
       // Request permission first
       const hasPermission = state.permission === 'granted' || await requestPermission();
       if (!hasPermission) {
-        setState(prev => ({ ...prev, isLoading: false }));
-        return false;
+        // Permission denied - still save locally
+        const localSubs = JSON.parse(localStorage.getItem('notifyMe') || '[]');
+        if (!localSubs.includes(featureType)) {
+          localSubs.push(featureType);
+          localStorage.setItem('notifyMe', JSON.stringify(localSubs));
+        }
+        setState(prev => ({ ...prev, isSubscribed: true, isLoading: false }));
+        toast({
+          title: "Subscribed!",
+          description: "You'll be notified when this feature is ready."
+        });
+        return true;
       }
 
       // Register service worker
@@ -149,7 +175,7 @@ export function usePushNotifications() {
       });
       return true;
     }
-  }, [state.permission, requestPermission, registerServiceWorker, user, toast]);
+  }, [state.isSupported, state.permission, requestPermission, registerServiceWorker, user, toast]);
 
   const showLocalNotification = useCallback(async (title: string, options?: NotificationOptions) => {
     if (state.permission !== 'granted') {
