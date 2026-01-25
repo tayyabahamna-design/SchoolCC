@@ -2579,24 +2579,27 @@ export async function registerRoutes(
         return res.status(400).json({ error: "No audio file provided" });
       }
 
-      // Note: Claude cannot directly transcribe audio
-      // This endpoint is a placeholder for Whisper API integration
-      try {
-        const transcription = await transcribeAudio(req.file.buffer);
-        res.json({ transcription });
-      } catch (error: any) {
-        // Return a helpful message about Whisper API integration
-        res.status(501).json({
-          error: "Audio transcription not yet implemented",
-          message: "Please integrate OpenAI Whisper API, AssemblyAI, or Deepgram for audio transcription",
-          details: error.message
-        });
-      }
+      // Get language from request body or default to English
+      const language = req.body.language || 'en';
+
+      console.log(`Transcribing audio file (${req.file.size} bytes) in language: ${language}`);
+
+      // Transcribe audio using Deepgram
+      const transcription = await transcribeAudio(req.file.buffer, language);
+
+      console.log(`Transcription successful: ${transcription.substring(0, 100)}...`);
+
+      res.json({
+        transcription,
+        language,
+        success: true
+      });
     } catch (error: any) {
       console.error("Transcription error:", error);
       res.status(500).json({
         error: "Failed to transcribe audio",
-        details: error.message || String(error)
+        details: error.message || String(error),
+        success: false
       });
     }
   });

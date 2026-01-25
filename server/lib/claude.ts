@@ -1,18 +1,54 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { createClient } from '@deepgram/sdk';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
 });
 
+const deepgram = createClient(process.env.DEEPGRAM_API_KEY || '');
+
 /**
- * Transcribe audio using Claude's vision capabilities
- * Note: Claude doesn't directly transcribe audio, so we'll use a placeholder
- * In production, you'd use a service like Deepgram, AssemblyAI, or Whisper API
+ * Transcribe audio using Deepgram speech-to-text API
+ * Supports multiple languages including English and Urdu
  */
-export async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
-  // For now, return a placeholder since Claude doesn't directly process audio
-  // In production, integrate with Whisper API or similar service
-  throw new Error('Audio transcription requires integration with Whisper API or similar service');
+export async function transcribeAudio(audioBuffer: Buffer, language: string = 'en'): Promise<string> {
+  try {
+    if (!process.env.DEEPGRAM_API_KEY) {
+      throw new Error('Deepgram API key not configured');
+    }
+
+    // Determine language code for Deepgram
+    const languageCode = language === 'ur' ? 'ur' : 'en-US';
+
+    // Transcribe audio using Deepgram
+    const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
+      audioBuffer,
+      {
+        model: 'nova-2',
+        language: languageCode,
+        smart_format: true,
+        punctuate: true,
+        paragraphs: true,
+      }
+    );
+
+    if (error) {
+      console.error('Deepgram transcription error:', error);
+      throw new Error(`Deepgram transcription failed: ${error.message}`);
+    }
+
+    // Extract the transcript from Deepgram response
+    const transcript = result?.results?.channels?.[0]?.alternatives?.[0]?.transcript;
+
+    if (!transcript) {
+      throw new Error('No transcription generated');
+    }
+
+    return transcript;
+  } catch (error: any) {
+    console.error('Error transcribing audio:', error);
+    throw new Error(`Audio transcription failed: ${error.message || 'Unknown error'}`);
+  }
 }
 
 /**
