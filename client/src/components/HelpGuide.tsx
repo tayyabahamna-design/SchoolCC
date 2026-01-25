@@ -842,19 +842,13 @@ export function HelpGuide() {
             />
           )}
 
-          {/* Guide panel - smart positioning: bottom when menu open or highlighting top elements, top otherwise */}
+          {/* Guide panel - always at TOP to never hide content */}
           <div
-            className={`fixed z-[70] w-[calc(100%-16px)] max-w-sm bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-xl shadow-lg overflow-hidden animate-in fade-in duration-200 ${
-              currentStepData?.openMenu || currentStepData?.target?.includes('menu') || currentStepData?.target?.includes('toggle')
-                ? 'slide-in-from-bottom-2' 
-                : 'slide-in-from-top-2'
-            }`}
+            className="fixed z-[70] w-[calc(100%-16px)] max-w-sm bg-white/90 dark:bg-gray-900/90 backdrop-blur-md rounded-xl shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
             style={{ 
+              top: '8px',
               left: '50%', 
-              transform: 'translateX(-50%)',
-              ...(currentStepData?.openMenu || currentStepData?.target?.includes('menu') || currentStepData?.target?.includes('toggle')
-                ? { bottom: '8px' } 
-                : { top: '8px' })
+              transform: 'translateX(-50%)'
             }}
             dir={language === 'ur' ? 'rtl' : 'ltr'}
           >
