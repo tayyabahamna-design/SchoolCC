@@ -104,7 +104,7 @@ export default function PersistentHelpBanner({
   if (isMinimized) {
     return (
       <div
-        className={`fixed left-0 right-0 ${positionClasses} z-[45] bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 shadow-lg transition-transform duration-300 ${transformClass}`}
+        className={`fixed left-0 right-0 ${positionClasses} z-[45] bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 shadow-lg transition-transform duration-300 ${transformClass}`}
       >
         <button
           onClick={handleExpand}
