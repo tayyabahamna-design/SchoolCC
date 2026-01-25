@@ -588,3 +588,18 @@ export type InsertOtherActivity = z.infer<typeof insertOtherActivitySchema>;
 export type OtherActivity = typeof otherActivities.$inferSelect;
 export type InsertVisitSession = z.infer<typeof insertVisitSessionSchema>;
 export type VisitSession = typeof visitSessions.$inferSelect;
+
+// Push notification subscriptions
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id"),
+  endpoint: text("endpoint").notNull(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  featureType: text("feature_type").notNull(), // 'lesson_plans', 'data_requests', etc.
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions).omit({ id: true, createdAt: true });
+export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
