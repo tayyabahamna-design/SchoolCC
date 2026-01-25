@@ -251,10 +251,10 @@ export default function UserProfile() {
       </Button>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <div 
-                className={`relative h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center ${editMode ? 'cursor-pointer group' : ''}`}
+                className={`relative h-16 w-16 shrink-0 rounded-full bg-primary/10 flex items-center justify-center ${editMode ? 'cursor-pointer group' : ''}`}
                 onClick={() => editMode && setShowPictureEditor(true)}
                 data-testid="button-change-profile-picture"
               >
@@ -273,8 +273,8 @@ export default function UserProfile() {
                   </div>
                 )}
               </div>
-              <div>
-                <CardTitle className="text-2xl">{profile.name}</CardTitle>
+              <div className="min-w-0">
+                <CardTitle className="text-xl sm:text-2xl truncate">{profile.name}</CardTitle>
                 <p className="text-sm text-muted-foreground">{profile.role}</p>
                 {editMode && (
                   <button 
@@ -287,21 +287,22 @@ export default function UserProfile() {
               </div>
             </div>
             {!editMode ? (
-              <Button onClick={() => setEditMode(true)}>
+              <Button onClick={() => setEditMode(true)} className="w-full sm:w-auto">
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Profile
               </Button>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
                 <Button
                   variant="outline"
                   onClick={handleCancel}
                   disabled={saving}
+                  className="flex-1 sm:flex-none"
                 >
                   <X className="h-4 w-4 mr-2" />
                   Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={saving}>
+                <Button onClick={handleSave} disabled={saving} className="flex-1 sm:flex-none">
                   {saving ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (

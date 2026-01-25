@@ -564,24 +564,6 @@ export default function Dashboard() {
               </Button>
             </div>
 
-            {/* User Profile Section */}
-            <div className="p-4 border-b border-border/50 shrink-0">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5">
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center ring-2 ring-primary/30 ring-offset-2 ring-offset-background shadow-lg">
-                    <span className="text-lg font-bold text-primary-foreground">
-                      {user.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-foreground text-sm truncate">{user.name}</h3>
-                  <p className="text-xs text-muted-foreground">{user.role.replace(/_/g, ' ')}</p>
-                </div>
-              </div>
-            </div>
-
             {/* Mobile Sidebar Content */}
             <div className="flex-1 overflow-y-auto p-4 min-h-0">
               <nav className="space-y-2">
