@@ -856,6 +856,18 @@ export default function Dashboard() {
                 <span className="font-medium text-foreground">Data Requests</span>
               </button>
             )}
+            {user.role === 'TEACHER' && (
+              <button
+                onClick={() => navigate('/data-requests-preview')}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left hover:bg-violet-100/80 dark:hover:bg-violet-900/30 transition-all duration-300 group press-effect"
+                data-testid="button-data-requests-preview"
+              >
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-violet-400 to-violet-500 flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+                  <FileText className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-medium text-foreground">Data Requests</span>
+              </button>
+            )}
             
             <button
               onClick={() => navigate('/calendar')}

@@ -44,6 +44,7 @@ import MentoringVisitForm from "@/pages/MentoringVisitForm";
 import OfficeVisitForm from "@/pages/OfficeVisitForm";
 import OtherActivityForm from "@/pages/OtherActivityForm";
 import LessonPlansPreview from "@/pages/LessonPlansPreview";
+import DataRequestsPreview from "@/pages/DataRequestsPreview";
 import NotFound from "@/pages/not-found";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
@@ -129,6 +130,7 @@ function Router() {
         <Route path="/aeo-activity/office" component={OfficeVisitForm} />
         <Route path="/aeo-activity/other-activity" component={OtherActivityForm} />
         <Route path="/lesson-plans" component={LessonPlansPreview} />
+        <Route path="/data-requests-preview" component={DataRequestsPreview} />
         {/* Fallback to 404 */}
         <Route component={NotFound} />
       </Switch>
