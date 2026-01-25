@@ -50,24 +50,10 @@ export default function SchoolVisits() {
     }
   }, [user?.role]);
 
-  if (!user) return null;
-  
-  // Show embedded form based on selected type
-  if (showFormType === 'monitoring') {
-    return <MonitoringVisitForm />;
-  }
-  if (showFormType === 'mentoring') {
-    return <MentoringVisitForm />;
-  }
-  if (showFormType === 'office') {
-    return <OfficeVisitForm />;
-  }
-  if (showFormType === 'other') {
-    return <OtherActivityForm />;
-  }
-
   // Combine and normalize all visits from the activities context
+  // MUST call useMemo before any conditional returns to satisfy Rules of Hooks
   const userVisits = useMemo(() => {
+    if (!user) return [];
     const visits: NormalizedVisit[] = [];
 
     // Filter by user for AEO role, show all for leadership
@@ -163,6 +149,23 @@ export default function SchoolVisits() {
         return 'bg-muted text-muted-foreground';
     }
   };
+
+  // Early returns AFTER all hooks are called
+  if (!user) return null;
+
+  // Show embedded form based on selected type
+  if (showFormType === 'monitoring') {
+    return <MonitoringVisitForm />;
+  }
+  if (showFormType === 'mentoring') {
+    return <MentoringVisitForm />;
+  }
+  if (showFormType === 'office') {
+    return <OfficeVisitForm />;
+  }
+  if (showFormType === 'other') {
+    return <OtherActivityForm />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
