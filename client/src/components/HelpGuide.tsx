@@ -842,10 +842,20 @@ export function HelpGuide() {
             />
           )}
 
-          {/* Guide panel */}
+          {/* Guide panel - positioned at top when menu is open to not block sidebar items */}
           <div
-            className="fixed z-[70] w-[calc(100%-32px)] max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 max-h-[80vh] overflow-y-auto"
-            style={{ bottom: '16px', left: '50%', transform: 'translateX(-50%)' }}
+            className={`fixed z-[70] w-[calc(100%-32px)] max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in duration-300 ${
+              currentStepData?.openMenu 
+                ? 'slide-in-from-top-4' 
+                : 'slide-in-from-bottom-4'
+            }`}
+            style={{ 
+              left: '50%', 
+              transform: 'translateX(-50%)',
+              ...(currentStepData?.openMenu 
+                ? { top: '16px' } 
+                : { bottom: '16px' })
+            }}
             dir={language === 'ur' ? 'rtl' : 'ltr'}
           >
             {/* Header */}
