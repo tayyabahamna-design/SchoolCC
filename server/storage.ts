@@ -1,9 +1,10 @@
 import { db } from "./db";
-import { users, dataRequests, requestAssignees, voiceRecordings, districts, clusters, schools, notifications, queries, queryResponses, visitLogs, schoolAlbums, albumPhotos, albumComments, albumReactions, announcements, monitoringVisits, mentoringVisits, officeVisits, otherActivities, visitSessions, pushSubscriptions } from "@shared/schema";
+import { users, dataRequests, requestAssignees, voiceRecordings, districts, clusters, schools, tehsils, markazes, notifications, queries, queryResponses, visitLogs, schoolAlbums, albumPhotos, albumComments, albumReactions, announcements, monitoringVisits, mentoringVisits, officeVisits, otherActivities, visitSessions, pushSubscriptions } from "@shared/schema";
 import type {
   InsertUser, User, InsertDataRequest, DataRequest, InsertRequestAssignee, RequestAssignee,
   InsertVoiceRecording, VoiceRecording,
   InsertDistrict, District, InsertCluster, Cluster, InsertSchool, School,
+  InsertTehsil, Tehsil, InsertMarkaz, Markaz,
   InsertNotification, Notification, InsertQuery, Query, InsertQueryResponse, QueryResponse,
   InsertVisitLog, VisitLog, InsertSchoolAlbum, SchoolAlbum, InsertAlbumPhoto, AlbumPhoto,
   InsertAlbumComment, AlbumComment, InsertAlbumReaction, AlbumReaction, InsertAnnouncement, Announcement,
@@ -30,6 +31,25 @@ export interface IStorage {
   createCluster(cluster: InsertCluster): Promise<Cluster>;
   updateCluster(id: string, updates: Partial<Cluster>): Promise<Cluster>;
   deleteCluster(id: string): Promise<void>;
+
+  // Tehsil operations
+  getAllTehsils(): Promise<Tehsil[]>;
+  getTehsilsByDistrict(districtId: string): Promise<Tehsil[]>;
+  getTehsil(id: string): Promise<Tehsil | undefined>;
+  getTehsilByName(name: string, districtId: string): Promise<Tehsil | undefined>;
+  createTehsil(tehsil: InsertTehsil): Promise<Tehsil>;
+  updateTehsil(id: string, updates: Partial<Tehsil>): Promise<Tehsil>;
+  deleteTehsil(id: string): Promise<void>;
+
+  // Markaz operations
+  getAllMarkazes(): Promise<Markaz[]>;
+  getMarkazesByTehsil(tehsilId: string): Promise<Markaz[]>;
+  getMarkazesByDistrict(districtId: string): Promise<Markaz[]>;
+  getMarkaz(id: string): Promise<Markaz | undefined>;
+  getMarkazByName(name: string, tehsilId: string): Promise<Markaz | undefined>;
+  createMarkaz(markaz: InsertMarkaz): Promise<Markaz>;
+  updateMarkaz(id: string, updates: Partial<Markaz>): Promise<Markaz>;
+  deleteMarkaz(id: string): Promise<void>;
 
   // School operations
   getAllSchools(): Promise<School[]>;
@@ -219,6 +239,80 @@ export class DBStorage implements IStorage {
 
   async deleteCluster(id: string): Promise<void> {
     await db.delete(clusters).where(eq(clusters.id, id));
+  }
+
+  // Tehsil operations
+  async getAllTehsils(): Promise<Tehsil[]> {
+    return await db.select().from(tehsils);
+  }
+
+  async getTehsilsByDistrict(districtId: string): Promise<Tehsil[]> {
+    return await db.select().from(tehsils).where(eq(tehsils.districtId, districtId));
+  }
+
+  async getTehsil(id: string): Promise<Tehsil | undefined> {
+    const result = await db.select().from(tehsils).where(eq(tehsils.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getTehsilByName(name: string, districtId: string): Promise<Tehsil | undefined> {
+    const result = await db.select().from(tehsils)
+      .where(and(eq(tehsils.name, name), eq(tehsils.districtId, districtId)))
+      .limit(1);
+    return result[0];
+  }
+
+  async createTehsil(tehsil: InsertTehsil): Promise<Tehsil> {
+    const result = await db.insert(tehsils).values(tehsil).returning();
+    return result[0];
+  }
+
+  async updateTehsil(id: string, updates: Partial<Tehsil>): Promise<Tehsil> {
+    const result = await db.update(tehsils).set(updates).where(eq(tehsils.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteTehsil(id: string): Promise<void> {
+    await db.delete(tehsils).where(eq(tehsils.id, id));
+  }
+
+  // Markaz operations
+  async getAllMarkazes(): Promise<Markaz[]> {
+    return await db.select().from(markazes);
+  }
+
+  async getMarkazesByTehsil(tehsilId: string): Promise<Markaz[]> {
+    return await db.select().from(markazes).where(eq(markazes.tehsilId, tehsilId));
+  }
+
+  async getMarkazesByDistrict(districtId: string): Promise<Markaz[]> {
+    return await db.select().from(markazes).where(eq(markazes.districtId, districtId));
+  }
+
+  async getMarkaz(id: string): Promise<Markaz | undefined> {
+    const result = await db.select().from(markazes).where(eq(markazes.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getMarkazByName(name: string, tehsilId: string): Promise<Markaz | undefined> {
+    const result = await db.select().from(markazes)
+      .where(and(eq(markazes.name, name), eq(markazes.tehsilId, tehsilId)))
+      .limit(1);
+    return result[0];
+  }
+
+  async createMarkaz(markaz: InsertMarkaz): Promise<Markaz> {
+    const result = await db.insert(markazes).values(markaz).returning();
+    return result[0];
+  }
+
+  async updateMarkaz(id: string, updates: Partial<Markaz>): Promise<Markaz> {
+    const result = await db.update(markazes).set(updates).where(eq(markazes.id, id)).returning();
+    return result[0];
+  }
+
+  async deleteMarkaz(id: string): Promise<void> {
+    await db.delete(markazes).where(eq(markazes.id, id));
   }
 
   // School operations

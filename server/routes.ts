@@ -4,7 +4,8 @@ import { storage } from "./storage";
 import { z } from "zod";
 import {
   insertDataRequestSchema, insertRequestAssigneeSchema, insertVoiceRecordingSchema,
-  insertDistrictSchema, insertClusterSchema, insertSchoolSchema, insertUserSchema
+  insertDistrictSchema, insertClusterSchema, insertSchoolSchema, insertUserSchema,
+  insertTehsilSchema, insertMarkazSchema
 } from "@shared/schema";
 import multer from "multer";
 import { transcribeAudio, generateVisitSummary } from "./lib/claude";
@@ -526,6 +527,127 @@ export async function registerRoutes(
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete cluster" });
+    }
+  });
+
+  // Tehsil routes
+  app.get("/api/tehsils", async (req, res) => {
+    try {
+      const { districtId } = req.query;
+      const tehsilList = districtId 
+        ? await storage.getTehsilsByDistrict(districtId as string)
+        : await storage.getAllTehsils();
+      res.json(tehsilList);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch tehsils" });
+    }
+  });
+
+  app.post("/api/tehsils", async (req, res) => {
+    try {
+      const body = insertTehsilSchema.parse(req.body);
+      // Check if tehsil already exists
+      const existing = await storage.getTehsilByName(body.name, body.districtId);
+      if (existing) {
+        return res.json(existing);
+      }
+      const tehsil = await storage.createTehsil(body);
+      res.json(tehsil);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid tehsil data" });
+    }
+  });
+
+  app.get("/api/tehsils/:id", async (req, res) => {
+    try {
+      const tehsil = await storage.getTehsil(req.params.id);
+      if (!tehsil) {
+        return res.status(404).json({ error: "Tehsil not found" });
+      }
+      res.json(tehsil);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch tehsil" });
+    }
+  });
+
+  app.patch("/api/tehsils/:id", async (req, res) => {
+    try {
+      const tehsil = await storage.updateTehsil(req.params.id, req.body);
+      res.json(tehsil);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update tehsil" });
+    }
+  });
+
+  app.delete("/api/tehsils/:id", async (req, res) => {
+    try {
+      await storage.deleteTehsil(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete tehsil" });
+    }
+  });
+
+  // Markaz routes
+  app.get("/api/markazes", async (req, res) => {
+    try {
+      const { tehsilId, districtId } = req.query;
+      let markazList;
+      if (tehsilId) {
+        markazList = await storage.getMarkazesByTehsil(tehsilId as string);
+      } else if (districtId) {
+        markazList = await storage.getMarkazesByDistrict(districtId as string);
+      } else {
+        markazList = await storage.getAllMarkazes();
+      }
+      res.json(markazList);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch markazes" });
+    }
+  });
+
+  app.post("/api/markazes", async (req, res) => {
+    try {
+      const body = insertMarkazSchema.parse(req.body);
+      // Check if markaz already exists
+      const existing = await storage.getMarkazByName(body.name, body.tehsilId);
+      if (existing) {
+        return res.json(existing);
+      }
+      const markaz = await storage.createMarkaz(body);
+      res.json(markaz);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid markaz data" });
+    }
+  });
+
+  app.get("/api/markazes/:id", async (req, res) => {
+    try {
+      const markaz = await storage.getMarkaz(req.params.id);
+      if (!markaz) {
+        return res.status(404).json({ error: "Markaz not found" });
+      }
+      res.json(markaz);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch markaz" });
+    }
+  });
+
+  app.patch("/api/markazes/:id", async (req, res) => {
+    try {
+      const markaz = await storage.updateMarkaz(req.params.id, req.body);
+      res.json(markaz);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update markaz" });
+    }
+  });
+
+  app.delete("/api/markazes/:id", async (req, res) => {
+    try {
+      await storage.deleteMarkaz(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete markaz" });
     }
   });
 
