@@ -29,40 +29,32 @@ const guides: Record<string, ScreenGuide> = {
     },
     steps: [
       {
-        title: { en: 'Task & Stats Cards', ur: 'کام اور اعدادوشمار کارڈز' },
+        title: { en: 'Task Cards', ur: 'کام کارڈز' },
         description: {
-          en: 'At the top of your dashboard, you\'ll see 3 cards:\n\n• MY TASKS - Shows pending work assigned to you\n• COMPLETED - Shows tasks you\'ve finished\n• LESSON PLANS - Coming soon!\n\nThese cards give you a quick overview of your workload.',
-          ur: 'آپ کے ڈیش بورڈ کے اوپر 3 کارڈز نظر آئیں گے:\n\n• میرے کام - آپ کو دیے گئے زیر التوا کام\n• مکمل - آپ کے ختم شدہ کام\n• سبق کے منصوبے - جلد آ رہے ہیں!\n\nیہ کارڈز آپ کے کام کا فوری جائزہ دیتے ہیں۔'
+          en: 'See your tasks, completed work, and lesson plans at a glance.',
+          ur: 'اپنے کام، مکمل شدہ کام، اور سبق کے منصوبے ایک نظر میں دیکھیں۔'
         },
         tip: {
-          en: 'Tap any card to see more details!',
-          ur: 'مزید تفصیلات کے لیے کسی بھی کارڈ پر ٹیپ کریں!'
+          en: 'Tap any card for details!',
+          ur: 'تفصیلات کے لیے کارڈ ٹیپ کریں!'
         },
         target: '[data-testid="widget-stats"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Today\'s Inspiration Quote', ur: 'آج کا حوصلہ افزا اقتباس' },
+        title: { en: 'Inspiration Quote', ur: 'حوصلہ افزا اقتباس' },
         description: {
-          en: 'Every time you visit the dashboard, you see a new inspiring quote about teaching. These motivational quotes change randomly to keep you inspired!',
-          ur: 'جب بھی آپ ڈیش بورڈ دیکھتے ہیں، آپ کو تدریس کے بارے میں ایک نیا حوصلہ افزا اقتباس نظر آتا ہے۔ یہ اقتباسات تصادفی طور پر بدلتے ہیں!'
-        },
-        tip: {
-          en: 'Refresh the page to see a new quote!',
-          ur: 'نیا اقتباس دیکھنے کے لیے صفحہ ریفریش کریں!'
+          en: 'A new inspiring quote appears each time you visit.',
+          ur: 'ہر بار نیا حوصلہ افزا اقتباس نظر آتا ہے۔'
         },
         target: '[data-testid="widget-quote"]',
         position: 'top'
       },
       {
-        title: { en: 'Teaching Tips Section', ur: 'تدریسی تجاویز سیکشن' },
+        title: { en: 'Teaching Tips', ur: 'تدریسی تجاویز' },
         description: {
-          en: 'Get 3 random teaching tips every time you visit! These tips help you improve your classroom teaching with practical advice and techniques.',
-          ur: 'ہر بار جب آپ آئیں تو 3 تصادفی تدریسی تجاویز حاصل کریں! یہ تجاویز آپ کو عملی مشورے اور تکنیکوں کے ساتھ اپنی کلاس روم تدریس بہتر بنانے میں مدد کرتی ہیں۔'
-        },
-        tip: {
-          en: 'Tips change on every page refresh!',
-          ur: 'ہر صفحہ ریفریش پر تجاویز بدل جاتی ہیں!'
+          en: '3 random tips to improve your teaching.',
+          ur: 'تدریس بہتر کرنے کی 3 تجاویز۔'
         },
         target: '[data-testid="widget-tips"]',
         position: 'top'
@@ -70,12 +62,8 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'Leave Calendar', ur: 'چھٹی کیلنڈر' },
         description: {
-          en: 'The LEAVE CALENDAR helps you track your time off:\n\n• Tap the "Calendar" button to open it\n• Select any date to add a leave entry\n• Choose leave type: Casual, Sick, Earned, or Special\n• Add your already approved leaves here for visibility\n\nKeep all your leaves recorded in one place!',
-          ur: 'چھٹی کیلنڈر آپ کی چھٹیوں کو ٹریک کرنے میں مدد کرتا ہے:\n\n• کھولنے کے لیے "کیلنڈر" بٹن ٹیپ کریں\n• چھٹی کا اندراج شامل کرنے کے لیے کوئی بھی تاریخ منتخب کریں\n• چھٹی کی قسم چنیں: کیژول، بیمار، ارنڈ، یا خصوصی\n• اپنی پہلے سے منظور شدہ چھٹیاں یہاں نظر آنے کے لیے شامل کریں'
-        },
-        tip: {
-          en: 'Add your approved leaves here for easy tracking!',
-          ur: 'آسان ٹریکنگ کے لیے اپنی منظور شدہ چھٹیاں یہاں شامل کریں!'
+          en: 'Track your approved leaves here.',
+          ur: 'اپنی منظور شدہ چھٹیاں یہاں دیکھیں۔'
         },
         target: '[data-testid="button-view-calendar-mobile"], [data-testid="button-view-calendar"]',
         position: 'bottom'
@@ -83,85 +71,61 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'Community Album', ur: 'کمیونٹی البم' },
         description: {
-          en: 'The COMMUNITY ALBUM is where you share your teaching moments:\n\n• See photos from ALL schools in the district\n• Post your classroom activities with up to 10 photos\n• React with Like, Love, Clap, or Celebrate\n• Comment and engage with other teachers\n• Get notified when someone reacts to your posts!',
-          ur: 'کمیونٹی البم وہ جگہ ہے جہاں آپ اپنے تدریسی لمحات شیئر کرتے ہیں:\n\n• ضلع کے تمام اسکولوں کی تصاویر دیکھیں\n• 10 تصاویر تک اپنی کلاس روم سرگرمیاں پوسٹ کریں\n• لائک، لو، تالی یا جشن سے ری ایکٹ کریں\n• دوسرے اساتذہ کے ساتھ تبصرے کریں!'
-        },
-        tip: {
-          en: 'Share your best classroom moments with everyone!',
-          ur: 'اپنے بہترین کلاس روم لمحات سب کے ساتھ شیئر کریں!'
+          en: 'Share classroom photos with other teachers.',
+          ur: 'دوسرے اساتذہ کے ساتھ تصاویر شیئر کریں۔'
         },
         target: '[data-testid="button-community-album"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Queries & Help', ur: 'سوالات اور مدد' },
+        title: { en: 'Queries', ur: 'سوالات' },
         description: {
-          en: 'Need help? Use the QUERIES section to:\n\n• Ask questions to your Head Teacher or AEO\n• Report issues or concerns\n• Track responses to your queries\n• Get help with policies and procedures\n\nYour supervisors will respond to your queries.',
-          ur: 'مدد چاہیے؟ سوالات کا سیکشن استعمال کریں:\n\n• اپنے ہیڈ ٹیچر یا AEO سے سوالات پوچھیں\n• مسائل یا خدشات رپورٹ کریں\n• اپنے سوالات کے جوابات ٹریک کریں\n• پالیسیوں اور طریقہ کار میں مدد لیں'
+          en: 'Ask questions to your Head Teacher or AEO.',
+          ur: 'ہیڈ ٹیچر یا AEO سے سوالات پوچھیں۔'
         },
         target: '[data-testid="button-view-queries"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Menu Button (Mobile)', ur: 'مینو بٹن (موبائل)' },
+        title: { en: 'Menu', ur: 'مینو' },
         description: {
-          en: 'On mobile, tap the ☰ MENU BUTTON (three lines) in the top-left corner to open the sidebar menu:\n\n• Leave Calendar - Track your approved leaves\n• Data Requests - View and respond to requests\n• Community Album - Share and view activities\n• Queries - Get help from seniors\n• My Profile - View and edit your info\n• Help Guide - Open this guide again\n• Logout - Sign out of the app\n\nTap anywhere outside to close the menu!',
-          ur: 'موبائل پر، سائڈبار مینو کھولنے کے لیے اوپر بائیں کونے میں ☰ مینو بٹن (تین لائنیں) ٹیپ کریں:\n\n• چھٹی کیلنڈر - اپنی منظور شدہ چھٹیاں دیکھیں\n• ڈیٹا کی درخواستیں - درخواستیں دیکھیں اور جواب دیں\n• کمیونٹی البم - سرگرمیاں شیئر کریں\n• سوالات - بڑوں سے مدد حاصل کریں\n• میرا پروفائل - اپنی معلومات دیکھیں\n• ہیلپ گائیڈ - یہ گائیڈ دوبارہ کھولیں\n• لاگ آؤٹ - ایپ سے باہر نکلیں'
-        },
-        tip: {
-          en: 'Tap outside the menu or the X button to close it!',
-          ur: 'مینو بند کرنے کے لیے باہر ٹیپ کریں یا X بٹن دبائیں!'
+          en: 'Tap ☰ to access all features.',
+          ur: 'تمام خصوصیات کے لیے ☰ ٹیپ کریں۔'
         },
         target: '[data-testid="button-open-menu"]',
         position: 'right'
       },
       {
-        title: { en: 'Sidebar Menu (Desktop)', ur: 'سائڈبار مینو (ڈیسک ٹاپ)' },
+        title: { en: 'Done!', ur: 'مکمل!' },
         description: {
-          en: 'On larger screens, the LEFT SIDEBAR is always visible and gives you quick access to:\n\n• Your profile at the top\n• Quick action buttons\n• Navigation menu with all features\n• Logout button at the bottom\n\nUse the sidebar for easy navigation!',
-          ur: 'بڑی سکرینوں پر، بائیں سائڈبار ہمیشہ نظر آتا ہے اور آپ کو فوری رسائی دیتا ہے:\n\n• اوپر آپ کا پروفائل\n• فوری ایکشن بٹن\n• تمام خصوصیات کے ساتھ نیویگیشن مینو\n• نیچے لاگ آؤٹ بٹن'
-        },
-        position: 'center'
-      },
-      {
-        title: { en: 'That\'s it!', ur: 'بس!' },
-        description: {
-          en: 'You now know all the features of TaleemHub Dashboard!\n\n• Task cards show your work overview\n• Quotes and tips keep you inspired\n• Leave Calendar for time-off management\n• Community Album for sharing activities\n• Queries for getting help\n\nTap "Done" to close this guide. You can open it anytime from the Help button!',
-          ur: 'اب آپ TaleemHub ڈیش بورڈ کی تمام خصوصیات جان گئے!\n\n• ٹاسک کارڈز آپ کے کام کا جائزہ دکھاتے ہیں\n• اقتباسات اور تجاویز آپ کو متحرک رکھتے ہیں\n• چھٹی کیلنڈر وقت کے انتظام کے لیے\n• کمیونٹی البم سرگرمیاں شیئر کرنے کے لیے\n• سوالات مدد کے لیے\n\nگائیڈ بند کرنے کے لیے "مکمل" ٹیپ کریں۔ آپ اسے کسی بھی وقت Help بٹن سے کھول سکتے ہیں!'
-        },
-        tip: {
-          en: 'Tap the Help button anytime to reopen this guide!',
-          ur: 'یہ گائیڈ دوبارہ کھولنے کے لیے کسی بھی وقت Help بٹن ٹیپ کریں!'
+          en: 'You\'re all set! Tap Help anytime to see this guide again.',
+          ur: 'آپ تیار ہیں! گائیڈ دوبارہ دیکھنے کے لیے Help ٹیپ کریں۔'
         },
         position: 'center'
       },
     ],
   },
   '/dashboard-head-teacher': {
-    screenName: { en: 'Head Teacher Dashboard Guide', ur: 'ہیڈ ٹیچر ڈیش بورڈ گائیڈ' },
+    screenName: { en: 'Head Teacher Guide', ur: 'ہیڈ ٹیچر گائیڈ' },
     introduction: {
-      en: 'Welcome to your Head Teacher Dashboard! This is your control center for managing your school, staff, and data requests. Let me show you each feature step by step.',
-      ur: 'اپنے ہیڈ ٹیچر ڈیش بورڈ میں خوش آمدید! یہ آپ کا اسکول، عملے اور ڈیٹا کی درخواستوں کے انتظام کا مرکز ہے۔ آئیں میں آپ کو ہر خصوصیت قدم بہ قدم دکھاتا ہوں۔'
+      en: 'Welcome! Let me show you your dashboard features.',
+      ur: 'خوش آمدید! آئیں آپ کو ڈیش بورڈ دکھاتا ہوں۔'
     },
     steps: [
       {
-        title: { en: 'Task & Stats Cards', ur: 'کام اور اعدادوشمار کارڈز' },
+        title: { en: 'Task Cards', ur: 'کام کارڈز' },
         description: {
-          en: 'At the top of your dashboard, you\'ll see 3 cards:\n\n• PENDING TASKS - Data requests you need to respond to\n• COMPLETED - Tasks you\'ve finished\n• LESSON PLANS - View lesson plans from your teachers (coming soon!)\n\nThese cards give you a quick overview of your workload.',
-          ur: 'آپ کے ڈیش بورڈ کے اوپر 3 کارڈز نظر آئیں گے:\n\n• زیر التوا کام - ڈیٹا کی درخواستیں جن کا آپ کو جواب دینا ہے\n• مکمل - آپ کے ختم شدہ کام\n• سبق کے منصوبے - اپنے اساتذہ کے سبق کے منصوبے دیکھیں (جلد آ رہا ہے!)\n\nیہ کارڈز آپ کے کام کا فوری جائزہ دیتے ہیں۔'
-        },
-        tip: {
-          en: 'Tap any card to see more details!',
-          ur: 'مزید تفصیلات کے لیے کسی بھی کارڈ پر ٹیپ کریں!'
+          en: 'View pending tasks, completed work, and lesson plans.',
+          ur: 'زیر التوا کام، مکمل شدہ کام، اور سبق کے منصوبے دیکھیں۔'
         },
         target: '[data-testid="widget-stats"]',
         position: 'bottom'
       },
       {
-        title: { en: 'My School Staff', ur: 'میرے اسکول کا عملہ' },
+        title: { en: 'Staff Overview', ur: 'عملے کا جائزہ' },
         description: {
-          en: 'This section shows your school\'s staff statistics:\n\n• Total number of teachers\n• Present teachers today\n• Teachers on leave\n\nThis helps you track daily attendance at a glance.',
-          ur: 'یہ سیکشن آپ کے اسکول کے عملے کے اعداد و شمار دکھاتا ہے:\n\n• اساتذہ کی کل تعداد\n• آج موجود اساتذہ\n• چھٹی پر اساتذہ\n\nیہ آپ کو روزانہ حاضری کا فوری جائزہ لینے میں مدد کرتا ہے۔'
+          en: 'See total, present, and absent teachers today.',
+          ur: 'آج کل، موجود اور غیر حاضر اساتذہ دیکھیں۔'
         },
         target: '[data-testid="widget-staff"]',
         position: 'bottom'
@@ -169,38 +133,30 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'Manage Teachers', ur: 'اساتذہ کا انتظام' },
         description: {
-          en: 'Tap "MANAGE TEACHERS" to:\n\n• View all teachers in your school\n• See their details and contact info\n• Monitor their work status\n• Approve new teacher registrations',
-          ur: '"اساتذہ کا انتظام" پر ٹیپ کریں:\n\n• اپنے اسکول کے تمام اساتذہ دیکھیں\n• ان کی تفصیلات اور رابطہ معلومات دیکھیں\n• ان کی کام کی حیثیت کی نگرانی کریں\n• نئے اساتذہ کی رجسٹریشن منظور کریں'
-        },
-        tip: {
-          en: 'You can approve pending teacher registrations here!',
-          ur: 'آپ یہاں زیر التوا اساتذہ کی رجسٹریشن منظور کر سکتے ہیں!'
+          en: 'View and approve teacher registrations.',
+          ur: 'اساتذہ کی رجسٹریشن دیکھیں اور منظور کریں۔'
         },
         target: '[data-testid="button-manage-teachers"]',
         position: 'bottom'
       },
       {
-        title: { en: 'School Management', ur: 'اسکول کا انتظام' },
+        title: { en: 'Edit School', ur: 'اسکول ایڈٹ' },
         description: {
-          en: 'Tap "EDIT SCHOOL" to manage your school\'s data:\n\n• Basic Info - School details, EMIS code, contact info\n• Attendance - Daily student and teacher attendance\n• Infrastructure - Classrooms, facilities, utilities\n• Inventory - Furniture, equipment, supplies\n\n⚠️ Remember to update attendance daily before 10:00 AM!',
-          ur: 'اپنے اسکول کا ڈیٹا منظم کرنے کے لیے "اسکول ایڈٹ" پر ٹیپ کریں:\n\n• بنیادی معلومات - اسکول کی تفصیلات، EMIS کوڈ، رابطہ معلومات\n• حاضری - روزانہ طلباء اور اساتذہ کی حاضری\n• انفراسٹرکچر - کلاس رومز، سہولیات\n• انوینٹری - فرنیچر، سامان\n\n⚠️ یاد رکھیں روزانہ صبح 10 بجے سے پہلے حاضری اپ ڈیٹ کریں!'
+          en: 'Update attendance, infrastructure, inventory.',
+          ur: 'حاضری، انفراسٹرکچر، انوینٹری اپ ڈیٹ کریں۔'
         },
         tip: {
-          en: 'Update attendance daily before 10:00 AM!',
-          ur: 'روزانہ صبح 10 بجے سے پہلے حاضری اپ ڈیٹ کریں!'
+          en: 'Update attendance before 10 AM!',
+          ur: '10 بجے سے پہلے حاضری اپ ڈیٹ کریں!'
         },
         target: '[data-testid="button-edit-school"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Data Requests', ur: 'ڈیٹا کی درخواستیں' },
+        title: { en: 'Data Requests', ur: 'ڈیٹا درخواستیں' },
         description: {
-          en: 'Use "DATA REQUESTS" to:\n\n• View requests from AEO, DEO, or CEO\n• Create new data requests for your teachers\n• Use VOICE NOTES to record instructions in English or Urdu - speech is automatically converted to text!\n• Track responses and submissions\n• Export data to Excel for reporting\n\n🎤 Voice Recording: Tap the microphone icon to record voice notes. Your speech will be transcribed automatically!',
-          ur: '"ڈیٹا کی درخواستیں" استعمال کریں:\n\n• AEO، DEO یا CEO کی درخواستیں دیکھیں\n• اپنے اساتذہ کے لیے نئی ڈیٹا کی درخواستیں بنائیں\n• انگریزی یا اردو میں ہدایات ریکارڈ کرنے کے لیے وائس نوٹس استعمال کریں - تقریر خودکار طور پر ٹیکسٹ میں تبدیل ہو جاتی ہے!\n• جوابات اور جمع کرائیں ٹریک کریں\n• رپورٹنگ کے لیے ڈیٹا Excel میں ایکسپورٹ کریں\n\n🎤 وائس ریکارڈنگ: وائس نوٹس ریکارڈ کرنے کے لیے مائیکروفون آئیکن ٹیپ کریں۔ آپ کی تقریر خودکار طور پر لکھی جائے گی!'
-        },
-        tip: {
-          en: 'Use voice notes in English or Urdu - they get converted to text automatically!',
-          ur: 'انگریزی یا اردو میں وائس نوٹس استعمال کریں - یہ خودکار طور پر ٹیکسٹ میں تبدیل ہو جاتے ہیں!'
+          en: 'Create requests and use voice notes.',
+          ur: 'درخواستیں بنائیں اور وائس نوٹس استعمال کریں۔'
         },
         target: '[data-testid="button-data-requests"]',
         position: 'bottom'
@@ -208,60 +164,35 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'Leave Calendar', ur: 'چھٹی کیلنڈر' },
         description: {
-          en: 'The LEAVE CALENDAR helps you manage staff leave:\n\n• View all teachers\' approved leaves\n• Add new leave entries for teachers\n• Track leave types: Casual, Sick, Earned, Special\n• Plan staffing based on upcoming leaves',
-          ur: 'چھٹی کیلنڈر آپ کو عملے کی چھٹی کا انتظام کرنے میں مدد کرتا ہے:\n\n• تمام اساتذہ کی منظور شدہ چھٹیاں دیکھیں\n• اساتذہ کے لیے نئے چھٹی کے اندراج شامل کریں\n• چھٹی کی اقسام ٹریک کریں\n• آنے والی چھٹیوں کی بنیاد پر عملے کی منصوبہ بندی کریں'
-        },
-        tip: {
-          en: 'Keep track of all teacher leaves in one place!',
-          ur: 'تمام اساتذہ کی چھٹیوں کا ایک جگہ ریکارڈ رکھیں!'
+          en: 'Track teacher leaves.',
+          ur: 'اساتذہ کی چھٹیاں ٹریک کریں۔'
         },
         target: '[data-testid="button-view-calendar"], [data-testid="button-view-calendar-mobile"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Community Album (Social Feed)', ur: 'کمیونٹی البم (سوشل فیڈ)' },
+        title: { en: 'Community Album', ur: 'کمیونٹی البم' },
         description: {
-          en: 'The COMMUNITY ALBUM is a social media-style feed (separate from School Inventory):\n\n• Teachers share classroom activity photos here\n• View posts from ALL schools in the district\n• React with Like, Love, Clap, or Celebrate\n• Comment and encourage fellow teachers\n• You can delete inappropriate posts from your school\n\n📌 Note: This is different from School Inventory which tracks furniture and supplies.',
-          ur: 'کمیونٹی البم ایک سوشل میڈیا سٹائل فیڈ ہے (اسکول انوینٹری سے الگ):\n\n• اساتذہ یہاں کلاس روم سرگرمیوں کی تصاویر شیئر کرتے ہیں\n• ضلع کے تمام اسکولوں کی پوسٹس دیکھیں\n• لائک، لو، تالی یا جشن سے ری ایکٹ کریں\n• ساتھی اساتذہ کو تبصرے کریں اور حوصلہ افزائی کریں\n• آپ اپنے اسکول کی نامناسب پوسٹس حذف کر سکتے ہیں\n\n📌 نوٹ: یہ اسکول انوینٹری سے مختلف ہے جو فرنیچر اور سپلائز کو ٹریک کرتی ہے۔'
+          en: 'View and share classroom photos.',
+          ur: 'کلاس روم کی تصاویر دیکھیں اور شیئر کریں۔'
         },
         target: '[data-testid="button-community-album"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Quick Coaching Tips', ur: 'فوری کوچنگ تجاویز' },
+        title: { en: 'Menu', ur: 'مینو' },
         description: {
-          en: 'The COACHING TIPS section helps you guide your teachers:\n\n• Get 3 random coaching tips each time you visit\n• Use these tips during teacher observations\n• Share tips with teachers during mentoring sessions\n• Tips cover teaching techniques, classroom management, and student engagement',
-          ur: 'کوچنگ تجاویز کا سیکشن آپ کو اپنے اساتذہ کی رہنمائی میں مدد کرتا ہے:\n\n• ہر بار جب آپ آئیں تو 3 تصادفی کوچنگ تجاویز حاصل کریں\n• اساتذہ کے مشاہدے کے دوران ان تجاویز کا استعمال کریں\n• مینٹورنگ سیشنز کے دوران اساتذہ کے ساتھ تجاویز شیئر کریں\n• تجاویز میں تدریسی تکنیک، کلاس روم کا انتظام، اور طلباء کی مشغولیت شامل ہے'
-        },
-        tip: {
-          en: 'Use these tips during your classroom observations!',
-          ur: 'کلاس روم مشاہدے کے دوران ان تجاویز کا استعمال کریں!'
-        },
-        target: '[data-testid="widget-coaching-tips"]',
-        position: 'bottom'
-      },
-      {
-        title: { en: 'Menu Button (Mobile)', ur: 'مینو بٹن (موبائل)' },
-        description: {
-          en: 'On mobile, tap the ☰ MENU BUTTON (three lines) to open the sidebar menu with all options:\n\n• School Management\n• Manage Teachers\n• Data Requests\n• Leave Calendar\n• Community Album\n• My Profile & Settings\n• Help Guide & Logout',
-          ur: 'موبائل پر، تمام آپشنز کے ساتھ سائڈبار مینو کھولنے کے لیے ☰ مینو بٹن پر ٹیپ کریں:\n\n• اسکول کا انتظام\n• اساتذہ کا انتظام\n• ڈیٹا کی درخواستیں\n• چھٹی کیلنڈر\n• کمیونٹی البم\n• میرا پروفائل اور ترتیبات\n• ہیلپ گائیڈ اور لاگ آؤٹ'
-        },
-        tip: {
-          en: 'Tap outside the menu or the X button to close it!',
-          ur: 'مینو بند کرنے کے لیے باہر ٹیپ کریں یا X بٹن دبائیں!'
+          en: 'Tap ☰ for all features.',
+          ur: 'تمام خصوصیات کے لیے ☰ ٹیپ کریں۔'
         },
         target: '[data-testid="button-open-menu"]',
         position: 'right'
       },
       {
-        title: { en: 'That\'s it!', ur: 'بس!' },
+        title: { en: 'Done!', ur: 'مکمل!' },
         description: {
-          en: 'You now know all the features of your Head Teacher Dashboard!\n\n• Task cards show your work overview\n• Staff section shows teacher attendance\n• School Management for all school data\n• Data Requests for collecting information\n• Leave Calendar for tracking leaves\n\nTap "Done" to close this guide. You can open it anytime from the Help button!',
-          ur: 'اب آپ اپنے ہیڈ ٹیچر ڈیش بورڈ کی تمام خصوصیات جان گئے!\n\n• ٹاسک کارڈز آپ کے کام کا جائزہ دکھاتے ہیں\n• عملے کا سیکشن اساتذہ کی حاضری دکھاتا ہے\n• تمام اسکول ڈیٹا کے لیے اسکول کا انتظام\n• معلومات جمع کرنے کے لیے ڈیٹا کی درخواستیں\n• چھٹیوں کو ٹریک کرنے کے لیے چھٹی کیلنڈر\n\nگائیڈ بند کرنے کے لیے "مکمل" ٹیپ کریں!'
-        },
-        tip: {
-          en: 'Tap the Help button anytime to reopen this guide!',
-          ur: 'یہ گائیڈ دوبارہ کھولنے کے لیے کسی بھی وقت Help بٹن ٹیپ کریں!'
+          en: 'You\'re all set! Tap Help anytime.',
+          ur: 'آپ تیار ہیں! کسی بھی وقت Help ٹیپ کریں۔'
         },
         position: 'center'
       },
@@ -270,244 +201,174 @@ const guides: Record<string, ScreenGuide> = {
   '/calendar': {
     screenName: { en: 'Leave Calendar', ur: 'چھٹی کیلنڈر' },
     introduction: {
-      en: 'The Leave Calendar helps you track staff absences. All leaves are automatically approved.',
-      ur: 'چھٹی کیلنڈر آپ کو عملے کی غیر حاضریوں کو ٹریک کرنے میں مدد کرتا ہے۔ تمام چھٹیاں خودکار طور پر منظور ہو جاتی ہیں۔'
+      en: 'Track staff leaves here.',
+      ur: 'یہاں عملے کی چھٹیاں ٹریک کریں۔'
     },
     steps: [
       {
-        title: { en: 'Month Navigation', ur: 'مہینے کی نیویگیشن' },
+        title: { en: 'Navigation', ur: 'نیویگیشن' },
         description: {
-          en: 'Use these arrow buttons to move between months. The left arrow goes to the previous month, and the right arrow goes to the next month.',
-          ur: 'مہینوں کے درمیان جانے کے لیے ان تیر کے بٹنوں کا استعمال کریں۔ بائیں تیر پچھلے مہینے پر جاتا ہے اور دائیں تیر اگلے مہینے پر۔'
+          en: 'Use arrows to move between months.',
+          ur: 'مہینوں کے درمیان جانے کے لیے تیر استعمال کریں۔'
         },
         target: '[data-testid*="prev"], [data-testid*="next"], .calendar-nav',
         position: 'bottom'
       },
       {
-        title: { en: 'Calendar Grid - Tap to Add Leave', ur: 'کیلنڈر گرڈ - چھٹی شامل کرنے کے لیے ٹیپ کریں' },
+        title: { en: 'Add Leave', ur: 'چھٹی شامل کریں' },
         description: {
-          en: 'TAP ON ANY DATE to add a new leave! A form will appear where you select the teacher, leave type, and dates. Colored dots show existing leaves.',
-          ur: 'نئی چھٹی شامل کرنے کے لیے کسی بھی تاریخ پر ٹیپ کریں! ایک فارم ظاہر ہوگا جہاں آپ استاد، چھٹی کی قسم اور تاریخیں منتخب کریں۔ رنگین نقطے موجودہ چھٹیاں دکھاتے ہیں۔'
-        },
-        tip: {
-          en: 'Just tap a date - no button needed!',
-          ur: 'بس تاریخ پر ٹیپ کریں - کسی بٹن کی ضرورت نہیں!'
+          en: 'Tap any date to add a leave.',
+          ur: 'چھٹی شامل کرنے کے لیے تاریخ ٹیپ کریں۔'
         },
         target: '.calendar-grid, [data-testid*="calendar"], .grid-cols-7',
         position: 'top'
       },
       {
-        title: { en: 'Leave Types & Colors', ur: 'چھٹی کی اقسام اور رنگ' },
+        title: { en: 'Leave Colors', ur: 'چھٹی کے رنگ' },
         description: {
-          en: 'GREEN = Casual Leave (عارضی), BLUE = Sick Leave (بیماری), PURPLE = Earned Leave (کمائی ہوئی), ORANGE = Special Leave (خصوصی). Look for the colored dots on dates.',
-          ur: 'سبز = عارضی چھٹی، نیلا = بیماری کی چھٹی، جامنی = کمائی ہوئی چھٹی، نارنجی = خصوصی چھٹی۔ تاریخوں پر رنگین نقطے تلاش کریں۔'
+          en: 'Green=Casual, Blue=Sick, Purple=Earned, Orange=Special.',
+          ur: 'سبز=عارضی، نیلا=بیماری، جامنی=کمائی، نارنجی=خصوصی۔'
         },
         target: '.legend, [data-testid*="legend"], [data-testid*="guide"]',
         position: 'top'
       },
-      {
-        title: { en: 'View Leave Details', ur: 'چھٹی کی تفصیلات دیکھیں' },
-        description: {
-          en: 'Tap on any date with a colored dot to see who is on leave that day, the leave type, and any notes that were added.',
-          ur: 'رنگین نقطے والی کسی بھی تاریخ پر ٹیپ کریں تاکہ دیکھ سکیں کہ اس دن کون چھٹی پر ہے، چھٹی کی قسم اور کوئی نوٹ جو شامل کیے گئے تھے۔'
-        },
-        position: 'center'
-      },
     ],
   },
   '/data-requests': {
-    screenName: { en: 'Data Requests', ur: 'ڈیٹا کی درخواستیں' },
+    screenName: { en: 'Data Requests', ur: 'ڈیٹا درخواستیں' },
     introduction: {
-      en: 'View and respond to data collection requests from your supervisors. You can use voice notes to record responses in English or Urdu!',
-      ur: 'اپنے سپروائزرز کی طرف سے ڈیٹا جمع کرنے کی درخواستیں دیکھیں اور ان کا جواب دیں۔ آپ انگریزی یا اردو میں جوابات ریکارڈ کرنے کے لیے وائس نوٹس استعمال کر سکتے ہیں!'
+      en: 'View and respond to requests. Use voice notes!',
+      ur: 'درخواستیں دیکھیں اور جواب دیں۔ وائس نوٹس استعمال کریں!'
     },
     steps: [
       {
-        title: { en: 'Filter Tabs', ur: 'فلٹر ٹیبز' },
+        title: { en: 'Filter', ur: 'فلٹر' },
         description: {
-          en: 'Use these tabs to filter: ALL shows everything, PENDING shows requests you haven\'t submitted yet, SUBMITTED shows completed ones.',
-          ur: 'فلٹر کرنے کے لیے یہ ٹیبز استعمال کریں: سب کچھ دکھاتا ہے، زیر التوا وہ درخواستیں دکھاتا ہے جو آپ نے ابھی تک جمع نہیں کرائیں، جمع شدہ مکمل شدہ دکھاتا ہے۔'
+          en: 'Use tabs: All, Pending, Submitted.',
+          ur: 'ٹیبز استعمال کریں: سب، زیر التوا، جمع شدہ۔'
         },
         target: '[data-testid*="filter"], .tabs, [role="tablist"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Request Cards', ur: 'درخواست کارڈز' },
+        title: { en: 'Requests', ur: 'درخواستیں' },
         description: {
-          en: 'Each card shows a request with its title, sender, deadline, and status. Tap a card to open it and submit your response.',
-          ur: 'ہر کارڈ ایک درخواست دکھاتا ہے جس میں عنوان، بھیجنے والا، آخری تاریخ اور حیثیت ہوتی ہے۔ اسے کھولنے اور اپنا جواب جمع کرنے کے لیے کارڈ پر ٹیپ کریں۔'
-        },
-        tip: {
-          en: 'Check deadlines! Submit before time expires.',
-          ur: 'آخری تاریخیں چیک کریں! وقت ختم ہونے سے پہلے جمع کریں۔'
+          en: 'Tap a card to view and respond.',
+          ur: 'دیکھنے اور جواب دینے کے لیے کارڈ ٹیپ کریں۔'
         },
         target: '[data-testid*="request-card"], .request-list',
         position: 'bottom'
       },
       {
-        title: { en: 'Voice Notes Feature', ur: 'وائس نوٹس کی خصوصیت' },
+        title: { en: 'Voice Notes', ur: 'وائس نوٹس' },
         description: {
-          en: 'Use VOICE NOTES to record your instructions or responses:\n\n• Tap the 🎤 microphone icon to start recording\n• Speak in English or Urdu\n• Your speech is automatically converted to text!\n• The transcribed text appears in the text field\n• You can edit the text after recording',
-          ur: 'اپنی ہدایات یا جوابات ریکارڈ کرنے کے لیے وائس نوٹس استعمال کریں:\n\n• ریکارڈنگ شروع کرنے کے لیے 🎤 مائیکروفون آئیکن ٹیپ کریں\n• انگریزی یا اردو میں بولیں\n• آپ کی تقریر خودکار طور پر ٹیکسٹ میں تبدیل ہو جاتی ہے!\n• لکھا ہوا ٹیکسٹ ٹیکسٹ فیلڈ میں ظاہر ہوتا ہے\n• آپ ریکارڈنگ کے بعد ٹیکسٹ ایڈٹ کر سکتے ہیں'
-        },
-        tip: {
-          en: 'Speak clearly - your voice is converted to text automatically!',
-          ur: 'واضح بولیں - آپ کی آواز خودکار طور پر ٹیکسٹ میں تبدیل ہو جاتی ہے!'
+          en: 'Tap 🎤 to record. Speech converts to text.',
+          ur: 'ریکارڈ کرنے کے لیے 🎤 ٹیپ کریں۔ آواز ٹیکسٹ میں بدل جاتی ہے۔'
         },
         target: '[data-testid*="voice-recorder"], [data-testid*="mic"]',
         position: 'bottom'
-      },
-      {
-        title: { en: 'Submitting a Response', ur: 'جواب جمع کرانا' },
-        description: {
-          en: 'After tapping a request, fill in all required fields carefully. You can type or use voice notes. Upload any needed files or photos. Tap "Submit" when done - you cannot change it after!',
-          ur: 'درخواست پر ٹیپ کرنے کے بعد تمام مطلوبہ خانے احتیاط سے پُر کریں۔ آپ ٹائپ کر سکتے ہیں یا وائس نوٹس استعمال کر سکتے ہیں۔ کوئی بھی ضروری فائلیں یا تصاویر اپ لوڈ کریں۔ مکمل ہونے پر "جمع کریں" پر ٹیپ کریں - بعد میں تبدیل نہیں ہو سکتا!'
-        },
-        position: 'center'
       },
     ],
   },
   '/school-visits': {
     screenName: { en: 'School Visits', ur: 'اسکول دورے' },
     introduction: {
-      en: 'Record and track your school visits for monitoring, mentoring, and office activities.',
-      ur: 'نگرانی، رہنمائی اور دفتری سرگرمیوں کے لیے اپنے اسکول کے دوروں کا ریکارڈ رکھیں۔'
+      en: 'Record your school visits.',
+      ur: 'اپنے اسکول کے دوروں کا ریکارڈ رکھیں۔'
     },
     steps: [
       {
-        title: { en: 'Visit Type Tabs', ur: 'دورے کی قسم کے ٹیبز' },
+        title: { en: 'Visit Type', ur: 'دورے کی قسم' },
         description: {
-          en: 'Choose the type of visit: MONITORING (school inspections), MENTORING (teacher coaching), OFFICE (administrative work). Each has different forms.',
-          ur: 'دورے کی قسم منتخب کریں: نگرانی (اسکول معائنہ)، رہنمائی (اساتذہ کی کوچنگ)، دفتر (انتظامی کام)۔ ہر ایک کے مختلف فارمز ہیں۔'
+          en: 'Choose: Monitoring, Mentoring, or Office.',
+          ur: 'منتخب کریں: نگرانی، رہنمائی، یا دفتر۔'
         },
         target: '[data-testid*="tab"], [role="tablist"], .tabs',
         position: 'bottom'
       },
       {
-        title: { en: 'New Visit Button', ur: 'نیا دورہ بٹن' },
+        title: { en: 'New Visit', ur: 'نیا دورہ' },
         description: {
-          en: 'Tap "New Visit" to start recording a visit. Select the school, and the system will record your arrival time automatically.',
-          ur: 'دورہ ریکارڈ کرنا شروع کرنے کے لیے "نیا دورہ" پر ٹیپ کریں۔ اسکول منتخب کریں اور سسٹم خودکار طور پر آپ کے پہنچنے کا وقت ریکارڈ کرے گا۔'
+          en: 'Tap to start a visit. Arrival time is auto-recorded.',
+          ur: 'دورہ شروع کرنے کے لیے ٹیپ کریں۔ آمد کا وقت خودکار ریکارڈ ہوتا ہے۔'
         },
         target: '[data-testid*="new-visit"], [data-testid*="create"], button:contains("New")',
         position: 'bottom'
       },
       {
-        title: { en: 'Add Photos as Evidence', ur: 'ثبوت کے طور پر تصاویر شامل کریں' },
+        title: { en: 'Photos', ur: 'تصاویر' },
         description: {
-          en: 'During your visit, tap "Add Photo" to capture evidence. Take clear photos of classrooms, facilities, and any issues you find.',
-          ur: 'اپنے دورے کے دوران ثبوت حاصل کرنے کے لیے "تصویر شامل کریں" پر ٹیپ کریں۔ کلاس رومز، سہولیات اور کسی بھی مسئلے کی واضح تصاویر لیں۔'
-        },
-        tip: {
-          en: 'Photos help verify your visit!',
-          ur: 'تصاویر آپ کے دورے کی تصدیق کرتی ہیں!'
-        },
-        position: 'center'
-      },
-      {
-        title: { en: 'Submit Your Visit', ur: 'اپنا دورہ جمع کریں' },
-        description: {
-          en: 'Fill all required fields, record your departure time, and tap "Submit". Once submitted, your supervisor can see the visit report.',
-          ur: 'تمام مطلوبہ خانے پُر کریں، اپنے جانے کا وقت ریکارڈ کریں اور "جمع کریں" پر ٹیپ کریں۔ جمع کرنے کے بعد آپ کا سپروائزر دورے کی رپورٹ دیکھ سکتا ہے۔'
+          en: 'Add photos as evidence of your visit.',
+          ur: 'اپنے دورے کے ثبوت کے طور پر تصاویر شامل کریں۔'
         },
         position: 'center'
       },
     ],
   },
   '/profile': {
-    screenName: { en: 'Your Profile', ur: 'آپ کا پروفائل' },
+    screenName: { en: 'Profile', ur: 'پروفائل' },
     introduction: {
-      en: 'View your account information and manage app settings.',
-      ur: 'اپنے اکاؤنٹ کی معلومات دیکھیں اور ایپ کی ترتیبات کا انتظام کریں۔'
+      en: 'Your account info and settings.',
+      ur: 'آپ کے اکاؤنٹ کی معلومات اور ترتیبات۔'
     },
     steps: [
       {
-        title: { en: 'Your Information', ur: 'آپ کی معلومات' },
+        title: { en: 'Your Info', ur: 'آپ کی معلومات' },
         description: {
-          en: 'Here you can see your name, role, phone number, and assigned school. This info is from your registration.',
-          ur: 'یہاں آپ اپنا نام، کردار، فون نمبر اور تفویض کردہ اسکول دیکھ سکتے ہیں۔ یہ معلومات آپ کی رجسٹریشن سے ہے۔'
+          en: 'View name, role, phone, school.',
+          ur: 'نام، کردار، فون، اسکول دیکھیں۔'
         },
         target: '.profile-info, [data-testid*="user-info"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Theme Toggle', ur: 'تھیم ٹوگل' },
+        title: { en: 'Theme', ur: 'تھیم' },
         description: {
-          en: 'Switch between Light Mode (bright) and Dark Mode (dark background). Dark mode is easier on eyes at night.',
-          ur: 'لائٹ موڈ (روشن) اور ڈارک موڈ (گہرا پس منظر) کے درمیان سوئچ کریں۔ رات کو ڈارک موڈ آنکھوں کے لیے آسان ہے۔'
+          en: 'Switch between light and dark mode.',
+          ur: 'لائٹ اور ڈارک موڈ کے درمیان سوئچ کریں۔'
         },
         target: '[data-testid*="theme"], .theme-toggle',
         position: 'bottom'
       },
-      {
-        title: { en: 'Logout Button', ur: 'لاگ آؤٹ بٹن' },
-        description: {
-          en: 'Tap "Logout" to sign out. Always logout when using a shared or borrowed device for security.',
-          ur: 'سائن آؤٹ کرنے کے لیے "لاگ آؤٹ" پر ٹیپ کریں۔ سیکیورٹی کے لیے مشترکہ یا ادھار لی گئی ڈیوائس پر ہمیشہ لاگ آؤٹ کریں۔'
-        },
-        tip: {
-          en: 'Always logout on shared devices!',
-          ur: 'مشترکہ ڈیوائسز پر ہمیشہ لاگ آؤٹ کریں!'
-        },
-        target: '[data-testid*="logout"], button:contains("Logout")',
-        position: 'top'
-      },
     ],
   },
   '/school-data': {
-    screenName: { en: 'School Information', ur: 'اسکول کی معلومات' },
+    screenName: { en: 'School Info', ur: 'اسکول کی معلومات' },
     introduction: {
-      en: 'View and manage your school\'s information, inventory, and statistics.',
-      ur: 'اپنے اسکول کی معلومات، انوینٹری اور اعداد و شمار دیکھیں اور ان کا انتظام کریں۔'
+      en: 'View and manage school data.',
+      ur: 'اسکول کا ڈیٹا دیکھیں اور انتظام کریں۔'
     },
     steps: [
       {
-        title: { en: 'School Profile', ur: 'اسکول کا پروفائل' },
+        title: { en: 'School Details', ur: 'اسکول تفصیلات' },
         description: {
-          en: 'View EMIS code, school name, address, and contact details from official records.',
-          ur: 'سرکاری ریکارڈ سے EMIS کوڈ، اسکول کا نام، پتہ اور رابطے کی تفصیلات دیکھیں۔'
+          en: 'View EMIS code, name, address.',
+          ur: 'EMIS کوڈ، نام، پتہ دیکھیں۔'
         },
         position: 'center'
-      },
-      {
-        title: { en: 'Staff & Student Count', ur: 'عملہ اور طالب علم کی تعداد' },
-        description: {
-          en: 'See current teacher count and student enrollment numbers at your school.',
-          ur: 'اپنے اسکول میں موجودہ اساتذہ کی تعداد اور طلباء کے داخلے کی تعداد دیکھیں۔'
-        },
-        position: 'center'
-      },
-      {
-        title: { en: 'Edit School Data', ur: 'اسکول کا ڈیٹا ایڈٹ کریں' },
-        description: {
-          en: 'If you have permission, tap "Edit" to update school information. Changes may need supervisor approval.',
-          ur: 'اگر آپ کے پاس اجازت ہے تو اسکول کی معلومات اپ ڈیٹ کرنے کے لیے "ایڈٹ" پر ٹیپ کریں۔ تبدیلیوں کو سپروائزر کی منظوری درکار ہو سکتی ہے۔'
-        },
-        target: '[data-testid*="edit"], button:contains("Edit")',
-        position: 'bottom'
       },
     ],
   },
   '/queries': {
     screenName: { en: 'Queries', ur: 'سوالات' },
     introduction: {
-      en: 'Submit questions and track responses from your supervisors.',
-      ur: 'سوالات جمع کریں اور اپنے سپروائزرز کے جوابات کو ٹریک کریں۔'
+      en: 'Ask questions to supervisors.',
+      ur: 'سپروائزرز سے سوالات پوچھیں۔'
     },
     steps: [
       {
-        title: { en: 'Your Queries', ur: 'آپ کے سوالات' },
+        title: { en: 'Queries', ur: 'سوالات' },
         description: {
-          en: 'See all your submitted queries. "Pending" means waiting for response. "Resolved" means answered.',
-          ur: 'اپنے تمام جمع کرائے گئے سوالات دیکھیں۔ "زیر التوا" کا مطلب جواب کا انتظار۔ "حل شدہ" کا مطلب جواب دے دیا گیا۔'
+          en: 'See pending and resolved queries.',
+          ur: 'زیر التوا اور حل شدہ سوالات دیکھیں۔'
         },
         position: 'center'
       },
       {
-        title: { en: 'Create New Query', ur: 'نیا سوال بنائیں' },
+        title: { en: 'New Query', ur: 'نیا سوال' },
         description: {
-          en: 'Tap "Create Query" to ask a new question. Describe your problem clearly so your supervisor can help.',
-          ur: 'نیا سوال پوچھنے کے لیے "سوال بنائیں" پر ٹیپ کریں۔ اپنے مسئلے کو واضح طور پر بیان کریں تاکہ آپ کا سپروائزر مدد کر سکے۔'
+          en: 'Tap Create to ask a question.',
+          ur: 'سوال پوچھنے کے لیے Create ٹیپ کریں۔'
         },
         target: '[data-testid*="create"], button:contains("Create")',
         position: 'bottom'
@@ -517,122 +378,62 @@ const guides: Record<string, ScreenGuide> = {
   '/community-album': {
     screenName: { en: 'Community Album', ur: 'کمیونٹی البم' },
     introduction: {
-      en: 'Welcome to the Community Album! This is where teachers from ALL schools share their classroom activities, achievements, and memorable moments. Let me show you how to use it!',
-      ur: 'کمیونٹی البم میں خوش آمدید! یہاں تمام اسکولوں کے اساتذہ اپنی کلاس روم سرگرمیاں، کامیابیاں اور یادگار لمحات شیئر کرتے ہیں۔ آئیں میں آپ کو دکھاتا ہوں کہ اسے کیسے استعمال کریں!'
+      en: 'Share classroom photos with other schools.',
+      ur: 'دوسرے اسکولوں کے ساتھ تصاویر شیئر کریں۔'
     },
     steps: [
       {
-        title: { en: 'Feed & Albums Tabs', ur: 'فیڈ اور البمز ٹیبز' },
+        title: { en: 'Feed', ur: 'فیڈ' },
         description: {
-          en: 'Switch between Feed (all posts) and Albums (organized by school). Feed shows recent activities from all schools. Albums lets you browse by school.',
-          ur: 'فیڈ (تمام پوسٹس) اور البمز (اسکول کے لحاظ سے منظم) کے درمیان سوئچ کریں۔ فیڈ تمام اسکولوں کی حالیہ سرگرمیاں دکھاتی ہے۔ البمز آپ کو اسکول کے لحاظ سے براؤز کرنے دیتے ہیں۔'
-        },
-        tip: {
-          en: 'You can see what other schools are doing for inspiration!',
-          ur: 'آپ دوسرے اسکولوں کی سرگرمیاں دیکھ کر تحریک حاصل کر سکتے ہیں!'
+          en: 'See posts from all schools.',
+          ur: 'تمام اسکولوں کی پوسٹس دیکھیں۔'
         },
         target: '[data-testid="button-view-feed"]',
         position: 'bottom'
       },
       {
-        title: { en: 'Create New Post Button', ur: 'نئی پوسٹ بنائیں بٹن' },
+        title: { en: 'Create Post', ur: 'پوسٹ بنائیں' },
         description: {
-          en: 'Tap this button to share your classroom activity! You can: Add up to 10 photos at once, Write a title and description, Share achievements, events, or daily activities.',
-          ur: 'اپنی کلاس روم سرگرمی شیئر کرنے کے لیے یہ بٹن ٹیپ کریں! آپ: ایک وقت میں 10 تصاویر تک شامل کر سکتے ہیں، عنوان اور تفصیل لکھ سکتے ہیں، کامیابیاں، تقریبات یا روزانہ کی سرگرمیاں شیئر کر سکتے ہیں۔'
-        },
-        tip: {
-          en: 'Maximum 10 photos per post!',
-          ur: 'ہر پوسٹ میں زیادہ سے زیادہ 10 تصاویر!'
+          en: 'Share up to 10 photos with a title.',
+          ur: 'عنوان کے ساتھ 10 تصاویر تک شیئر کریں۔'
         },
         target: '[data-testid="button-create-activity"]',
         position: 'bottom'
       },
       {
-        title: { en: 'React to Posts', ur: 'پوسٹس پر ری ایکٹ کریں' },
+        title: { en: 'React', ur: 'ری ایکٹ' },
         description: {
-          en: 'Show appreciation by reacting to posts! Tap the reaction button to: Like, Love, Clap, or Celebrate someone\'s work. The poster will be notified when you react!',
-          ur: 'پوسٹس پر ری ایکٹ کرکے تعریف ظاہر کریں! ری ایکشن بٹن ٹیپ کریں: لائک، لو، تالی یا جشن منائیں۔ جب آپ ری ایکٹ کریں گے تو پوسٹ کرنے والے کو مطلع کیا جائے گا!'
-        },
-        tip: {
-          en: 'Reactions notify the teacher who posted!',
-          ur: 'ری ایکشنز پوسٹ کرنے والے استاد کو مطلع کرتے ہیں!'
+          en: 'Like, Love, Clap, or Celebrate posts.',
+          ur: 'پوسٹس پر لائک، لو، تالی، یا جشن۔'
         },
         target: '[data-testid^="button-reaction-"]',
         position: 'top'
       },
-      {
-        title: { en: 'Add Comments', ur: 'تبصرے شامل کریں' },
-        description: {
-          en: 'Type in the comment box to add a comment. Share your thoughts, ask questions, or appreciate the activity. Comments help build community!',
-          ur: 'تبصرہ شامل کرنے کے لیے تبصرے کے باکس میں ٹائپ کریں۔ اپنے خیالات شیئر کریں، سوالات پوچھیں یا سرگرمی کی تعریف کریں۔ تبصرے کمیونٹی بنانے میں مدد کرتے ہیں!'
-        },
-        target: '[data-testid^="input-comment-"]',
-        position: 'top'
-      },
-      {
-        title: { en: 'Post Menu (Delete/Manage)', ur: 'پوسٹ مینو (حذف/انتظام)' },
-        description: {
-          en: 'Tap the three dots menu on your posts to delete them. Teachers can delete their own posts. Head Teachers can delete posts from their school.',
-          ur: 'اپنی پوسٹس حذف کرنے کے لیے تین نقطوں کے مینو پر ٹیپ کریں۔ اساتذہ اپنی پوسٹس حذف کر سکتے ہیں۔ ہیڈ ٹیچرز اپنے اسکول کی پوسٹس حذف کر سکتے ہیں۔'
-        },
-        tip: {
-          en: 'Only you can delete your posts!',
-          ur: 'صرف آپ اپنی پوسٹس حذف کر سکتے ہیں!'
-        },
-        target: '[data-testid^="button-menu-"]',
-        position: 'left'
-      },
-      {
-        title: { en: 'Download Photos', ur: 'تصاویر ڈاؤن لوڈ کریں' },
-        description: {
-          en: 'You can download individual photos or all photos from a post. Tap the download button on any photo to save it to your device.',
-          ur: 'آپ انفرادی تصاویر یا پوسٹ کی تمام تصاویر ڈاؤن لوڈ کر سکتے ہیں۔ کسی بھی تصویر کو اپنے ڈیوائس میں محفوظ کرنے کے لیے ڈاؤن لوڈ بٹن پر ٹیپ کریں۔'
-        },
-        target: '[data-testid="button-download-png"]',
-        position: 'top'
-      },
-      {
-        title: { en: 'Back to Dashboard', ur: 'ڈیش بورڈ پر واپس' },
-        description: {
-          en: 'Tap the back arrow at the top to return to your Dashboard.',
-          ur: 'اپنے ڈیش بورڈ پر واپس جانے کے لیے اوپر والے بیک ایرو پر ٹیپ کریں۔'
-        },
-        target: '[data-testid="button-back"]',
-        position: 'right'
-      },
     ],
   },
   '/user-management': {
-    screenName: { en: 'User Management', ur: 'صارف کا انتظام' },
+    screenName: { en: 'Users', ur: 'صارفین' },
     introduction: {
-      en: 'View and manage users under your supervision.',
-      ur: 'اپنی نگرانی میں صارفین کو دیکھیں اور ان کا انتظام کریں۔'
+      en: 'Manage users under you.',
+      ur: 'اپنے ماتحت صارفین کا انتظام کریں۔'
     },
     steps: [
       {
-        title: { en: 'User List', ur: 'صارف کی فہرست' },
+        title: { en: 'User List', ur: 'صارف فہرست' },
         description: {
-          en: 'See all users in your area. The list shows name, role, school, and account status.',
-          ur: 'اپنے علاقے کے تمام صارفین دیکھیں۔ فہرست نام، کردار، اسکول اور اکاؤنٹ کی حیثیت دکھاتی ہے۔'
+          en: 'View name, role, school, status.',
+          ur: 'نام، کردار، اسکول، حیثیت دیکھیں۔'
         },
         position: 'center'
       },
       {
-        title: { en: 'Filter Users', ur: 'صارفین فلٹر کریں' },
+        title: { en: 'Filter', ur: 'فلٹر' },
         description: {
-          en: 'Use filters to find users by role, school, or district. This helps quickly find who you need.',
-          ur: 'کردار، اسکول یا ضلع کے لحاظ سے صارفین تلاش کرنے کے لیے فلٹرز استعمال کریں۔ یہ جلدی تلاش کرنے میں مدد کرتا ہے۔'
+          en: 'Filter by role, school, or area.',
+          ur: 'کردار، اسکول یا علاقے کے لحاظ سے فلٹر کریں۔'
         },
         target: '[data-testid*="filter"], .filters',
         position: 'bottom'
-      },
-      {
-        title: { en: 'View User Profile', ur: 'صارف کا پروفائل دیکھیں' },
-        description: {
-          en: 'Tap any user to see their complete profile, contact info, and activity history.',
-          ur: 'ان کا مکمل پروفائل، رابطے کی معلومات اور سرگرمی کی تاریخ دیکھنے کے لیے کسی بھی صارف پر ٹیپ کریں۔'
-        },
-        position: 'center'
       },
     ],
   },
