@@ -23,18 +23,12 @@ const grades = [
   { id: '3', label: 'Class 3', labelUr: 'جماعت 3' },
   { id: '4', label: 'Class 4', labelUr: 'جماعت 4' },
   { id: '5', label: 'Class 5', labelUr: 'جماعت 5' },
-  { id: '6', label: 'Class 6', labelUr: 'جماعت 6' },
-  { id: '7', label: 'Class 7', labelUr: 'جماعت 7' },
-  { id: '8', label: 'Class 8', labelUr: 'جماعت 8' },
 ];
 
 const subjects = [
   { id: 'english', label: 'English', labelUr: 'انگریزی', color: 'from-blue-400 to-blue-600', icon: '📘' },
   { id: 'urdu', label: 'Urdu', labelUr: 'اردو', color: 'from-emerald-400 to-emerald-600', icon: '📗' },
   { id: 'math', label: 'Mathematics', labelUr: 'ریاضی', color: 'from-amber-400 to-amber-600', icon: '📐' },
-  { id: 'science', label: 'General Science', labelUr: 'سائنس', color: 'from-purple-400 to-purple-600', icon: '🔬' },
-  { id: 'islamiat', label: 'Islamiat', labelUr: 'اسلامیات', color: 'from-teal-400 to-teal-600', icon: '📖' },
-  { id: 'social', label: 'Social Studies', labelUr: 'معاشرتی علوم', color: 'from-rose-400 to-rose-600', icon: '🌍' },
 ];
 
 const upcomingFeatures = [
