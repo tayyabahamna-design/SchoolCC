@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useActivities, MonitoringVisitData, MentoringVisitData, OfficeVisitData } from '@/contexts/activities';
 import { useLocation } from 'wouter';
-import { ArrowLeft, MapPin, Calendar, User, CheckCircle, Mic, Camera, Clock, FileText, Navigation } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, User, CheckCircle, Mic, Camera, Clock, FileText, Navigation, Edit } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { analytics } from '@/lib/analytics';
 import type { GpsTrackingPoint } from '@shared/schema';
@@ -758,11 +758,34 @@ export default function ViewVisit() {
             </Button>
             <h1 className="text-2xl font-bold text-foreground ml-4 uppercase">{visit.schoolName}</h1>
           </div>
-          <span className={`px-3 py-1 rounded text-sm font-medium ${
-            visit.status === 'submitted' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-          }`}>
-            {visit.status === 'submitted' ? 'Completed' : visit.status}
-          </span>
+          <div className="flex items-center gap-3">
+            {/* Edit button - only for AEO viewing their own visit */}
+            {user.role === 'AEO' && visit.aeoId === user.id && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Navigate to edit form based on visit type
+                  if (visit.type === 'monitoring') {
+                    navigate(`/edit-monitoring-visit/${visit.id}`);
+                  } else if (visit.type === 'mentoring') {
+                    navigate(`/edit-mentoring-visit/${visit.id}`);
+                  } else if (visit.type === 'office') {
+                    navigate(`/edit-office-visit/${visit.id}`);
+                  }
+                }}
+                className="flex items-center gap-2"
+              >
+                <Edit className="w-4 h-4" />
+                Edit Visit
+              </Button>
+            )}
+            <span className={`px-3 py-1 rounded text-sm font-medium ${
+              visit.status === 'submitted' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+            }`}>
+              {visit.status === 'submitted' ? 'Completed' : visit.status}
+            </span>
+          </div>
         </div>
       </div>
 

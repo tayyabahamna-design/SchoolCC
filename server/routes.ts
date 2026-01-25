@@ -2296,6 +2296,21 @@ export async function registerRoutes(
     }
   });
 
+  app.put("/api/activities/monitoring/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const visitData = {
+        ...req.body,
+        submittedAt: req.body.submittedAt ? new Date(req.body.submittedAt) : undefined,
+      };
+      const updatedVisit = await storage.updateMonitoringVisit(id, visitData);
+      res.json(updatedVisit);
+    } catch (error: any) {
+      console.error("Monitoring visit update error:", error?.message || error);
+      res.status(400).json({ error: "Failed to update monitoring visit", details: error?.message || String(error) });
+    }
+  });
+
   // Mentoring Visit endpoints
   app.post("/api/activities/mentoring", async (req, res) => {
     try {
@@ -2326,6 +2341,21 @@ export async function registerRoutes(
     }
   });
 
+  app.put("/api/activities/mentoring/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const visitData = {
+        ...req.body,
+        submittedAt: req.body.submittedAt ? new Date(req.body.submittedAt) : undefined,
+      };
+      const updatedVisit = await storage.updateMentoringVisit(id, visitData);
+      res.json(updatedVisit);
+    } catch (error: any) {
+      console.error("Mentoring visit update error:", error?.message || error);
+      res.status(400).json({ error: "Failed to update mentoring visit", details: error?.message || String(error) });
+    }
+  });
+
   // Office Visit endpoints
   app.post("/api/activities/office", async (req, res) => {
     try {
@@ -2353,6 +2383,21 @@ export async function registerRoutes(
       res.json(visits);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch office visits" });
+    }
+  });
+
+  app.put("/api/activities/office/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const visitData = {
+        ...req.body,
+        submittedAt: req.body.submittedAt ? new Date(req.body.submittedAt) : undefined,
+      };
+      const updatedVisit = await storage.updateOfficeVisit(id, visitData);
+      res.json(updatedVisit);
+    } catch (error: any) {
+      console.error("Office visit update error:", error?.message || error);
+      res.status(400).json({ error: "Failed to update office visit", details: error?.message || String(error) });
     }
   });
 

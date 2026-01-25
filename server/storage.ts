@@ -152,16 +152,19 @@ export interface IStorage {
   createMonitoringVisit(visit: InsertMonitoringVisit): Promise<MonitoringVisit>;
   getMonitoringVisitsByAeo(aeoId: string): Promise<MonitoringVisit[]>;
   getAllMonitoringVisits(): Promise<MonitoringVisit[]>;
+  updateMonitoringVisit(id: string, visit: Partial<InsertMonitoringVisit>): Promise<MonitoringVisit>;
 
   // Mentoring Visit operations
   createMentoringVisit(visit: InsertMentoringVisit): Promise<MentoringVisit>;
   getMentoringVisitsByAeo(aeoId: string): Promise<MentoringVisit[]>;
   getAllMentoringVisits(): Promise<MentoringVisit[]>;
+  updateMentoringVisit(id: string, visit: Partial<InsertMentoringVisit>): Promise<MentoringVisit>;
 
   // Office Visit operations
   createOfficeVisit(visit: InsertOfficeVisit): Promise<OfficeVisit>;
   getOfficeVisitsByAeo(aeoId: string): Promise<OfficeVisit[]>;
   getAllOfficeVisits(): Promise<OfficeVisit[]>;
+  updateOfficeVisit(id: string, visit: Partial<InsertOfficeVisit>): Promise<OfficeVisit>;
 
   // Other Activity operations
   createOtherActivity(activity: InsertOtherActivity): Promise<OtherActivity>;
@@ -902,6 +905,14 @@ export class DBStorage implements IStorage {
       .orderBy(desc(monitoringVisits.createdAt));
   }
 
+  async updateMonitoringVisit(id: string, visit: Partial<InsertMonitoringVisit>): Promise<MonitoringVisit> {
+    const result = await db.update(monitoringVisits)
+      .set(visit as any)
+      .where(eq(monitoringVisits.id, id))
+      .returning();
+    return result[0];
+  }
+
   // Mentoring Visit operations
   async createMentoringVisit(visit: InsertMentoringVisit): Promise<MentoringVisit> {
     const result = await db.insert(mentoringVisits).values(visit as any).returning();
@@ -921,6 +932,14 @@ export class DBStorage implements IStorage {
       .orderBy(desc(mentoringVisits.createdAt));
   }
 
+  async updateMentoringVisit(id: string, visit: Partial<InsertMentoringVisit>): Promise<MentoringVisit> {
+    const result = await db.update(mentoringVisits)
+      .set(visit as any)
+      .where(eq(mentoringVisits.id, id))
+      .returning();
+    return result[0];
+  }
+
   // Office Visit operations
   async createOfficeVisit(visit: InsertOfficeVisit): Promise<OfficeVisit> {
     const result = await db.insert(officeVisits).values(visit as any).returning();
@@ -938,6 +957,14 @@ export class DBStorage implements IStorage {
     return await db.select()
       .from(officeVisits)
       .orderBy(desc(officeVisits.createdAt));
+  }
+
+  async updateOfficeVisit(id: string, visit: Partial<InsertOfficeVisit>): Promise<OfficeVisit> {
+    const result = await db.update(officeVisits)
+      .set(visit as any)
+      .where(eq(officeVisits.id, id))
+      .returning();
+    return result[0];
   }
 
   // Other Activity operations

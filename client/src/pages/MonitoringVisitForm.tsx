@@ -221,6 +221,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
         arrivalTime: formData.arrivalTime || currentTime,
         departureTime: formData.departureTime || currentTime,
         markaz: user?.markaz || formData.markaz || '',
+        tehsil: user?.tehsilName || formData.tehsil || '',
         evidence,
         status: 'submitted',
         submittedAt: new Date(),

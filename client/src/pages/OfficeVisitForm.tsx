@@ -180,6 +180,8 @@ export default function OfficeVisitForm({ onClose }: Props) {
         id: `off-${Date.now()}`,
         aeoId: formData.aeoId || user?.id || '',
         aeoName: formData.aeoName || user?.name || '',
+        markaz: user?.markaz || '',
+        tehsil: user?.tehsilName || '',
         visitDate: formData.visitDate || now.toISOString().split('T')[0],
         arrivalTime: formData.arrivalTime || currentTime,
         departureTime: formData.departureTime || currentTime,
