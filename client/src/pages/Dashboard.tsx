@@ -983,9 +983,9 @@ export default function Dashboard() {
 
       {/* Main Content Area */}
       <div className="flex-1">
-        {/* Mobile Header */}
+        {/* Mobile Header - matches desktop style */}
         <div className="lg:hidden bg-card/95 dark:bg-card backdrop-blur-xl border-b border-border sticky top-0 z-50">
-          <div className="px-4 py-3 flex items-center justify-between">
+          <div className="px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
@@ -997,8 +997,8 @@ export default function Dashboard() {
                 <Menu className="w-6 h-6" />
               </Button>
               <div>
-                <h1 className="text-lg font-bold gradient-text-gold">TaleemHub</h1>
-                <p className="text-xs text-muted-foreground">{user.name}</p>
+                <h1 className="text-base font-bold gradient-text">Welcome, {user.name.split(' ')[0]}</h1>
+                <p className="text-xs text-muted-foreground">Dashboard overview</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -1017,82 +1017,6 @@ export default function Dashboard() {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-          
-          {/* Mobile Quick Actions Scroll */}
-          <div className="px-4 pb-4 overflow-x-auto">
-            <div className="flex gap-2 min-w-max">
-              {user.role === 'AEO' && (
-                <>
-                  <Button
-                    onClick={() => setActiveActivityForm('visit-selector')}
-                    size="sm"
-                    className="rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0"
-                    data-testid="button-plan-visit-mobile"
-                  >
-                    <ClipboardList className="w-4 h-4" />
-                    Plan Visit
-                  </Button>
-                  <Button
-                    onClick={() => setActiveActivityForm('other-activity')}
-                    size="sm"
-                    className="rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0"
-                    data-testid="button-log-activity-mobile"
-                  >
-                    <CheckSquare className="w-4 h-4" />
-                    Log Activity
-                  </Button>
-                </>
-              )}
-              <Button
-                onClick={() => toast({
-                  title: "Coming Soon!",
-                  description: "All Requests feature is under development.",
-                })}
-                size="sm"
-                className="rounded-full bg-gradient-to-r from-slate-400 to-slate-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0"
-                data-testid="button-view-requests-mobile"
-              >
-                <FileText className="w-4 h-4" />
-                Requests
-              </Button>
-              <Button
-                onClick={() => navigate('/calendar')}
-                size="sm"
-                className="rounded-full bg-gradient-to-r from-blue-400 to-blue-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0"
-                data-testid="button-view-calendar-mobile"
-              >
-                <Calendar className="w-4 h-4" />
-                Calendar
-              </Button>
-              <Button
-                onClick={() => navigate('/school-data')}
-                size="sm"
-                className="rounded-full bg-gradient-to-r from-teal-400 to-teal-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0"
-                data-testid="button-view-schools-mobile"
-              >
-                <Building2 className="w-4 h-4" />
-                Schools
-              </Button>
-              <Button
-                onClick={() => navigate('/lesson-plans')}
-                size="sm"
-                className="rounded-full bg-gradient-to-r from-indigo-400 to-indigo-500 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0"
-                data-testid="button-lesson-plans-mobile"
-              >
-                <BookOpen className="w-4 h-4" />
-                Lesson Plans
-              </Button>
-              <Button
-                onClick={() => window.dispatchEvent(new CustomEvent('openHelpGuide'))}
-                size="sm"
-                className="rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 border-0 animate-pulse"
-                data-testid="button-help-guide-mobile"
-              >
-                <HelpCircle className="w-4 h-4" />
-                Help
-              </Button>
             </div>
           </div>
         </div>
