@@ -84,13 +84,22 @@ const guides: Record<string, ScreenGuide> = {
         position: 'bottom'
       },
       {
-        title: { en: 'Open Menu', ur: 'مینو کھولیں' },
+        title: { en: 'Menu Button', ur: 'مینو بٹن' },
         description: {
-          en: 'Now let me show you the menu. I\'ll open it for you.',
-          ur: 'اب مینو دیکھتے ہیں۔ میں آپ کے لیے کھولتا ہوں۔'
+          en: 'This is the menu button (☰). Tap it to see all features.',
+          ur: 'یہ مینو بٹن (☰) ہے۔ تمام خصوصیات دیکھنے کے لیے ٹیپ کریں۔'
         },
-        target: '[data-testid="button-open-menu"], [data-testid="button-toggle-menu"]',
-        position: 'right',
+        target: '[data-testid="button-toggle-menu"]',
+        position: 'left'
+      },
+      {
+        title: { en: 'Menu Opened', ur: 'مینو کھل گیا' },
+        description: {
+          en: 'The menu is now open. Let me show you each feature.',
+          ur: 'مینو اب کھل گیا ہے۔ ہر خصوصیت دکھاتا ہوں۔'
+        },
+        target: '[data-testid="button-toggle-menu"]',
+        position: 'left',
         openMenu: true
       },
       {
