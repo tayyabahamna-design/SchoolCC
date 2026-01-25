@@ -50,7 +50,17 @@ import PWAInstallBanner from "@/components/PWAInstallBanner";
 import { HelpGuide } from "@/components/HelpGuide";
 
 function DashboardRoute() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
+  
+  // Show loading state while checking auth - prevents redirect flash
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
   if (!isAuthenticated) return <Login />;
 
   // CEO gets CEO Dashboard
@@ -64,7 +74,16 @@ function DashboardRoute() {
 }
 
 function Router() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
+
+  // Show loading state while checking auth - prevents redirect on page refresh
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <>

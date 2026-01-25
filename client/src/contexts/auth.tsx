@@ -60,23 +60,27 @@ interface AuthContextType {
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    // Initialize from localStorage on first render
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initialize from localStorage on first render
+  useEffect(() => {
     try {
       const stored = localStorage.getItem(USER_STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        setUser(JSON.parse(stored));
       }
     } catch (e) {
       console.error('Failed to parse stored user:', e);
     }
-    return null;
-  });
+    setIsLoading(false);
+  }, []);
 
   // Re-identify user with PostHog when session is restored or user changes
   useEffect(() => {
@@ -151,7 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUser, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser, isAuthenticated: !!user, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
