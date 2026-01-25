@@ -1121,7 +1121,7 @@ export default function Dashboard() {
               <NotificationBell />
               <div
                 onClick={() => navigate('/profile')}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/50 cursor-pointer transition-all duration-200"
+                className="p-1 rounded-full hover:bg-muted/50 cursor-pointer transition-all duration-200"
                 data-testid="header-profile-button"
               >
                 {user.profilePicture ? (
@@ -1131,10 +1131,6 @@ export default function Dashboard() {
                     <User className="w-5 h-5 text-white" />
                   </div>
                 )}
-                <div className="hidden xl:block">
-                  <p className="font-semibold text-foreground text-sm">{user.name}</p>
-                  <p className="text-muted-foreground text-xs">{user.role.replace(/_/g, ' ')}</p>
-                </div>
               </div>
             </div>
           </div>
