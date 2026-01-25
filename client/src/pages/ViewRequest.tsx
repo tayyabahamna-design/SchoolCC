@@ -74,37 +74,14 @@ export default function ViewRequest() {
       if (!showDelegateModal || !user) return;
       
       try {
-        const response = await fetch('/api/users');
+        // Use /api/admin/users with userId for proper hierarchical filtering
+        const response = await fetch(`/api/admin/users?userId=${user.id}`);
         if (response.ok) {
-          const allUsers = await response.json();
-          const userHierarchy = ROLE_HIERARCHY[user.role as UserRole] || 0;
-          
-          // Filter users that are lower in hierarchy
-          const lowerUsers = allUsers.filter((u: any) => {
-            const theirHierarchy = ROLE_HIERARCHY[u.role as UserRole] || 0;
-            // Must be lower in hierarchy (higher number = lower rank)
-            if (theirHierarchy <= userHierarchy) return false;
-            
-            // Filter by location - must be in same district/cluster/school
-            if (user.role === 'AEO') {
-              // AEO can assign to head teachers/teachers in their cluster
-              return u.clusterId === user.clusterId || 
-                     (user.assignedSchools && user.assignedSchools.includes(u.schoolName));
-            }
-            if (user.role === 'DDEO' || user.role === 'DEO') {
-              // DEO/DDEO can assign to AEOs/HTs/Teachers in their district
-              return u.districtId === user.districtId;
-            }
-            if (user.role === 'HEAD_TEACHER') {
-              // Head Teacher can assign to teachers in their school
-              return u.schoolId === user.schoolId;
-            }
-            return false;
-          });
+          const filteredUsers = await response.json();
           
           // Exclude already assigned users
           const existingAssigneeIds = request?.assignees.map(a => a.userId) || [];
-          const availableUsers = lowerUsers.filter((u: any) => !existingAssigneeIds.includes(u.id));
+          const availableUsers = filteredUsers.filter((u: any) => !existingAssigneeIds.includes(u.id));
           
           setSubordinates(availableUsers);
         }
