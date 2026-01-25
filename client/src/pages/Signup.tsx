@@ -5,8 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { AlertCircle, CheckCircle, ArrowLeft, HelpCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, ArrowLeft, HelpCircle, Search, X, Plus } from 'lucide-react';
 import type { UserRole } from '@/contexts/auth';
 import { analytics } from '@/lib/analytics';
 import CompactTooltipGuide, { TooltipStep, useTooltipGuideStatus } from '@/components/CompactTooltipGuide';
@@ -53,19 +52,13 @@ const signupGuideSteps: TooltipStep[] = [
   {
     target: '[data-guide="schools-select"]',
     title: '4b. اسکولز | Schools',
-    message: 'وہ اسکول منتخب کریں جن کی آپ نگرانی کریں گے۔\nSelect the schools you will oversee.',
+    message: 'اسکول تلاش کریں یا دستی طور پر شامل کریں۔\nSearch for schools or add manually.',
     placement: 'bottom',
   },
   {
-    target: '[data-guide="school-name-input"]',
-    title: '4c. اسکول کا نام | School Name',
-    message: 'اپنے اسکول کا نام درج کریں۔\nEnter your school name.',
-    placement: 'bottom',
-  },
-  {
-    target: '[data-guide="school-emis-input"]',
-    title: '4d. ای ایم آئی ایس | EMIS Number',
-    message: 'اپنے اسکول کا ای ایم آئی ایس نمبر درج کریں۔\nEnter your school EMIS number.',
+    target: '[data-guide="school-select"]',
+    title: '4c. اسکول منتخب کریں | Select School',
+    message: 'اپنا اسکول تلاش کریں یا دستی طور پر شامل کریں۔\nSearch for your school or add manually.',
     placement: 'bottom',
   },
   {
@@ -132,8 +125,207 @@ const ALL_SCHOOLS = [
   { name: "GPS REHMATABAD", emis: "37330383" }
 ];
 
-// School names only for AEO selection
-const SCHOOL_NAMES = ALL_SCHOOLS.map(s => s.name);
+// Searchable School Selector Component
+function SchoolSelector({
+  selectedSchools,
+  onChange,
+  label,
+  sublabel,
+  multiple = true,
+}: {
+  selectedSchools: Array<{ name: string; emis: string }>;
+  onChange: (schools: Array<{ name: string; emis: string }>) => void;
+  label: string;
+  sublabel?: string;
+  multiple?: boolean;
+}) {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [manualName, setManualName] = useState('');
+  const [manualEmis, setManualEmis] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const filteredSchools = ALL_SCHOOLS.filter(school =>
+    school.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    school.emis.includes(searchQuery)
+  );
+
+  const handleSelectSchool = (school: { name: string; emis: string }) => {
+    if (multiple) {
+      if (!selectedSchools.some(s => s.emis === school.emis)) {
+        onChange([...selectedSchools, school]);
+      }
+    } else {
+      onChange([school]);
+    }
+    setSearchQuery('');
+    setShowDropdown(false);
+  };
+
+  const handleRemoveSchool = (emis: string) => {
+    onChange(selectedSchools.filter(s => s.emis !== emis));
+  };
+
+  const handleAddManual = () => {
+    if (manualName.trim()) {
+      const newSchool = { name: manualName.trim(), emis: manualEmis.trim() || 'CUSTOM' };
+      if (multiple) {
+        onChange([...selectedSchools, newSchool]);
+      } else {
+        onChange([newSchool]);
+      }
+      setManualName('');
+      setManualEmis('');
+      setShowManualEntry(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="space-y-3" data-guide="school-select">
+      <div>
+        <Label>{label}</Label>
+        {sublabel && <p className="text-sm text-muted-foreground mb-2">{sublabel}</p>}
+      </div>
+
+      {/* Search Input */}
+      <div className="relative" ref={dropdownRef}>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowDropdown(true);
+            }}
+            onFocus={() => setShowDropdown(true)}
+            placeholder="Search school by name or EMIS | اسکول تلاش کریں"
+            className="pl-9"
+            data-testid="input-school-search"
+          />
+        </div>
+
+        {/* Dropdown */}
+        {showDropdown && searchQuery && (
+          <div className="absolute z-50 w-full mt-1 bg-background border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+            {filteredSchools.length > 0 ? (
+              filteredSchools.map((school) => (
+                <button
+                  key={school.emis}
+                  type="button"
+                  onClick={() => handleSelectSchool(school)}
+                  className={`w-full text-left px-3 py-2 hover:bg-muted text-sm ${
+                    selectedSchools.some(s => s.emis === school.emis) ? 'bg-muted/50' : ''
+                  }`}
+                >
+                  <span className="font-medium">{school.name}</span>
+                  <span className="text-muted-foreground ml-2">({school.emis})</span>
+                </button>
+              ))
+            ) : (
+              <div className="px-3 py-2 text-sm text-muted-foreground">
+                No schools found. Use "Add manually" below.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Selected Schools */}
+      {selectedSchools.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {selectedSchools.map((school, idx) => (
+            <div
+              key={`${school.emis}-${idx}`}
+              className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-sm"
+            >
+              <span>{school.name}</span>
+              <button
+                type="button"
+                onClick={() => handleRemoveSchool(school.emis)}
+                className="hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Manual Entry Toggle */}
+      {!showManualEntry ? (
+        <button
+          type="button"
+          onClick={() => setShowManualEntry(true)}
+          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
+        >
+          <Plus className="w-4 h-4" />
+          Add school manually | دستی طور پر اسکول شامل کریں
+        </button>
+      ) : (
+        <div className="border rounded-lg p-3 space-y-3 bg-muted/30">
+          <p className="text-sm font-medium">Add School Manually | اسکول دستی طور پر شامل کریں</p>
+          <div>
+            <Label className="text-xs">School Name | اسکول کا نام</Label>
+            <Input
+              value={manualName}
+              onChange={(e) => setManualName(e.target.value)}
+              placeholder="Enter school name"
+              data-testid="input-manual-school-name"
+            />
+          </div>
+          <div>
+            <Label className="text-xs">EMIS Number (optional) | ای ایم آئی ایس نمبر</Label>
+            <Input
+              value={manualEmis}
+              onChange={(e) => setManualEmis(e.target.value)}
+              placeholder="Enter EMIS number"
+              data-testid="input-manual-school-emis"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleAddManual}
+              disabled={!manualName.trim()}
+            >
+              Add | شامل کریں
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setShowManualEntry(false);
+                setManualName('');
+                setManualEmis('');
+              }}
+            >
+              Cancel | منسوخ
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {selectedSchools.length > 0 && (
+        <p className="text-sm text-muted-foreground">
+          Selected: {selectedSchools.length} school(s) | منتخب: {selectedSchools.length} اسکول
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function Signup() {
   const [, navigate] = useLocation();
@@ -172,6 +364,8 @@ export default function Signup() {
     districtId: 'Rawalpindi',
     markazName: '',
     assignedSchools: [] as string[],
+    aeoSchools: [] as Array<{ name: string; emis: string }>,
+    teacherSchools: [] as Array<{ name: string; emis: string }>,
   });
 
   // Initialize tooltip guide when page loads
@@ -454,71 +648,26 @@ export default function Signup() {
                     />
                   </div>
                   <div data-guide="schools-select">
-                    <Label>Select Schools to Oversee *</Label>
-                    <p className="text-sm text-muted-foreground mb-2">Choose the schools you will be monitoring</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto border rounded-lg p-3 bg-muted/30">
-                      {SCHOOL_NAMES.map((school) => (
-                        <div key={school} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={school}
-                            checked={formData.assignedSchools.includes(school)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setFormData({
-                                  ...formData,
-                                  assignedSchools: [...formData.assignedSchools, school]
-                                });
-                              } else {
-                                setFormData({
-                                  ...formData,
-                                  assignedSchools: formData.assignedSchools.filter(s => s !== school)
-                                });
-                              }
-                            }}
-                          />
-                          <label
-                            htmlFor={school}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                          >
-                            {school}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                    {formData.assignedSchools.length > 0 && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Selected: {formData.assignedSchools.length} school(s)
-                      </p>
-                    )}
+                    <SchoolSelector
+                      selectedSchools={formData.aeoSchools || []}
+                      onChange={(schools) => setFormData({ ...formData, aeoSchools: schools })}
+                      label="Select Schools to Oversee * | نگرانی کے لیے اسکول منتخب کریں"
+                      sublabel="Choose the schools you will be monitoring | وہ اسکول منتخب کریں جن کی آپ نگرانی کریں گے"
+                      multiple={true}
+                    />
                   </div>
                 </div>
               )}
 
               {(formData.role === 'HEAD_TEACHER' || formData.role === 'TEACHER') && (
-                <div className="space-y-4">
-                  <div data-guide="school-name-input">
-                    <Label>School Name * | اسکول کا نام</Label>
-                    <Input
-                      value={formData.schoolName || ''}
-                      onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
-                      placeholder="Enter your school name | اپنے اسکول کا نام درج کریں"
-                      required
-                      data-testid="input-school-name"
-                    />
-                  </div>
-                  <div data-guide="school-emis-input">
-                    <Label>EMIS Number * | ای ایم آئی ایس نمبر</Label>
-                    <Input
-                      value={formData.schoolEmis}
-                      onChange={(e) => setFormData({ ...formData, schoolEmis: e.target.value })}
-                      placeholder="Enter EMIS number | ای ایم آئی ایس نمبر درج کریں"
-                      required
-                      data-testid="input-school-emis"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Enter the EMIS code of your school | اپنے اسکول کا ای ایم آئی ایس کوڈ درج کریں
-                    </p>
-                  </div>
+                <div data-guide="school-select">
+                  <SchoolSelector
+                    selectedSchools={formData.teacherSchools || []}
+                    onChange={(schools) => setFormData({ ...formData, teacherSchools: schools })}
+                    label="Select Your School * | اپنا اسکول منتخب کریں"
+                    sublabel="Search or add the school where you work | وہ اسکول تلاش کریں یا شامل کریں جہاں آپ کام کرتے ہیں"
+                    multiple={true}
+                  />
                 </div>
               )}
 
