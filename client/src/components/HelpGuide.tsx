@@ -128,8 +128,8 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'Help Guide', ur: 'ہیلپ گائیڈ' },
         description: {
-          en: 'Open this guide anytime from here.',
-          ur: 'یہ گائیڈ کسی بھی وقت یہاں سے کھولیں۔'
+          en: 'Tap here anytime to learn how to use any feature. This guide will walk you through everything!',
+          ur: 'کسی بھی خصوصیت کا استعمال سیکھنے کے لیے یہاں ٹیپ کریں۔ یہ گائیڈ آپ کو سب کچھ سکھائے گا!'
         },
         target: '[data-testid="mobile-button-help-guide"], [data-testid="button-help-guide-sidebar"]',
         position: 'right',
@@ -138,8 +138,8 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'Logout', ur: 'لاگ آؤٹ' },
         description: {
-          en: 'Sign out of your account.',
-          ur: 'اپنے اکاؤنٹ سے سائن آؤٹ کریں۔'
+          en: 'Sign out of your account when done.',
+          ur: 'کام ختم ہونے پر اپنے اکاؤنٹ سے سائن آؤٹ کریں۔'
         },
         target: '[data-testid="mobile-button-logout"], [data-testid="button-logout"]',
         position: 'right',
@@ -272,8 +272,8 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'Help Guide', ur: 'ہیلپ گائیڈ' },
         description: {
-          en: 'Open this guide anytime.',
-          ur: 'یہ گائیڈ کسی بھی وقت کھولیں۔'
+          en: 'Tap here anytime to learn how to use any feature. This guide will walk you through everything!',
+          ur: 'کسی بھی خصوصیت کا استعمال سیکھنے کے لیے یہاں ٹیپ کریں۔ یہ گائیڈ آپ کو سب کچھ سکھائے گا!'
         },
         target: '[data-testid="mobile-button-help-guide"], [data-testid="button-help-guide-sidebar"]',
         position: 'right',
@@ -282,8 +282,8 @@ const guides: Record<string, ScreenGuide> = {
       {
         title: { en: 'Logout', ur: 'لاگ آؤٹ' },
         description: {
-          en: 'Sign out of your account.',
-          ur: 'اپنے اکاؤنٹ سے سائن آؤٹ کریں۔'
+          en: 'Sign out of your account when done.',
+          ur: 'کام ختم ہونے پر اپنے اکاؤنٹ سے سائن آؤٹ کریں۔'
         },
         target: '[data-testid="mobile-button-logout"], [data-testid="button-logout"]',
         position: 'right',
