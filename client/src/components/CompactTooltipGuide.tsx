@@ -37,6 +37,13 @@ export default function CompactTooltipGuide({
     placement: string;
   } | null>(null);
 
+  // Reset to step 1 when guide is opened
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentStep(0);
+    }
+  }, [isOpen]);
+
   const step = steps[currentStep];
 
   const calculatePosition = useCallback(() => {
