@@ -1011,12 +1011,17 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <NotificationBell />
+              <div title="Toggle theme | تھیم تبدیل کریں">
+                <ThemeToggle />
+              </div>
+              <div title="Notifications | اطلاعات">
+                <NotificationBell />
+              </div>
               <div
                 onClick={() => navigate('/profile')}
                 className="cursor-pointer"
                 data-testid="mobile-profile-button"
+                title="Edit Profile | پروفائل میں ترمیم کریں"
               >
                 {user.profilePicture ? (
                   <img src={user.profilePicture} alt={user.name} className="w-9 h-9 rounded-full object-cover shadow-md ring-2 ring-primary/20" />
@@ -1117,12 +1122,17 @@ export default function Dashboard() {
               <p className="text-base text-muted-foreground mt-1">Here's your dashboard overview</p>
             </div>
             <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <NotificationBell />
+              <div title="Toggle theme | تھیم تبدیل کریں">
+                <ThemeToggle />
+              </div>
+              <div title="Notifications | اطلاعات">
+                <NotificationBell />
+              </div>
               <div
                 onClick={() => navigate('/profile')}
                 className="p-1 rounded-full hover:bg-muted/50 cursor-pointer transition-all duration-200"
                 data-testid="header-profile-button"
+                title="Edit Profile | پروفائل میں ترمیم کریں"
               >
                 {user.profilePicture ? (
                   <img src={user.profilePicture} alt={user.name} className="w-10 h-10 rounded-full object-cover shadow-md ring-2 ring-primary/20" />
