@@ -45,6 +45,18 @@ const signupGuideSteps: TooltipStep[] = [
     placement: 'bottom',
   },
   {
+    target: '[data-guide="markaz-input"]',
+    title: '4a. مرکز کا نام | Markaz Name',
+    message: 'اگر آپ AEO ہیں تو اپنے مرکز کا نام درج کریں۔\nIf you are AEO, enter your Markaz name.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-guide="schools-select"]',
+    title: '4b. اسکولز | Schools',
+    message: 'وہ اسکول منتخب کریں جن کی آپ نگرانی کریں گے۔\nSelect the schools you will oversee.',
+    placement: 'bottom',
+  },
+  {
     target: '[data-guide="father-name"]',
     title: '5. والد کا نام | Father Name',
     message: 'والد کا نام درج کریں (اختیاری)۔\nEnter father name (optional).',
@@ -419,7 +431,7 @@ export default function Signup() {
               {/* Role-specific fields */}
               {formData.role === 'AEO' && (
                 <div className="space-y-4">
-                  <div>
+                  <div data-guide="markaz-input">
                     <Label>Markaz Name *</Label>
                     <Input
                       value={formData.markazName}
@@ -428,7 +440,7 @@ export default function Signup() {
                       required
                     />
                   </div>
-                  <div>
+                  <div data-guide="schools-select">
                     <Label>Select Schools to Oversee *</Label>
                     <p className="text-sm text-muted-foreground mb-2">Choose the schools you will be monitoring</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-64 overflow-y-auto border rounded-lg p-3 bg-muted/30">
