@@ -75,6 +75,23 @@ export default function LessonPlansPreview() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        <Card className="p-6 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-xl">
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center animate-pulse">
+              <Clock className="w-8 h-8" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold mb-2">Feature Preview</h2>
+              <p className="text-white/90 text-sm mb-1">
+                This feature is under development. The selections below show what will be available once the feature is ready.
+              </p>
+              <p className="text-white/80 text-sm" dir="rtl">
+                یہ فیچر تیاری میں ہے۔ نیچے دی گئی انتخابات دکھاتی ہیں کہ فیچر تیار ہونے پر کیا دستیاب ہوگا۔
+              </p>
+            </div>
+          </div>
+        </Card>
+
         <Card className="p-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-0 shadow-xl">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center">
@@ -83,19 +100,22 @@ export default function LessonPlansPreview() {
             <div className="flex-1">
               <h2 className="text-2xl font-bold mb-2">Lesson Plans Hub</h2>
               <p className="text-white/90 text-sm mb-1">
-                Your complete teaching companion with ready-made lesson plans, activities, and assessments.
+                Your complete teaching companion with ready-made lesson plans.
               </p>
               <p className="text-white/80 text-sm" dir="rtl">
-                تیار شدہ سبق کے منصوبے، سرگرمیاں اور جانچ کے ساتھ آپ کا مکمل تدریسی ساتھی
+                تیار شدہ سبق کے منصوبوں کے ساتھ آپ کا مکمل تدریسی ساتھی
               </p>
             </div>
           </div>
         </Card>
 
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <GraduationCap className="w-5 h-5 text-indigo-600" />
-            <h3 className="text-lg font-semibold text-foreground">Select Grade / جماعت منتخب کریں</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-lg font-semibold text-foreground">Select Grade / جماعت منتخب کریں</h3>
+            </div>
+            <span className="text-xs px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full font-medium">Preview Only</span>
           </div>
           
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
@@ -118,9 +138,12 @@ export default function LessonPlansPreview() {
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-purple-600" />
-            <h3 className="text-lg font-semibold text-foreground">Select Subject / مضمون منتخب کریں</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-purple-600" />
+              <h3 className="text-lg font-semibold text-foreground">Select Subject / مضمون منتخب کریں</h3>
+            </div>
+            <span className="text-xs px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full font-medium">Preview Only</span>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
