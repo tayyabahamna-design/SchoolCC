@@ -536,16 +536,16 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background flex">
       {/* Mobile Sidebar Overlay */}
       {showSidebar && (
-        <div className="lg:hidden fixed inset-0 z-50">
+        <div className="lg:hidden fixed inset-0 z-[60]">
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowSidebar(false)}
           />
-          <aside className="absolute left-0 top-0 h-full w-72 bg-card/95 dark:bg-card backdrop-blur-xl border-r border-border animate-slideInLeft overflow-y-auto"
+          <aside className="absolute left-0 top-0 h-full w-72 bg-card dark:bg-card border-r border-border animate-slideInLeft flex flex-col"
             data-testid="mobile-sidebar"
           >
             {/* Mobile Sidebar Header */}
-            <div className="p-4 border-b border-border flex items-center justify-between">
+            <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <img src="/taleemhub-logo.png" alt="TaleemHub Logo" className="w-12 h-12" />
                 <div>
@@ -565,7 +565,7 @@ export default function Dashboard() {
             </div>
 
             {/* User Profile Section */}
-            <div className="p-4 border-b border-border/50">
+            <div className="p-4 border-b border-border/50 shrink-0">
               <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5">
                 <div className="relative">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center ring-2 ring-primary/30 ring-offset-2 ring-offset-background shadow-lg">
@@ -583,7 +583,7 @@ export default function Dashboard() {
             </div>
 
             {/* Mobile Sidebar Content */}
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-4 min-h-0">
               <nav className="space-y-2">
                 {user.role === 'AEO' && (
                   <>
@@ -753,7 +753,7 @@ export default function Dashboard() {
             </div>
 
             {/* Mobile Sidebar Footer */}
-            <div className="p-3 border-t border-border">
+            <div className="p-3 border-t border-border shrink-0 mt-auto">
               <Button
                 variant="outline"
                 size="sm"
@@ -772,16 +772,15 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Desktop Sidebar - Quick Actions */}
       {/* Desktop Sidebar Overlay */}
       {showSidebar && (
         <div 
-          className="hidden lg:block fixed inset-0 bg-black/50 z-40"
+          className="hidden lg:block fixed inset-0 bg-black/50 z-[55]"
           onClick={() => setShowSidebar(false)}
         />
       )}
       
-      <aside className={`hidden lg:flex flex-col w-72 bg-card/95 dark:bg-card backdrop-blur-xl border-r border-border fixed left-0 top-0 h-screen z-50 transition-transform duration-300 ${showSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`hidden lg:flex flex-col w-72 bg-card dark:bg-card border-r border-border fixed left-0 top-0 h-screen z-[60] transition-transform duration-300 ${showSidebar ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Sidebar Header - matches main header height */}
         <div className="px-6 py-6 border-b border-border h-[88px] flex items-center justify-between">
           <div className="flex items-center gap-3">
