@@ -356,6 +356,14 @@ export default function Signup() {
   const { hasCompleted, reset: resetGuide } = useTooltipGuideStatus(SIGNUP_GUIDE_KEY);
   const [showGuide, setShowGuide] = useState(false);
 
+  // Tehsil and Markaz lists from API
+  const [tehsilList, setTehsilList] = useState<Array<{ id: string; name: string }>>([]);
+  const [markazList, setMarkazList] = useState<Array<{ id: string; name: string }>>([]);
+  const [showNewTehsilInput, setShowNewTehsilInput] = useState(false);
+  const [showNewMarkazInput, setShowNewMarkazInput] = useState(false);
+  const [newTehsilName, setNewTehsilName] = useState('');
+  const [newMarkazName, setNewMarkazName] = useState('');
+
   // Form state
   const [formData, setFormData] = useState({
     // Basic info
@@ -379,11 +387,96 @@ export default function Signup() {
     schoolName: '',
     schoolEmis: '',
     districtId: 'Rawalpindi',
+    tehsilId: '',
+    tehsilName: '',
+    markazId: '',
     markazName: '',
     assignedSchools: [] as string[],
     aeoSchools: [] as Array<{ name: string; emis: string }>,
     teacherSchools: [] as Array<{ name: string; emis: string }>,
   });
+
+  // Fetch tehsils on mount
+  useEffect(() => {
+    const fetchTehsils = async () => {
+      try {
+        const response = await fetch('/api/tehsils?districtId=Rawalpindi');
+        if (response.ok) {
+          const data = await response.json();
+          setTehsilList(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch tehsils:', error);
+      }
+    };
+    fetchTehsils();
+  }, []);
+
+  // Fetch markazes when tehsil changes
+  useEffect(() => {
+    const fetchMarkazes = async () => {
+      if (!formData.tehsilId) {
+        setMarkazList([]);
+        return;
+      }
+      try {
+        const response = await fetch(`/api/markazes?tehsilId=${formData.tehsilId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setMarkazList(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch markazes:', error);
+      }
+    };
+    fetchMarkazes();
+  }, [formData.tehsilId]);
+
+  // Handle adding new tehsil
+  const handleAddNewTehsil = async () => {
+    if (!newTehsilName.trim()) return;
+    try {
+      const response = await fetch('/api/tehsils', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newTehsilName.trim(), districtId: 'Rawalpindi' })
+      });
+      if (response.ok) {
+        const tehsil = await response.json();
+        setTehsilList(prev => [...prev, tehsil]);
+        setFormData(prev => ({ ...prev, tehsilId: tehsil.id, tehsilName: tehsil.name }));
+        setNewTehsilName('');
+        setShowNewTehsilInput(false);
+      }
+    } catch (error) {
+      console.error('Failed to add tehsil:', error);
+    }
+  };
+
+  // Handle adding new markaz
+  const handleAddNewMarkaz = async () => {
+    if (!newMarkazName.trim() || !formData.tehsilId) return;
+    try {
+      const response = await fetch('/api/markazes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          name: newMarkazName.trim(), 
+          tehsilId: formData.tehsilId,
+          districtId: 'Rawalpindi'
+        })
+      });
+      if (response.ok) {
+        const markaz = await response.json();
+        setMarkazList(prev => [...prev, markaz]);
+        setFormData(prev => ({ ...prev, markazId: markaz.id, markazName: markaz.name, clusterId: markaz.name }));
+        setNewMarkazName('');
+        setShowNewMarkazInput(false);
+      }
+    } catch (error) {
+      console.error('Failed to add markaz:', error);
+    }
+  };
 
   // Initialize tooltip guide when page loads
   useEffect(() => {
@@ -430,13 +523,27 @@ export default function Signup() {
 
     // AEO-specific validation
     if (formData.role === 'AEO') {
-      if (!formData.markazName) {
-        setError('Please enter your Markaz name');
+      if (!formData.tehsilId || !formData.tehsilName) {
+        setError('Please select a tehsil | براہ کرم تحصیل منتخب کریں');
+        setLoading(false);
+        return;
+      }
+      if (!formData.markazId || !formData.markazName) {
+        setError('Please select a markaz | براہ کرم مرکز منتخب کریں');
         setLoading(false);
         return;
       }
       if (!formData.aeoSchools || formData.aeoSchools.length === 0) {
         setError('Please select at least one school to oversee');
+        setLoading(false);
+        return;
+      }
+    }
+
+    // DDEO-specific validation
+    if (formData.role === 'DDEO') {
+      if (!formData.tehsilId || !formData.tehsilName) {
+        setError('Please select a tehsil | براہ کرم تحصیل منتخب کریں');
         setLoading(false);
         return;
       }
@@ -664,15 +771,108 @@ export default function Signup() {
               {/* Role-specific fields */}
               {formData.role === 'AEO' && (
                 <div className="space-y-4">
-                  <div data-guide="markaz-input">
-                    <Label>Markaz Name *</Label>
-                    <Input
-                      value={formData.markazName}
-                      onChange={(e) => setFormData({ ...formData, markazName: e.target.value, clusterId: e.target.value })}
-                      placeholder="Enter your Markaz name"
-                      required
-                    />
+                  {/* Tehsil Selection */}
+                  <div data-guide="tehsil-select">
+                    <Label>Tehsil * | تحصیل</Label>
+                    {!showNewTehsilInput ? (
+                      <div className="space-y-2">
+                        <Select
+                          value={formData.tehsilId}
+                          onValueChange={(value) => {
+                            const tehsil = tehsilList.find(t => t.id === value);
+                            setFormData({ ...formData, tehsilId: value, tehsilName: tehsil?.name || '', markazId: '', markazName: '' });
+                          }}
+                        >
+                          <SelectTrigger data-testid="select-tehsil">
+                            <SelectValue placeholder="Select tehsil | تحصیل منتخب کریں" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {tehsilList.map((tehsil) => (
+                              <SelectItem key={tehsil.id} value={tehsil.id}>{tehsil.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <button
+                          type="button"
+                          onClick={() => setShowNewTehsilInput(true)}
+                          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Add new tehsil | نئی تحصیل شامل کریں
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 border rounded-lg p-3 bg-muted/30">
+                        <Input
+                          value={newTehsilName}
+                          onChange={(e) => setNewTehsilName(e.target.value)}
+                          placeholder="Enter tehsil name | تحصیل کا نام درج کریں"
+                          data-testid="input-new-tehsil"
+                        />
+                        <div className="flex gap-2">
+                          <Button type="button" size="sm" onClick={handleAddNewTehsil} disabled={!newTehsilName.trim()}>
+                            Add | شامل کریں
+                          </Button>
+                          <Button type="button" size="sm" variant="outline" onClick={() => { setShowNewTehsilInput(false); setNewTehsilName(''); }}>
+                            Cancel | منسوخ
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Markaz Selection - only show when tehsil is selected */}
+                  {formData.tehsilId && (
+                    <div data-guide="markaz-input">
+                      <Label>Markaz * | مرکز</Label>
+                      {!showNewMarkazInput ? (
+                        <div className="space-y-2">
+                          <Select
+                            value={formData.markazId}
+                            onValueChange={(value) => {
+                              const markaz = markazList.find(m => m.id === value);
+                              setFormData({ ...formData, markazId: value, markazName: markaz?.name || '', clusterId: markaz?.name || '' });
+                            }}
+                          >
+                            <SelectTrigger data-testid="select-markaz">
+                              <SelectValue placeholder="Select markaz | مرکز منتخب کریں" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {markazList.map((markaz) => (
+                                <SelectItem key={markaz.id} value={markaz.id}>{markaz.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <button
+                            type="button"
+                            onClick={() => setShowNewMarkazInput(true)}
+                            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Add new markaz | نیا مرکز شامل کریں
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2 border rounded-lg p-3 bg-muted/30">
+                          <Input
+                            value={newMarkazName}
+                            onChange={(e) => setNewMarkazName(e.target.value)}
+                            placeholder="Enter markaz name | مرکز کا نام درج کریں"
+                            data-testid="input-new-markaz"
+                          />
+                          <div className="flex gap-2">
+                            <Button type="button" size="sm" onClick={handleAddNewMarkaz} disabled={!newMarkazName.trim()}>
+                              Add | شامل کریں
+                            </Button>
+                            <Button type="button" size="sm" variant="outline" onClick={() => { setShowNewMarkazInput(false); setNewMarkazName(''); }}>
+                              Cancel | منسوخ
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div data-guide="schools-select">
                     <SchoolSelector
                       selectedSchools={formData.aeoSchools || []}
@@ -697,7 +897,70 @@ export default function Signup() {
                 </div>
               )}
 
-              {(formData.role === 'DEO' || formData.role === 'DDEO') && (
+              {formData.role === 'DDEO' && (
+                <div className="space-y-4">
+                  <div>
+                    <Label>District *</Label>
+                    <Input
+                      value={formData.districtId}
+                      onChange={(e) => setFormData({ ...formData, districtId: e.target.value })}
+                      placeholder="District name"
+                      required
+                    />
+                  </div>
+                  {/* Tehsil Selection for DDEO */}
+                  <div data-guide="tehsil-select">
+                    <Label>Tehsil * | تحصیل</Label>
+                    {!showNewTehsilInput ? (
+                      <div className="space-y-2">
+                        <Select
+                          value={formData.tehsilId}
+                          onValueChange={(value) => {
+                            const tehsil = tehsilList.find(t => t.id === value);
+                            setFormData({ ...formData, tehsilId: value, tehsilName: tehsil?.name || '' });
+                          }}
+                        >
+                          <SelectTrigger data-testid="select-tehsil-ddeo">
+                            <SelectValue placeholder="Select tehsil | تحصیل منتخب کریں" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {tehsilList.map((tehsil) => (
+                              <SelectItem key={tehsil.id} value={tehsil.id}>{tehsil.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <button
+                          type="button"
+                          onClick={() => setShowNewTehsilInput(true)}
+                          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Add new tehsil | نئی تحصیل شامل کریں
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 border rounded-lg p-3 bg-muted/30">
+                        <Input
+                          value={newTehsilName}
+                          onChange={(e) => setNewTehsilName(e.target.value)}
+                          placeholder="Enter tehsil name | تحصیل کا نام درج کریں"
+                          data-testid="input-new-tehsil-ddeo"
+                        />
+                        <div className="flex gap-2">
+                          <Button type="button" size="sm" onClick={handleAddNewTehsil} disabled={!newTehsilName.trim()}>
+                            Add | شامل کریں
+                          </Button>
+                          <Button type="button" size="sm" variant="outline" onClick={() => { setShowNewTehsilInput(false); setNewTehsilName(''); }}>
+                            Cancel | منسوخ
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {formData.role === 'DEO' && (
                 <div>
                   <Label>District *</Label>
                   <Input
