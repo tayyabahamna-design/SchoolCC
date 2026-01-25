@@ -66,21 +66,19 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Initialize from localStorage on first render
-  useEffect(() => {
+  // Initialize from localStorage synchronously on first render
+  const [user, setUser] = useState<User | null>(() => {
     try {
       const stored = localStorage.getItem(USER_STORAGE_KEY);
       if (stored) {
-        setUser(JSON.parse(stored));
+        return JSON.parse(stored);
       }
     } catch (e) {
       console.error('Failed to parse stored user:', e);
     }
-    setIsLoading(false);
-  }, []);
+    return null;
+  });
+  const [isLoading] = useState(false); // No loading needed with sync initialization
 
   // Re-identify user with PostHog when session is restored or user changes
   useEffect(() => {
