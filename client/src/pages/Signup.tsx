@@ -287,11 +287,11 @@ function SchoolSelector({
           className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
         >
           <Plus className="w-4 h-4" />
-          Add school manually | دستی طور پر اسکول شامل کریں
+          Add school manually | اسکول شامل کریں
         </button>
       ) : (
         <div className="border rounded-lg p-3 space-y-3 bg-muted/30">
-          <p className="text-sm font-medium">Add School Manually | اسکول دستی طور پر شامل کریں</p>
+          <p className="text-sm font-medium">Add School Manually | اسکول شامل کریں</p>
           <div>
             <Label className="text-xs">School Name | اسکول کا نام</Label>
             <Input
