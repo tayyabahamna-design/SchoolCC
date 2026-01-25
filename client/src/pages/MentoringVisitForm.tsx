@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
-import { useRoute, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -44,10 +44,11 @@ interface Props {
 export default function MentoringVisitForm({ onClose }: Props) {
   const { user } = useAuth();
   const { addMentoringVisit } = useActivities();
-  const [, params] = useRoute('/edit-mentoring-visit/:id');
-  const [, navigate] = useLocation();
-  const visitId = params?.id;
-  const isEditMode = !!visitId;
+  const [location, navigate] = useLocation();
+
+  // Detect edit mode from URL path
+  const isEditMode = location.startsWith('/edit-mentoring-visit/');
+  const visitId = isEditMode ? location.split('/').pop() : undefined;
   const mentoringAreas = MENTORING_AREAS;
 
   // Get schools - filter by assigned schools for AEO users

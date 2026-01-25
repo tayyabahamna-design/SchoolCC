@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth';
-import { useRoute, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -28,10 +28,11 @@ interface Props {
 export default function OfficeVisitForm({ onClose }: Props) {
   const { user } = useAuth();
   const { addOfficeVisit } = useActivities();
-  const [, params] = useRoute('/edit-office-visit/:id');
-  const [, navigate] = useLocation();
-  const visitId = params?.id;
-  const isEditMode = !!visitId;
+  const [location, navigate] = useLocation();
+
+  // Detect edit mode from URL path
+  const isEditMode = location.startsWith('/edit-office-visit/');
+  const visitId = isEditMode ? location.split('/').pop() : undefined;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<OfficeVisitData>>({

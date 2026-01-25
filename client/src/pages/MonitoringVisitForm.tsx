@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/auth';
-import { useRoute, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -38,10 +38,11 @@ interface Props {
 export default function MonitoringVisitForm({ onClose }: Props) {
   const { user } = useAuth();
   const { addMonitoringVisit } = useActivities();
-  const [, params] = useRoute('/edit-monitoring-visit/:id');
-  const [, navigate] = useLocation();
-  const visitId = params?.id;
-  const isEditMode = !!visitId;
+  const [location, navigate] = useLocation();
+
+  // Detect edit mode from URL path
+  const isEditMode = location.startsWith('/edit-monitoring-visit/');
+  const visitId = isEditMode ? location.split('/').pop() : undefined;
 
   // Get schools - filter by assigned schools for AEO users
   const getSchools = () => {
