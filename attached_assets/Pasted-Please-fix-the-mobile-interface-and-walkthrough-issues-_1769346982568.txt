@@ -1,0 +1,24 @@
+Please fix the mobile interface and walkthrough issues as follows:
+
+Walkthrough Pop-up Issues:
+The pop-up must be fully visible and readable on all mobile screens—never extend off the screen or cover dropdowns/inputs (like the "Select role" dropdown).
+Make the pop-up or help bubble smaller if necessary, and shape it to fit neatly on mobile devices (rounded, compact, never more than 50% of screen width).
+Remove the "Finish" and "X/close" controls while onboarding, so the guide cannot be dismissed or skipped by the user by accident.
+The pop-up should persist and continue to guide users through features until the walkthrough finishes naturally, but should never block critical UI—including the role selector and PWA install button/prompt.
+If touched or if the keyboard opens, the pop-up must reposition or minimize so it doesn't block fields.
+Make all pop-ups and tooltips readable by default—high contrast, large enough font, no truncated text.
+Menu Consistency and Mobile UX:
+Make the mobile menu identical to the web sidebar in both feature list and order—every item on the desktop/web menu must appear in the mobile hamburger/drawer menu, in the same order.
+Test on several mobile screen sizes and ensure there is no horizontal scroll or clipped/cut-off content anywhere (QA with real Android and iOS browsers).
+PWA Install Prompt:
+PWA install prompt/button should always be visible and approachable on mobile (never hidden under or covered by onboarding, help, or modals).
+Position the prompt in a sticky way (top- or bottom-fixed bar, not modal) until the PWA is installed.
+General Android Performance:
+App must work as well on Android phones as it does on desktop—no web-only layouts, everything must be touch-friendly, scrollable, and responsive.
+Share screenshots/gifs showing that:
+a. All walkthrough/help content is readable on mobile
+b. No popups ever obscure role/dropdowns/PWA install in onboarding or main menu
+c. Mobile menu is feature-complete and matches web sidebar
+Summary:
+Walkthrough should help, never block—fit mobile, always readable, never skip-dismissed, full menu/menu parity, and make PWA install button obvious at all times.
+I must be able to open the app on Android, do onboarding, and access all menu features and PWA install without anything hidden, blocked, or half-done.

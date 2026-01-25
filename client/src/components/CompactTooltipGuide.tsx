@@ -34,8 +34,9 @@ export default function CompactTooltipGuide({
   const [tooltipPosition, setTooltipPosition] = useState<{
     top: number;
     left: number;
-    placement: string;
+    placement: 'top' | 'bottom' | 'left' | 'right' | 'auto';
   } | null>(null);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   // Reset to step 1 when guide is opened
   useEffect(() => {
@@ -43,6 +44,23 @@ export default function CompactTooltipGuide({
       setCurrentStep(0);
     }
   }, [isOpen]);
+
+  // Detect keyboard visibility on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const windowHeight = window.innerHeight;
+      setKeyboardVisible(viewportHeight < windowHeight * 0.75);
+    };
+
+    window.visualViewport?.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const step = steps[currentStep];
 
@@ -53,10 +71,11 @@ export default function CompactTooltipGuide({
     if (!targetElement) return;
 
     const targetRect = targetElement.getBoundingClientRect();
-    const tooltipWidth = 280; // Compact width for mobile
-    const tooltipMaxHeight = 140; // Compact height
-    const arrowSize = 8;
-    const padding = 12;
+    const screenWidth = window.innerWidth;
+    const tooltipWidth = Math.min(220, screenWidth * 0.45); // Max 45% of screen, max 220px
+    const tooltipMaxHeight = keyboardVisible ? 80 : 110; // Smaller when keyboard is open
+    const arrowSize = 6;
+    const padding = 8;
 
     // Get safe areas (avoid PWA banner at top and sticky button at bottom)
     const pwaBarHeight = 70; // Approximate PWA banner height (with safety margin)
@@ -111,10 +130,10 @@ export default function CompactTooltipGuide({
     };
 
     // Try preferred placement first, then fallback
+    const placementOptions: Array<'bottom' | 'top' | 'right' | 'left'> = ['bottom', 'top', 'right', 'left'];
+    
     if (placement === 'auto') {
-      // Try placements in order: bottom, top, right, left
-      const placements = ['bottom', 'top', 'right', 'left'];
-      for (const p of placements) {
+      for (const p of placementOptions) {
         if (tryPlacement(p)) {
           placement = p;
           break;
@@ -122,9 +141,7 @@ export default function CompactTooltipGuide({
       }
     } else {
       if (!tryPlacement(placement)) {
-        // Fallback to auto if preferred doesn't work
-        const placements = ['bottom', 'top', 'right', 'left'];
-        for (const p of placements) {
+        for (const p of placementOptions) {
           if (tryPlacement(p)) {
             placement = p;
             break;
@@ -133,7 +150,7 @@ export default function CompactTooltipGuide({
       }
     }
 
-    setTooltipPosition({ top, left, placement });
+    setTooltipPosition({ top, left, placement: placement as 'top' | 'bottom' | 'left' | 'right' | 'auto' });
 
     // Scroll element into view gently
     targetElement.scrollIntoView({
@@ -141,7 +158,7 @@ export default function CompactTooltipGuide({
       block: 'nearest',
       inline: 'nearest'
     });
-  }, [step]);
+  }, [step, keyboardVisible]);
 
   useEffect(() => {
     if (!isOpen || !step) return;
@@ -178,58 +195,62 @@ export default function CompactTooltipGuide({
   if (!isOpen || !step || !tooltipPosition) return null;
 
   const getArrowStyle = () => {
-    const arrowSize = 8;
+    const arrowSize = 6;
     const baseStyle = 'absolute w-0 h-0 border-solid';
+    const blueColor = 'rgb(239 246 255)'; // blue-50
 
     switch (tooltipPosition.placement) {
       case 'top':
         return {
-          className: `${baseStyle} border-t-amber-100 dark:border-t-amber-900`,
+          className: baseStyle,
           style: {
             bottom: -arrowSize,
             left: '50%',
             transform: 'translateX(-50%)',
             borderWidth: `${arrowSize}px ${arrowSize}px 0 ${arrowSize}px`,
-            borderColor: 'rgb(254 243 199) transparent transparent transparent',
+            borderColor: `${blueColor} transparent transparent transparent`,
           }
         };
       case 'bottom':
         return {
-          className: `${baseStyle} border-b-amber-100 dark:border-b-amber-900`,
+          className: baseStyle,
           style: {
             top: -arrowSize,
             left: '50%',
             transform: 'translateX(-50%)',
             borderWidth: `0 ${arrowSize}px ${arrowSize}px ${arrowSize}px`,
-            borderColor: 'transparent transparent rgb(254 243 199) transparent',
+            borderColor: `transparent transparent ${blueColor} transparent`,
           }
         };
       case 'left':
         return {
-          className: `${baseStyle} border-l-amber-100 dark:border-l-amber-900`,
+          className: baseStyle,
           style: {
             right: -arrowSize,
             top: '50%',
             transform: 'translateY(-50%)',
             borderWidth: `${arrowSize}px 0 ${arrowSize}px ${arrowSize}px`,
-            borderColor: 'transparent transparent transparent rgb(254 243 199)',
+            borderColor: `transparent transparent transparent ${blueColor}`,
           }
         };
       case 'right':
         return {
-          className: `${baseStyle} border-r-amber-100 dark:border-r-amber-900`,
+          className: baseStyle,
           style: {
             left: -arrowSize,
             top: '50%',
             transform: 'translateY(-50%)',
             borderWidth: `${arrowSize}px ${arrowSize}px ${arrowSize}px 0`,
-            borderColor: 'transparent rgb(254 243 199) transparent transparent',
+            borderColor: `transparent ${blueColor} transparent transparent`,
           }
         };
     }
   };
 
   const arrow = getArrowStyle();
+
+  const screenWidth = window.innerWidth;
+  const tooltipMaxWidth = Math.min(220, screenWidth * 0.45);
 
   return (
     <>
@@ -238,73 +259,73 @@ export default function CompactTooltipGuide({
 
       {/* Compact tooltip bubble */}
       <div
-        className="fixed z-[36] animate-in fade-in zoom-in-95 duration-300"
+        className="fixed z-[36] animate-in fade-in zoom-in-95 duration-200"
         style={{
           top: tooltipPosition.top,
           left: tooltipPosition.left,
-          maxWidth: '280px',
-          width: 'calc(100vw - 32px)',
+          maxWidth: `${tooltipMaxWidth}px`,
+          width: `${tooltipMaxWidth}px`,
         }}
       >
         {/* Arrow pointing to target */}
         <div {...arrow} />
 
         {/* Tooltip content */}
-        <div className="bg-blue-50 dark:bg-blue-900 rounded-xl shadow-2xl border-2 border-blue-200 dark:border-blue-700 overflow-hidden">
-          <div className="px-4 py-3">
+        <div className="bg-blue-50 dark:bg-blue-900 rounded-lg shadow-xl border border-blue-200 dark:border-blue-700 overflow-hidden">
+          <div className="px-2.5 py-2">
             {/* Progress dots - compact */}
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex gap-1">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex gap-0.5">
                 {steps.map((_, idx) => (
                   <div
                     key={idx}
-                    className={`h-1 rounded-full transition-all ${
+                    className={`h-0.5 rounded-full transition-all ${
                       idx === currentStep
-                        ? 'w-4 bg-blue-600 dark:bg-blue-400'
+                        ? 'w-3 bg-blue-600 dark:bg-blue-400'
                         : idx < currentStep
-                        ? 'w-2 bg-blue-400 dark:bg-blue-500'
-                        : 'w-2 bg-blue-300 dark:bg-blue-700'
+                        ? 'w-1.5 bg-blue-400 dark:bg-blue-500'
+                        : 'w-1.5 bg-blue-300 dark:bg-blue-700'
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-xs font-bold text-blue-700 dark:text-blue-300">
+              <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300">
                 {currentStep + 1}/{steps.length}
               </span>
             </div>
 
             {/* Title - compact */}
-            <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100 mb-1">
+            <h3 className="text-xs font-bold text-blue-900 dark:text-blue-100 mb-0.5 leading-tight">
               {step.title}
             </h3>
 
             {/* Message - compact, supports multiline for bilingual text */}
-            <p className="text-xs text-blue-800 dark:text-blue-200 leading-snug mb-3 whitespace-pre-line">
+            <p className="text-[10px] text-blue-800 dark:text-blue-200 leading-tight mb-2 whitespace-pre-line">
               {step.message}
             </p>
 
             {/* Navigation buttons */}
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               {currentStep > 0 && (
                 <Button
                   onClick={() => setCurrentStep(prev => prev - 1)}
                   size="sm"
                   variant="outline"
-                  className="h-9 border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:text-blue-300 dark:hover:bg-blue-800"
+                  className="h-7 px-2 text-[10px] border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:text-blue-300 dark:hover:bg-blue-800"
                 >
-                  <ChevronLeft className="w-4 h-4 mr-1" />
+                  <ChevronLeft className="w-3 h-3" />
                   Back
                 </Button>
               )}
               <Button
                 onClick={handleNext}
                 size="sm"
-                className={`${currentStep > 0 ? 'flex-1' : 'w-full'} h-9 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold text-sm shadow-lg`}
+                className={`${currentStep > 0 ? 'flex-1' : 'w-full'} h-7 px-2 text-[10px] bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-md`}
               >
                 {currentStep === steps.length - 1 ? 'Got it!' : (
                   <>
                     Next
-                    <ChevronRight className="w-4 h-4 ml-1" />
+                    <ChevronRight className="w-3 h-3 ml-0.5" />
                   </>
                 )}
               </Button>
