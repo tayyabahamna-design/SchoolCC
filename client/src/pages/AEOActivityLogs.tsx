@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Calendar, Clock, FileText, Award, CheckSquare, Trash2, Edit } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, FileText, Award, CheckSquare, Trash2, Edit, Eye } from 'lucide-react';
 import { useActivities } from '@/contexts/activities';
 import { toast } from 'sonner';
 
@@ -52,6 +52,14 @@ export default function AEOActivityLogs() {
   };
 
   const handleEdit = (id: string, activityType: 'monitoring' | 'mentoring') => {
+    if (activityType === 'monitoring') {
+      navigate(`/edit-monitoring-visit/${id}`);
+    } else if (activityType === 'mentoring') {
+      navigate(`/edit-mentoring-visit/${id}`);
+    }
+  };
+
+  const handleView = (id: string, activityType: 'monitoring' | 'mentoring') => {
     if (activityType === 'monitoring') {
       navigate(`/edit-monitoring-visit/${id}`);
     } else if (activityType === 'mentoring') {
@@ -253,27 +261,43 @@ export default function AEOActivityLogs() {
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${colors.badge}`}>
                         {item.status === 'submitted' ? '✓ Submitted' : 'Draft'}
                       </span>
-                      {(item.activityType === 'monitoring' || item.activityType === 'mentoring') && item.canDelete && (
+                      {(item.activityType === 'monitoring' || item.activityType === 'mentoring') && (
                         <>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                            onClick={() => handleEdit(item.id, item.activityType)}
-                            data-testid={`button-edit-${item.id}`}
+                            className="h-8 w-8 text-blue-600 hover:text-blue-800 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/30"
+                            onClick={() => handleView(item.id, item.activityType)}
+                            data-testid={`button-view-${item.id}`}
+                            title="View"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Eye className="w-4 h-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            onClick={() => handleDelete(item.id, item.activityType, item.aeoId)}
-                            disabled={deletingId === item.id}
-                            data-testid={`button-delete-${item.id}`}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          {item.canDelete && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-amber-600 hover:text-amber-800 hover:bg-amber-100 dark:text-amber-400 dark:hover:text-amber-300 dark:hover:bg-amber-900/30"
+                                onClick={() => handleEdit(item.id, item.activityType)}
+                                data-testid={`button-edit-${item.id}`}
+                                title="Edit"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-red-600 hover:text-red-800 hover:bg-red-100 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/30"
+                                onClick={() => handleDelete(item.id, item.activityType, item.aeoId)}
+                                disabled={deletingId === item.id}
+                                data-testid={`button-delete-${item.id}`}
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </>
+                          )}
                         </>
                       )}
                     </div>
