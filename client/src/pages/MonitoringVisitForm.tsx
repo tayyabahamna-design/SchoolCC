@@ -206,21 +206,18 @@ export default function MonitoringVisitForm({ onClose }: Props) {
     });
   };
 
-  const calculatePercentages = () => {
-    // Calculate teacher attendance percentage
-    if (formData.teacherTotal > 0) {
-      const pct = Math.min(100, Math.round((formData.teacherPresent / formData.teacherTotal) * 100));
-      handleInputChange('teacherPercentage', pct);
-    } else {
-      handleInputChange('teacherPercentage', 0);
-    }
-    // Calculate student attendance percentage
-    if (formData.studentTotal > 0) {
-      const pct = Math.min(100, Math.round((formData.studentPresent / formData.studentTotal) * 100));
-      handleInputChange('studentPercentage', pct);
-    } else {
-      handleInputChange('studentPercentage', 0);
-    }
+  const updateTeacherData = (field: 'teacherTotal' | 'teacherPresent', value: number) => {
+    const total = field === 'teacherTotal' ? value : formData.teacherTotal;
+    const present = field === 'teacherPresent' ? value : formData.teacherPresent;
+    const pct = total > 0 ? Math.min(100, Math.round((present / total) * 100)) : 0;
+    setFormData(prev => ({ ...prev, [field]: value, teacherPercentage: pct }));
+  };
+
+  const updateStudentData = (field: 'studentTotal' | 'studentPresent', value: number) => {
+    const total = field === 'studentTotal' ? value : formData.studentTotal;
+    const present = field === 'studentPresent' ? value : formData.studentPresent;
+    const pct = total > 0 ? Math.min(100, Math.round((present / total) * 100)) : 0;
+    setFormData(prev => ({ ...prev, [field]: value, studentPercentage: pct }));
   };
 
   const validateCurrentStep = (): boolean => {
@@ -517,8 +514,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
                 value={formData.teacherTotal ?? ''}
                 onChange={(e) => {
                   const val = e.target.value === '' ? 0 : parseInt(e.target.value);
-                  handleInputChange('teacherTotal', isNaN(val) ? 0 : val);
-                  setTimeout(calculatePercentages, 0);
+                  updateTeacherData('teacherTotal', isNaN(val) ? 0 : val);
                 }}
                 data-testid="input-teacher-total"
               />
@@ -531,8 +527,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
                 value={formData.teacherPresent ?? ''}
                 onChange={(e) => {
                   const val = e.target.value === '' ? 0 : parseInt(e.target.value);
-                  handleInputChange('teacherPresent', isNaN(val) ? 0 : val);
-                  setTimeout(calculatePercentages, 0);
+                  updateTeacherData('teacherPresent', isNaN(val) ? 0 : val);
                 }}
                 data-testid="input-teacher-present"
               />
@@ -571,8 +566,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
                 value={formData.studentTotal ?? ''}
                 onChange={(e) => {
                   const val = e.target.value === '' ? 0 : parseInt(e.target.value);
-                  handleInputChange('studentTotal', isNaN(val) ? 0 : val);
-                  setTimeout(calculatePercentages, 0);
+                  updateStudentData('studentTotal', isNaN(val) ? 0 : val);
                 }}
                 data-testid="input-student-total"
               />
@@ -585,8 +579,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
                 value={formData.studentPresent ?? ''}
                 onChange={(e) => {
                   const val = e.target.value === '' ? 0 : parseInt(e.target.value);
-                  handleInputChange('studentPresent', isNaN(val) ? 0 : val);
-                  setTimeout(calculatePercentages, 0);
+                  updateStudentData('studentPresent', isNaN(val) ? 0 : val);
                 }}
                 data-testid="input-student-present"
               />
