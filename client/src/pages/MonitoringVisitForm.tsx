@@ -540,7 +540,7 @@ export default function MonitoringVisitForm({ onClose }: Props) {
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">Percentage</label>
               <div className="px-3 py-2 border border-input rounded-md bg-muted text-muted-foreground">
-                {formData.teacherPercentage || 0}%
+                {formData.teacherPercentage ?? 0}%
               </div>
             </div>
           </div>
