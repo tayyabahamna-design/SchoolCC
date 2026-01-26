@@ -264,9 +264,10 @@ export default function MonitoringVisitForm({ onClose }: Props) {
       const currentTime = now.toTimeString().slice(0, 5);
 
       if (isEditMode && visitId) {
-        // UPDATE existing visit
+        // UPDATE existing visit - exclude submittedAt to prevent date conversion issues
+        const { submittedAt, createdAt, id, ...updateFields } = formData as any;
         const visitData = {
-          ...formData,
+          ...updateFields,
           evidence,
           voiceNoteTranscription,
         };

@@ -2327,6 +2327,27 @@ export async function registerRoutes(
     }
   });
 
+  app.delete("/api/activities/monitoring/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { aeoId } = req.body;
+      
+      if (!aeoId) {
+        return res.status(400).json({ error: "aeoId is required" });
+      }
+      
+      const deleted = await storage.deleteMonitoringVisit(id, aeoId);
+      if (!deleted) {
+        return res.status(403).json({ error: "Not authorized to delete this visit or visit not found" });
+      }
+      
+      res.json({ success: true, message: "Monitoring visit deleted successfully" });
+    } catch (error: any) {
+      console.error("Monitoring visit delete error:", error?.message || error);
+      res.status(500).json({ error: "Failed to delete monitoring visit", details: error?.message || String(error) });
+    }
+  });
+
   // Mentoring Visit endpoints
   app.post("/api/activities/mentoring", async (req, res) => {
     try {
@@ -2385,6 +2406,27 @@ export async function registerRoutes(
     } catch (error: any) {
       console.error("Mentoring visit update error:", error?.message || error);
       res.status(400).json({ error: "Failed to update mentoring visit", details: error?.message || String(error) });
+    }
+  });
+
+  app.delete("/api/activities/mentoring/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { aeoId } = req.body;
+      
+      if (!aeoId) {
+        return res.status(400).json({ error: "aeoId is required" });
+      }
+      
+      const deleted = await storage.deleteMentoringVisit(id, aeoId);
+      if (!deleted) {
+        return res.status(403).json({ error: "Not authorized to delete this visit or visit not found" });
+      }
+      
+      res.json({ success: true, message: "Mentoring visit deleted successfully" });
+    } catch (error: any) {
+      console.error("Mentoring visit delete error:", error?.message || error);
+      res.status(500).json({ error: "Failed to delete mentoring visit", details: error?.message || String(error) });
     }
   });
 

@@ -154,6 +154,7 @@ export interface IStorage {
   getMonitoringVisitsByAeo(aeoId: string): Promise<MonitoringVisit[]>;
   getAllMonitoringVisits(): Promise<MonitoringVisit[]>;
   updateMonitoringVisit(id: string, visit: Partial<InsertMonitoringVisit>): Promise<MonitoringVisit>;
+  deleteMonitoringVisit(id: string, aeoId: string): Promise<boolean>;
 
   // Mentoring Visit operations
   createMentoringVisit(visit: InsertMentoringVisit): Promise<MentoringVisit>;
@@ -161,6 +162,7 @@ export interface IStorage {
   getMentoringVisitsByAeo(aeoId: string): Promise<MentoringVisit[]>;
   getAllMentoringVisits(): Promise<MentoringVisit[]>;
   updateMentoringVisit(id: string, visit: Partial<InsertMentoringVisit>): Promise<MentoringVisit>;
+  deleteMentoringVisit(id: string, aeoId: string): Promise<boolean>;
 
   // Office Visit operations
   createOfficeVisit(visit: InsertOfficeVisit): Promise<OfficeVisit>;
@@ -924,6 +926,15 @@ export class DBStorage implements IStorage {
     return result[0];
   }
 
+  async deleteMonitoringVisit(id: string, aeoId: string): Promise<boolean> {
+    const visit = await this.getMonitoringVisitById(id);
+    if (!visit || visit.aeoId !== aeoId) {
+      return false;
+    }
+    await db.delete(monitoringVisits).where(eq(monitoringVisits.id, id));
+    return true;
+  }
+
   // Mentoring Visit operations
   async createMentoringVisit(visit: InsertMentoringVisit): Promise<MentoringVisit> {
     const result = await db.insert(mentoringVisits).values(visit as any).returning();
@@ -957,6 +968,15 @@ export class DBStorage implements IStorage {
       .where(eq(mentoringVisits.id, id))
       .returning();
     return result[0];
+  }
+
+  async deleteMentoringVisit(id: string, aeoId: string): Promise<boolean> {
+    const visit = await this.getMentoringVisitById(id);
+    if (!visit || visit.aeoId !== aeoId) {
+      return false;
+    }
+    await db.delete(mentoringVisits).where(eq(mentoringVisits.id, id));
+    return true;
   }
 
   // Office Visit operations

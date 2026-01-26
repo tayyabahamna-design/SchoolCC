@@ -1,14 +1,17 @@
+import { useState } from 'react';
 import { useAuth } from '@/contexts/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useLocation } from 'wouter';
-import { ArrowLeft, Calendar, Clock, FileText, Award, CheckSquare } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, FileText, Award, CheckSquare, Trash2, Edit } from 'lucide-react';
 import { useActivities } from '@/contexts/activities';
+import { toast } from 'sonner';
 
 export default function AEOActivityLogs() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
-  const { getAllActivities } = useActivities();
+  const { getAllActivities, refreshActivities } = useActivities();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const activities = getAllActivities();
 
   if (!user || user.role !== 'AEO') {
@@ -16,38 +19,94 @@ export default function AEOActivityLogs() {
     return null;
   }
 
+  const handleDelete = async (id: string, activityType: 'monitoring' | 'mentoring', aeoId: string) => {
+    if (!user?.id || user.id !== aeoId) {
+      toast.error('You can only delete your own forms');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to delete this form? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      const response = await fetch(`/api/activities/${activityType}/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aeoId: user.id }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete');
+      }
+
+      toast.success('Form deleted successfully');
+      refreshActivities();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete form');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleEdit = (id: string, activityType: 'monitoring' | 'mentoring') => {
+    if (activityType === 'monitoring') {
+      navigate(`/edit-monitoring-visit/${id}`);
+    } else if (activityType === 'mentoring') {
+      navigate(`/edit-mentoring-visit/${id}`);
+    }
+  };
+
   const allItems = [
     ...activities.monitoring.map((item) => ({
+      id: item.id,
+      aeoId: item.aeoId,
+      activityType: 'monitoring' as const,
       type: 'Monitoring Visit',
       date: item.visitDate,
       school: item.schoolName,
       status: item.status,
       icon: 'monitor',
       color: 'blue',
+      canDelete: item.aeoId === user?.id,
     })),
     ...activities.mentoring.map((item) => ({
+      id: item.id,
+      aeoId: item.aeoId,
+      activityType: 'mentoring' as const,
       type: 'Mentoring Visit',
       date: item.visitDate,
       school: item.schoolName,
       status: item.status,
       icon: 'award',
       color: 'purple',
+      canDelete: item.aeoId === user?.id,
     })),
     ...activities.office.map((item) => ({
+      id: item.id,
+      aeoId: item.aeoId,
+      activityType: 'office' as const,
       type: 'Office Visit',
       date: item.visitDate,
       school: '-',
       status: item.status,
       icon: 'building',
       color: 'emerald',
+      canDelete: false,
     })),
     ...activities.other.map((item) => ({
+      id: item.id,
+      aeoId: item.aeoId,
+      activityType: 'other' as const,
       type: item.activityType,
       date: item.activityDate,
       school: '-',
       status: item.status,
       icon: 'checkmark',
       color: 'slate',
+      canDelete: false,
     })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
@@ -190,10 +249,33 @@ export default function AEOActivityLogs() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="flex items-center gap-2">
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${colors.badge}`}>
                         {item.status === 'submitted' ? '✓ Submitted' : 'Draft'}
                       </span>
+                      {(item.activityType === 'monitoring' || item.activityType === 'mentoring') && item.canDelete && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            onClick={() => handleEdit(item.id, item.activityType)}
+                            data-testid={`button-edit-${item.id}`}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={() => handleDelete(item.id, item.activityType, item.aeoId)}
+                            disabled={deletingId === item.id}
+                            data-testid={`button-delete-${item.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </Card>
